@@ -1,36 +1,137 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Project Name
 
-## Getting Started
+JOOAV - A modern Inventory management application built with **Next.js (v15+)**, **TypeScript**, **Tailwind CSS**, and **shadcn/ui**.
 
-First, run the development server:
+The project follows best practices for scalability, testing, theming, and environment-based configuration, with support for **staging** and **production** deployments.
+
+---
+
+## 🛠 Tech Stack
+
+**Frontend**
+- Next.js (v15+)
+- TypeScript
+- Tailwind CSS (v4)
+- shadcn/ui
+- Lucide Icons
+
+**State & Data**
+- React Query (server state)
+- Redux Toolkit (local/UI state)
+- Axios (API client with interceptors)
+
+**Forms & Validation**
+- React Hook Form
+- Zod
+
+**Testing**
+- Jest (unit & integration tests)
+- React Testing Library
+- jsdom
+- Playwright (E2E)
+
+**Deployment**
+- Vercel
+
+---
+
+## 🚀 Installation
+
+### Prerequisites
+- Node.js (v18+ recommended)
+- npm
+
+### Install dependencies
+```bash
+npm install
+npm run dev
+
+```
+### The app will be available at:
+http://localhost:3000
+
+
+
+## Environment Variables
+
+This project uses environment variables for configuration.
+
+### Required Variables
+
+| Variable | Description | Example |
+|--------|------------|--------|
+| NEXT_PUBLIC_API_BASE_URL | Backend API base URL | http://localhost:4000 |
+| NEXT_PUBLIC_ENV | App environment (dev/staging/prod) | dev |
+
+### Setup
+
+1. Copy `.env.example` to `.env.local`
+2. Fill in the required values
+3. Restart the dev server
+
+
+src/
+├─ app/                # Next.js App Router (routes, layouts)
+│  ├─ layout.tsx
+│  ├─ page.tsx
+│  ├─ globals.css      # Tailwind + design tokens
+│  └─ providers.tsx    # Global providers (theme, state, query)
+│
+├─ components/
+│  ├─ ui/              # shadcn/ui base components
+│  └─ shared/          # Reusable app components
+│
+├─ features/           # Feature-based modules
+│  ├─ auth/
+│  ├─ users/
+│  └─ cart/
+|
+├─ hooks/           # Reusable hooks
+│  ├─ auth/
+│  ├─ users/
+│  └─ cart/
+|
+├─ interfaces/    # interfaces
+│  ├─ auth/
+│  ├─ users/
+│  └─ cart/
+|
+├─ redux/           # State management
+│  ├─ slices/
+│     ├─ authSlice.ts
+│  ├─ hooks.ts/
+│  ├─ store.ts/
+│  └─ 
+|
+├─ schema/           # Form validations with zod
+│  ├─ auth/
+│  ├─ users/
+│  └─ cart/
+|
+├─ types/           # Data types
+│  ├─ auth/
+│  ├─ users/
+│  └─ cart/
+│
+├─ lib/
+│  ├─ axios.ts         # Axios instance & interceptors
+│  ├─ store.ts         # Redux store
+│  └─ queryClient.ts  # React Query client
+│
+├─ tests/
+│  ├─ unit/            # Unit tests
+│  └─ integration/    # Integration tests
+│
+└─ utils/
+   └─ helpers.ts     # Reusable functions
+
+
+
+## 🧪 Testing
+
+### Unit & Integration Tests (Jest)
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run test
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
