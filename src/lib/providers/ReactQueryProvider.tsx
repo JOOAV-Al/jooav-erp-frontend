@@ -2,7 +2,15 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+      queries: {
+        retry: 2,
+        staleTime: 1 * 60 * 60 * 1000,
+        // refetchInterval: 1800000,
+      },
+    },
+});
 
 export default function ReactQueryProvider({
   children,
