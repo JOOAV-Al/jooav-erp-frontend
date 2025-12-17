@@ -120,14 +120,14 @@
 :root {
 
     /* string */
-    --body: Garant Pro;
-    --cursive: String value;
-    --display: Garant Pro;
-    --heading: Garant Pro;
-    --mono: Suisse Int'l Mono;
- --sanserif: String value;
-    --serif: String value;
-    --subscript: Garant Pro;
+    --body: "Garant Pro";
+    --cursive: "String value";
+    --display: "Garant Pro";
+    --heading: "Garant Pro";
+    --mono: "Suisse Int'l Mono";
+    --sanserif: "String value";
+    --serif: "String value";
+    --subscript: "Garant Pro";
     --weight-heavy: semibold;
     --weight-lite: regular;
     --weight-normal: medium;
@@ -158,8 +158,10 @@
     --button-primary-background-hover: var(--blue-700);
     --button-primary-foreground: var(--blue-100);
     --button-secondary-background-hover: var(--cosmic-latte-700);
-    --button-secondary-backgrpund: var(--cosmic-latte-500);
-    --button-secondary-foregrpund: var(--gray-600);
+    /* start fix */
+    --button-secondary-background: var(--cosmic-latte-500);
+    --button-secondary-foreground: var(--gray-600);
+    /* end fix */
     --button-text-link: var(--orange-500);
     --button-text-link-hover: var(--orange-700);
     --icon-fill: var(--gray-600);
@@ -184,8 +186,10 @@
     --text-heading: var(--blue-800);
     --text-mono: var(--gray-600);
     --text-subscript: var(--gray-600);
-    --text-tag-acccent: var(--skyblue-500);
-    --text-tag-acccent-2: var(--yellow-500);
+    /* start fix */
+    --text-tag-accent: var(--skyblue-500);
+    --text-tag-accent-2: var(--yellow-500);
+    /* end fix */
     --text-tag-base: var(--gray-600);
     --text-tag-primary: var(--blue-500);
     --text-tag-secondary: var(--cosmic-latte-500);

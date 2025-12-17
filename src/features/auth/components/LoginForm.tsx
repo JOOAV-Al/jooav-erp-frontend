@@ -40,7 +40,7 @@ export function LoginForm() {
     <div className="w-full max-w-md">
       <FieldSet>
         <FieldGroup>
-          <Field>
+          <Field className="flex flex-col">
             <FieldLabel htmlFor="email">Email</FieldLabel>
             <Input
               id="email"
