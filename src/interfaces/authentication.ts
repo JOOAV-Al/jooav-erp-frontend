@@ -8,11 +8,3 @@ export interface User {
   profileImage: string | null;
   role: 'USER' | 'ADMIN' | 'SUPERADMIN';
 };
-
-
-export interface AuthState {
-  user: User | null;
-  token: string | null;
-  isAuthenticated: boolean;
-  isUserLoading: boolean;
-}
