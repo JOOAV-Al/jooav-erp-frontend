@@ -1,4 +1,4 @@
-# Project Name
+# Jooav-erp FE
 
 JOOAV - A modern Inventory management application built with **Next.js (v15+)**, **TypeScript**, **Tailwind CSS**, and **shadcn/ui**.
 
@@ -50,7 +50,7 @@ npm run dev
 ### The app will be available at:
 http://localhost:3000
 
-
+##Figma file: https://www.figma.com/design/JyCiUdPJ211qm8002nGxHg/JooavERP%E2%80%94Design?node-id=73-2&t=TIPqkE03iaqvAA0h-1
 
 ## Environment Variables
 
