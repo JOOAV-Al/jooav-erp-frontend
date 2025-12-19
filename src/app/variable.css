@@ -1,7 +1,6 @@
 /* primitive-colour */
 
 :root {
-
     /* color */
     --blue-100: hsl(215 83% 98%);
     --blue-200: hsl(216 82% 85%);
@@ -30,7 +29,7 @@
     --gray-100: hsl(0 0 100%);
     --gray-200: hsl(0 0 97%);
     --gray-300: hsl(0 0 93%);
-    --gray-400: hsl(0 0 93%);
+    --gray-400: hsl(0 0 60%);
     --gray-500: hsl(0 0 33%);
     --gray-600: hsl(0 0 20%);
     --gray-700: hsl(0 0 13%);
@@ -80,7 +79,6 @@
 /* primitive-integer */
 
 :root {
-
     /* number */
     --0rem: 0rem;
     --0-0625rem: 0.0625rem;
@@ -91,6 +89,7 @@
     --0-5rem: 0.5rem;
     --0-625rem: 0.625rem;
     --0-75rem: 0.75rem;
+    --0-8125rem: 0.8125rem;
     --0-875rem: 0.875rem;
     --1rem: 1rem;
     --1-125rem: 1.125rem;
@@ -102,7 +101,7 @@
     --3rem: 3rem;
     --3-5rem: 3.5rem;
     --4rem: 4rem;
-    --4-rem: 4.5rem;
+    --4-5rem: 4.5rem;
     --5rem: 5rem;
     --5-5rem: 5.5rem;
     --6rem: 6rem;
@@ -116,18 +115,16 @@
 }
 
 /* primitive-string */
-
 :root {
-
     /* string */
-    --body: Garant Pro;
-    --cursive: String value;
-    --display: Garant Pro;
-    --heading: Garant Pro;
-    --mono: Suisse Int'l Mono;
- --sanserif: String value;
-    --serif: String value;
-    --subscript: Garant Pro;
+    --body: "Garant Pro";
+    --cursive: "String value";
+    --display: "Garant Pro";
+    --heading: "Garant Pro";
+    --mono: "Suisse Int'l Mono";
+    --sanserif: "String value";
+    --serif: "String value";
+    --subscript: "Garant Pro";
     --weight-heavy: semibold;
     --weight-lite: regular;
     --weight-normal: medium;
@@ -136,7 +133,6 @@
 /* colour */
 
 :root {
-
     /* color */
     --border-accent: hsl(0 0 100%);
     --border-main: hsl(0 0 100%);
@@ -172,6 +168,8 @@
     --nominal-card-storey: var(--gray-200);
     --nominal-card-storey-hover: var(--gray-100);
     --nominal-foreground: var(--gray-100);
+    --nominal-input: var(--gray-100);
+    --nominal-input-hover: var(--gray-200);
     --states-danger: var(--error-500);
     --states-danger-hover: var(--error-700);
     --states-in-progress: var(--yellow-500);
@@ -180,6 +178,7 @@
     --states-warning: hsl(0 0 100%);
     --states-warning-hover: hsl(0 0 100%);
     --text-body: var(--gray-500);
+    --text-body-passive: var(--gray-400);
     --text-display: var(--blue-800);
     --text-heading: var(--blue-800);
     --text-mono: var(--gray-600);
@@ -194,7 +193,6 @@
 /* typography */
 
 :root {
-
     /* number */
     --leading-body: 0rem;
     --leading-card-body: 0rem;
@@ -211,13 +209,16 @@
     --letter-spacing-display: 0rem;
     --letter-spacing-heading: 0rem;
     --size-link: 0rem;
-    --size-tag: var(--0, 875rem);
-    --size-card-body: var(--1rem);
+    --size-button-label: var(--0-875rem);
+    --size-card-body: var(--0-875rem);
+    --size-tag: var(--0-875rem);
     --size-toast-body: var(--1rem);
-    --size-body: var(--1, 125rem);
-    --size-card-heading: var(--1, 5rem);
-    --size-toast-heading: var(--1, 5rem);
-    --size-heading: var(--1, 75rem);
+    --size-body: var(--1-125rem);
+    --size-h3: var(--1-25rem);
+    --size-card-heading: var(--1-5rem);
+    --size-toast-heading: var(--1-5rem);
+    --size-h2: var(--1-75rem);
+    --size-h1: var(--2rem);
     --size-display: var(--3rem);
     --weight-integer-body: var(--weight-500);
     --weight-integer-card-body: var(--weight-600);
@@ -246,11 +247,11 @@
     --weight-string-toast-heading: var(--weight-heavy);
 }
 
-/* spacing */
+/* numbers */
 
 :root {
-
     /* number */
+<<<<<<< HEAD
     --p-1: var(--0rem);
     --p-2: var(--0-1875rem);
     --p-3: var(--0-25rem);
@@ -269,6 +270,42 @@
     --radius-xl: var(--0-75rem);
     --radius-xxl: var(--1rem);
     --radius-xxxl: var(--1-25rem);
+=======
+    --grid-m-column: var(--0-5rem);
+    --grid-m-gutter: var(--0-5rem);
+    --grid-d-column: var(--0-75rem);
+    --grid-d-gutter: var(--0-75rem);
+    --grid-m-width: var(--1-5rem);
+    --grid-margin: var(--1-5rem);
+    --grid-d-width: var(--6rem);
+    --m--null: var(--0rem);
+    --m--sm: var(--1rem);
+    --m--main: var(--1-25rem);
+    --m--b: var(--1-5rem);
+    --m--t: var(--1-5rem);
+    --m--lg: var(--2rem);
+    --m--md: var(--2-5rem);
+    --m--xl: var(--4rem);
+    --p--1: var(--0rem);
+    --p--2: var(--0-1875rem);
+    --p--3: var(--0-25rem);
+    --p--4: var(--0-3125rem);
+    --p--5: var(--0-375rem);
+    --p--6: var(--0-5rem);
+    --p--sm: var(--0-5rem);
+    --p--md: var(--0-75rem);
+    --p--main: var(--1rem);
+    --p--lg: var(--1-25rem);
+    --p--xl: var(--1-5rem);
+    --p--xxl: var(--2rem);
+    --rd-sm: var(--0-1875rem);
+    --rd-main: var(--0-25rem);
+    --rd-md: var(--0-375rem);
+    --rd-lg: var(--0-5rem);
+    --rd-xl: var(--0-75rem);
+    --rd-xxl: var(--1rem);
+    --rd-xxxl: var(--1-25rem);
+>>>>>>> 2fd0f8a (src/app/variable.css)
     --sp-0: var(--0rem);
     --sp-1: var(--0-1875rem);
     --sp-2: var(--0-25rem);
@@ -282,5 +319,12 @@
     --sp-lg: var(--2rem);
     --sp-md: var(--2-5rem);
     --sp-xl: var(--4rem);
+<<<<<<< HEAD
     --sp-page-space: var(--12-5rem);
 }
+=======
+    --sp-pg-sp-sm: var(--8rem);
+    --sp-pg-sp-md: var(--10rem);
+    --sp-pg-sp-lg: var(--12-5rem);
+}
+>>>>>>> 2fd0f8a (src/app/variable.css)
