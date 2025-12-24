@@ -1,3 +1,4 @@
+import Cookies from "js-cookie";
 import { AuthState } from '@/features/auth/types';
 import { User } from '@/interfaces/authentication';
 import {createSlice, PayloadAction} from '@reduxjs/toolkit'
@@ -15,17 +16,18 @@ export const authSlice = createSlice({
   reducers: {
     setCredentials: ( state, action: PayloadAction<{token: string, user: User}>) => {
       state.user = action.payload.user;
-      if (action.payload.token) {
-        state.token = action.payload.token;
-      }
+      state.token = action.payload.token;
       state.isAuthenticated = true;
       state.isUserLoading = false
+      Cookies.set("authToken", action.payload.token, {
+        sameSite: "strict",
+      });
     },
     logout: (state) => {
+      state.isUserLoading = true;
       state.token = null;
       state.user = null;
       state.isAuthenticated = false;
-      state.isUserLoading = true;
     },
   }
 })

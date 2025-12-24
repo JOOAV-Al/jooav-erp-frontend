@@ -3,11 +3,10 @@
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-
 import { Button } from "@/components/ui/button";
 import {
   Field,
-  FieldDescription,
+  // FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
@@ -17,18 +16,20 @@ import { Input } from "@/components/ui/input";
 // import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useLogin } from "@/features/auth/services/auth.api";
 import { useRouter } from "next/navigation";
-import { useDispatch } from "react-redux";
-import { setCredentials } from "@/redux/slices/authSlice";
-import Image from "next/image";
+// import { useDispatch } from "react-redux";
+// import { setCredentials } from "@/redux/slices/authSlice";
+import AuthCardHeader from "@/features/auth/components/AuthCardHeader";
+import Cookies from "js-cookie"
+import PasswordInput from "@/features/auth/components/PasswordInput";
 
 const loginSchema = z.object({
   email: z.email("Enter a valid email"),
   password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
-export function LoginForm() {
+export function LoginForm({ toggleForm }: { toggleForm: () => void }) {
   const router = useRouter();
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -42,42 +43,39 @@ export function LoginForm() {
   const {
     handleSubmit,
     control,
-    formState: { isValid },
+    // formState: { isValid },
   } = form;
 
-  const { mutateAsync: login, isPending, error } = useLogin();
+  const { mutateAsync: login, isPending } = useLogin();
 
   const onSubmit = async (values: z.infer<typeof loginSchema>) => {
-    const response = await login(values);
-    dispatch(
-      setCredentials({
-        user: response?.data.user,
-        token: response?.data.token,
-      })
-    );
+    const { data } = await login(values);
+    // console.log(data)
+
+    Cookies.set("authToken", data.data.accessToken);
+    Cookies.set("refreshToken", data.data.refreshToken);
+
+    // dispatch(
+    //   setCredentials({
+    //     user: data.data.admin,
+    //     token: data.data.accessToken,
+    //   })
+    // );
     router.push("/dashboard");
   };
 
   return (
-    <div className="p-xl rounded-3xl mx-auto w-full max-w-105 bg-card flex flex-col gap-7 shadow-xl">
-      <div className="flex flex-col items-center">
-        <Image
-          src={"/auth/jooav-logo.svg"}
-          alt="JOOAV Logo"
-          width={90.7}
-          height={24}
-          className="py-xl"
-        />
-        <div className="flex flex-col items-center text-center gap-6 font-garantpro">
-          <h3 className="text-heading">Super-admin login</h3>
-          <p className="text-base text-card-foreground font-medium">
-            Log in with your admin credentials.
-          </p>
-        </div>
-      </div>
-      <FieldSet>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <FieldGroup>
+    <div className="p-xl rounded-3xl mx-auto w-full max-w-105 bg-card shadow-card flex flex-col gap-7 h-[530px]">
+      <AuthCardHeader
+        header="Super-admin login"
+        description="Log in with your admin credentials."
+      />
+      <FieldSet className="flex flex-1">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex flex-col flex-1"
+        >
+          <FieldGroup className="flex flex-col gap-7">
             {/* EMAIL */}
             <Controller
               control={control}
@@ -85,7 +83,7 @@ export function LoginForm() {
               render={({ field, fieldState }) => (
                 <div>
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel>Email</FieldLabel>
+                    <FieldLabel htmlFor="email">Email</FieldLabel>
                     <Input
                       {...field}
                       type="email"
@@ -108,11 +106,17 @@ export function LoginForm() {
                 <div>
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel>Password</FieldLabel>
-                    <Input
+                    {/* <Input
                       {...field}
+                      autoComplete="off"
                       type="password"
-                      placeholder="••••••••"
+                      placeholder="Enter password"
                       aria-invalid={fieldState.invalid}
+                    /> */}
+                    <PasswordInput
+                      field={field}
+                      placeholder="Enter password"
+                      ariaInvalid={fieldState.invalid}
                     />
                   </Field>
                   {fieldState.error && (
@@ -121,6 +125,16 @@ export function LoginForm() {
                 </div>
               )}
             />
+
+            <Button
+              type="button"
+              variant={"ghost"}
+              size={"ghost"}
+              className="w-fit h-fit p-0"
+              onClick={toggleForm}
+            >
+              Forgot Password?
+            </Button>
 
             {/* SERVER ERROR */}
             {/* {error && (
@@ -131,16 +145,13 @@ export function LoginForm() {
                 </AlertDescription>
               </Alert>
             )} */}
-
-            {/* SUBMIT */}
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={!isValid || isPending}
-            >
-              {isPending ? "Logging in..." : "Login"}
-            </Button>
           </FieldGroup>
+          <div className="mt-auto">
+            {/* SUBMIT */}
+            <Button type="submit" className="w-full mt-7" disabled={isPending}>
+              {isPending ? "Logging in..." : "Admin login"}
+            </Button>
+          </div>
         </form>
       </FieldSet>
     </div>

@@ -337,6 +337,31 @@
   --grid-d-width: var(--6rem);
 }
 
+/* Shadow Tokens */
+:root {
+  /* Input/Card elevation effect */
+  --shadow-input: 0px 0px 0px 2px rgba(0, 0, 0, 0.05),
+    0px 3px 2px 0px rgba(6, 16, 30, 0.08);
+
+  --shadow-card: 0px 0px 0px 2px rgba(0, 0, 0, 0.05),
+    0px 3px 2px 0px rgba(6, 16, 30, 0.08);
+
+  /* Additional common shadows (for future use) */
+  --shadow-sm: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0px 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0px 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0px 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0px 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0px 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0px 8px 10px -6px rgba(0, 0, 0, 0.1);
+
+  /* Button shadows (if needed) */
+  --shadow-button: 0px 1px 2px 0px rgba(0, 0, 0, 0.15),
+    0px 3px 2px 0px rgba(43, 111, 212, 0.25);
+  --shadow-button-hover: 0px 4px 8px 0px rgba(0, 0, 0, 0.1),
+    0px 3px 2px 0px rgba(6, 16, 30, 0.08);
+}
+
 /* ============================================
    TAILWIND THEME MAPPING
    Makes tokens available as Tailwind utilities
@@ -356,9 +381,8 @@
   --breakpoint-2xl: 1440px;
   --breakpoint-3xl: 2560px;
 
-
   /* ===== COLORS ===== */
-  
+
   /* Brand Colors */
   --color-brand-primary: var(--brand-primary);
   --color-brand-secondary: var(--brand-secondary);
@@ -458,19 +482,21 @@
   --color-destructive-foreground: var(--gray-100);
   --color-border: var(--border-stroke);
   --color-input: var(--border-stroke);
+  --color-nominal-input: var(--color-nominal-input);
+  --color-nominal-input-hover: var(--color-nominal-input-hover);
   --color-ring: var(--border-ring);
 
   /* ===== FONT SIZES (Tailwind-style naming) ===== */
   /* Use: text-xs, text-sm, text-base, text-lg, text-xl, etc. */
-  --font-size-xs: var(--size-tag);              /* 0.875rem - tags, labels */
-  --font-size-sm: var(--size-card-body);        /* 0.875rem - small text */
-  --font-size-base: var(--size-toast-body);     /* 1rem - base size */
-  --font-size-lg: var(--size-body);             /* 1.125rem - body text */
-  --font-size-xl: var(--size-h3);               /* 1.25rem - h3 */
-  --font-size-2xl: var(--size-card-heading);    /* 1.5rem - h2-level */
-  --font-size-3xl: var(--size-h2);              /* 1.75rem - h2 */
-  --font-size-4xl: var(--size-h1);              /* 2rem - h1 */
-  --font-size-5xl: var(--size-display);         /* 3rem - display */
+  --font-size-xs: var(--size-tag); /* 0.875rem - tags, labels */
+  --font-size-sm: var(--size-card-body); /* 0.875rem - small text */
+  --font-size-base: var(--size-toast-body); /* 1rem - base size */
+  --font-size-lg: var(--size-body); /* 1.125rem - body text */
+  --font-size-xl: var(--size-h3); /* 1.25rem - h3 */
+  --font-size-2xl: var(--size-card-heading); /* 1.5rem - h2-level */
+  --font-size-3xl: var(--size-h2); /* 1.75rem - h2 */
+  --font-size-4xl: var(--size-h1); /* 2rem - h1 */
+  --font-size-5xl: var(--size-display); /* 3rem - display */
 
   /* Semantic font sizes (alternative names) */
   --font-size-tag: var(--size-tag);
@@ -560,6 +586,17 @@
   --color-chart-3: oklch(0.398 0.07 227.392);
   --color-chart-4: oklch(0.828 0.189 84.429);
   --color-chart-5: oklch(0.769 0.188 70.08);
+
+  /* ===== BOX SHADOWS ===== */
+  /* Use: shadow-input, shadow-card, shadow-sm, shadow-lg */
+  --box-shadow-input: var(--shadow-input);
+  --box-shadow-card: var(--shadow-card);
+  --box-shadow-button: var(--shadow-button);
+  --box-shadow-button-hover: var(--shadow-button-hover);
+  --box-shadow-sm: var(--shadow-sm);
+  --box-shadow-md: var(--shadow-md);
+  --box-shadow-lg: var(--shadow-lg);
+  --box-shadow-xl: var(--shadow-xl);
 }
 
 /* ============================================
@@ -604,4 +641,38 @@
     line-height: var(--leading-heading);
     letter-spacing: var(--letter-spacing-heading);
   }
+}
+
+@layer utilities {
+  .shadow-input {
+    box-shadow: var(--shadow-input);
+  }
+
+  .shadow-input-focus {
+    box-shadow: var(--shadow-input), 0 0 0 2px hsl(var(--ring) / 0.5);
+  }
+
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+
+  .shadow-button {
+    box-shadow: var(--shadow-button);
+  }
+
+  .shadow-button-hover {
+    box-shadow: var(--shadow-button-hover);
+  }
+
+  .hover\:shadow-button-hover:hover {
+    box-shadow: var(--shadow-button-hover);
+  }
+}
+
+.force-white-toast {
+  color: white !important;
+}
+
+.force-white-toast * {
+  color: white !important;
 }
