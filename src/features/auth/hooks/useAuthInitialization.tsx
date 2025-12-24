@@ -3,9 +3,6 @@
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { useDispatch, useSelector } from "react-redux";
-// import { RootState } from "@/store";
-// import { useFetchCurrentUser } from "../dashboard/general";
-// import { logout, setCredentials } from "@/store/slices/authSlice";
 import { useRouter } from "next/navigation";
 import { jwtDecode } from "jwt-decode";
 import { normalizeRoleForRoute } from "@/lib/utils";
@@ -76,8 +73,7 @@ export const useAuthInit = (expectedRole: string) => {
       // 3) Check role compatibility
       const isRoleCompatible =
         role === expectedRole ||
-        (expectedRole === "ADMIN" && role === "SUPERADMIN") ||
-        (expectedRole === "GSUPERADMIN" && role === "GADMIN");
+        (expectedRole === "ADMIN" && role === "SUPERADMIN")
 
       if (!isRoleCompatible) {
         // Wrong role → send to *their* dashboard

@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ============================================
-   DESIGN TOKENS - From Designer
+   DESIGN TOKENS - From Designer (Updated)
    ============================================ */
 
 /* Primitive Color Tokens */
@@ -39,7 +39,7 @@
   --gray-100: hsl(0 0 100%);
   --gray-200: hsl(0 0 97%);
   --gray-300: hsl(0 0 93%);
-  --gray-400: hsl(0 0 93%);
+  --gray-400: hsl(0 0 60%);
   --gray-500: hsl(0 0 33%);
   --gray-600: hsl(0 0 20%);
   --gray-700: hsl(0 0 13%);
@@ -96,12 +96,14 @@
   --0rem: 0rem;
   --0-0625rem: 0.0625rem;
   --0-125rem: 0.125rem;
+  --0-1875rem: 0.1875rem;
   --0-25rem: 0.25rem;
   --0-3125rem: 0.3125rem;
   --0-375rem: 0.375rem;
   --0-5rem: 0.5rem;
   --0-625rem: 0.625rem;
   --0-75rem: 0.75rem;
+  --0-8125rem: 0.8125rem;
   --0-875rem: 0.875rem;
   --1rem: 1rem;
   --1-125rem: 1.125rem;
@@ -183,6 +185,8 @@
   --nominal-card-storey: var(--gray-200);
   --nominal-card-storey-hover: var(--gray-100);
   --nominal-foreground: var(--gray-100);
+  --nominal-input: var(--gray-100);
+  --nominal-input-hover: var(--gray-200);
 
   /* States */
   --states-danger: var(--error-500);
@@ -193,12 +197,13 @@
   --states-warning: hsl(0 0 100%);
   --states-warning-hover: hsl(0 0 100%);
 
-  /* Text */
-  --text-body: var(--gray-500);
-  --text-display: var(--blue-800);
-  --text-heading: var(--blue-800);
-  --text-mono: var(--gray-600);
-  --text-subscript: var(--gray-600);
+  /* Text Colors */
+  --text-body-color: var(--gray-500);
+  --text-body-passive: var(--gray-400);
+  --text-display-color: var(--blue-800);
+  --text-heading-color: var(--blue-800);
+  --text-mono-color: var(--gray-600);
+  --text-subscript-color: var(--gray-600);
   --text-tag-accent: var(--skyblue-500);
   --text-tag-accent-2: var(--yellow-500);
   --text-tag-base: var(--gray-600);
@@ -208,6 +213,7 @@
 
 /* Semantic Typography Tokens */
 :root {
+  /* Font Families */
   --family-body: var(--body);
   --family-card-body: var(--body);
   --family-card-heading: var(--heading);
@@ -215,16 +221,20 @@
   --family-heading: var(--heading);
   --family-subscript: var(--subscript);
 
-  --size-link: 1rem;
+  /* Font Sizes */
   --size-tag: var(--0-875rem);
-  --size-card-body: var(--1rem);
+  --size-button-label: var(--0-875rem);
+  --size-card-body: var(--0-875rem);
   --size-toast-body: var(--1rem);
   --size-body: var(--1-125rem);
+  --size-h3: var(--1-25rem);
   --size-card-heading: var(--1-5rem);
   --size-toast-heading: var(--1-5rem);
-  --size-heading: var(--1-75rem);
+  --size-h2: var(--1-75rem);
+  --size-h1: var(--2rem);
   --size-display: var(--3rem);
 
+  /* Font Weights */
   --weight-integer-body: var(--weight-500);
   --weight-integer-card-body: var(--weight-600);
   --weight-integer-display: var(--weight-600);
@@ -245,6 +255,7 @@
   --weight-string-toast-body: var(--weight-normal);
   --weight-string-toast-heading: var(--weight-heavy);
 
+  /* Line Heights - Updated with proper values */
   --leading-body: 1.5;
   --leading-card-body: 1.5;
   --leading-card-heading: 1.2;
@@ -255,6 +266,7 @@
   --leading-toast: 1.5;
   --leading-toast-body: 1.5;
 
+  /* Letter Spacing - Updated with proper values */
   --letter-spacing-body: 0;
   --letter-spacing-card-body: 0;
   --letter-spacing-card-heading: -0.01em;
@@ -264,8 +276,10 @@
 
 /* Semantic Spacing Tokens */
 :root {
+  /* Padding */
+  --p-0: var(--0rem);
   --p-1: var(--0rem);
-  --p-2: var(--0-125rem);
+  --p-2: var(--0-1875rem);
   --p-3: var(--0-25rem);
   --p-4: var(--0-375rem);
   --p-5: var(--0-5rem);
@@ -276,7 +290,8 @@
   --p-xl: var(--1-25rem);
   --p-mt: var(--1-5rem);
 
-  --radius-sm: var(--0-125rem);
+  /* Border Radius */
+  --radius-sm: var(--0-1875rem);
   --radius-main: var(--0-25rem);
   --radius-md: var(--0-375rem);
   --radius-lg: var(--0-5rem);
@@ -284,8 +299,9 @@
   --radius-xxl: var(--1rem);
   --radius-xxxl: var(--1-25rem);
 
+  /* Spacing (margins/gaps) */
   --sp-0: var(--0rem);
-  --sp-1: var(--0-125rem);
+  --sp-1: var(--0-1875rem);
   --sp-2: var(--0-25rem);
   --sp-3: var(--0-3125rem);
   --sp-4: var(--0-375rem);
@@ -297,25 +313,84 @@
   --sp-lg: var(--2rem);
   --sp-md: var(--2-5rem);
   --sp-xl: var(--4rem);
-  --sp-page-space: var(--12-5rem);
+  --sp-pg-sm: var(--8rem);
+  --sp-pg-md: var(--10rem);
+  --sp-pg-lg: var(--12-5rem);
+
+  /* Margins (from designer) */
+  --m-null: var(--0rem);
+  --m-sm: var(--1rem);
+  --m-main: var(--1-25rem);
+  --m-b: var(--1-5rem);
+  --m-t: var(--1-5rem);
+  --m-lg: var(--2rem);
+  --m-md: var(--2-5rem);
+  --m-xl: var(--4rem);
+
+  /* Grid System */
+  --grid-m-column: var(--0-5rem);
+  --grid-m-gutter: var(--0-5rem);
+  --grid-d-column: var(--0-75rem);
+  --grid-d-gutter: var(--0-75rem);
+  --grid-m-width: var(--1-5rem);
+  --grid-margin: var(--1-5rem);
+  --grid-d-width: var(--6rem);
+}
+
+/* Shadow Tokens */
+:root {
+  /* Input/Card elevation effect */
+  --shadow-input: 0px 0px 0px 2px rgba(0, 0, 0, 0.05),
+    0px 3px 2px 0px rgba(6, 16, 30, 0.08);
+
+  --shadow-card: 0px 0px 0px 2px rgba(0, 0, 0, 0.05),
+    0px 3px 2px 0px rgba(6, 16, 30, 0.08);
+
+  /* Additional common shadows (for future use) */
+  --shadow-sm: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0px 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0px 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0px 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0px 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0px 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0px 8px 10px -6px rgba(0, 0, 0, 0.1);
+
+  /* Button shadows (if needed) */
+  --shadow-button: 0px 1px 2px 0px rgba(0, 0, 0, 0.15),
+    0px 3px 2px 0px rgba(43, 111, 212, 0.25);
+  --shadow-button-hover: 0px 4px 8px 0px rgba(0, 0, 0, 0.1),
+    0px 3px 2px 0px rgba(6, 16, 30, 0.08);
 }
 
 /* ============================================
-   TAILWIND THEME MAPPING (COMPLETE)
-   Replace your existing @theme inline { } with this
+   TAILWIND THEME MAPPING
+   Makes tokens available as Tailwind utilities
    ============================================ */
 
 @theme inline {
+  /* ===== BREAKPOINTS ===== */
+  --breakpoint-sml: 280px;
+  --breakpoint-sm: 375px;
+  --breakpoint-smd: 425px;
+  --breakpoint-mdl: 600px;
+  --breakpoint-md: 768px;
+  --breakpoint-mdx: 860px;
+  --breakpoint-mdxl: 940px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1440px;
+  --breakpoint-3xl: 2560px;
+
   /* ===== COLORS ===== */
 
-  /* Brand Colors - use with bg-brand-primary, text-brand-accent, etc */
+  /* Brand Colors */
   --color-brand-primary: var(--brand-primary);
   --color-brand-secondary: var(--brand-secondary);
   --color-brand-accent: var(--brand-accent);
   --color-brand-accent-2: var(--brand-accent-2);
   --color-brand-signal: var(--brand-signal);
 
-  /* Primitive Color Palettes - use with bg-blue-500, text-gray-600, etc */
+  /* Primitive Color Palettes */
   --color-blue-100: var(--blue-100);
   --color-blue-200: var(--blue-200);
   --color-blue-300: var(--blue-300);
@@ -388,13 +463,13 @@
   --color-cosmic-latte-700: var(--cosmic-latte-700);
   --color-cosmic-latte-800: var(--cosmic-latte-800);
 
-  /* Shadcn Standard Colors - use with bg-background, bg-primary, etc */
+  /* Semantic UI Colors */
   --color-background: var(--nominal-background);
-  --color-foreground: var(--text-body);
+  --color-foreground: var(--text-body-color);
   --color-card: var(--nominal-card-background);
-  --color-card-foreground: var(--text-body);
+  --color-card-foreground: var(--text-body-color);
   --color-popover: var(--nominal-card-background);
-  --color-popover-foreground: var(--text-body);
+  --color-popover-foreground: var(--text-body-color);
   --color-primary: var(--button-primary-background);
   --color-primary-foreground: var(--button-primary-foreground);
   --color-secondary: var(--button-secondary-background);
@@ -407,10 +482,49 @@
   --color-destructive-foreground: var(--gray-100);
   --color-border: var(--border-stroke);
   --color-input: var(--border-stroke);
+  --color-nominal-input: var(--color-nominal-input);
+  --color-nominal-input-hover: var(--color-nominal-input-hover);
   --color-ring: var(--border-ring);
 
+  /* ===== FONT SIZES (Tailwind-style naming) ===== */
+  /* Use: text-xs, text-sm, text-base, text-lg, text-xl, etc. */
+  --font-size-xs: var(--size-tag); /* 0.875rem - tags, labels */
+  --font-size-sm: var(--size-card-body); /* 0.875rem - small text */
+  --font-size-base: var(--size-toast-body); /* 1rem - base size */
+  --font-size-lg: var(--size-body); /* 1.125rem - body text */
+  --font-size-xl: var(--size-h3); /* 1.25rem - h3 */
+  --font-size-2xl: var(--size-card-heading); /* 1.5rem - h2-level */
+  --font-size-3xl: var(--size-h2); /* 1.75rem - h2 */
+  --font-size-4xl: var(--size-h1); /* 2rem - h1 */
+  --font-size-5xl: var(--size-display); /* 3rem - display */
+
+  /* Semantic font sizes (alternative names) */
+  --font-size-tag: var(--size-tag);
+  --font-size-button: var(--size-button-label);
+  --font-size-card-body: var(--size-card-body);
+  --font-size-toast: var(--size-toast-body);
+  --font-size-body: var(--size-body);
+  --font-size-h3: var(--size-h3);
+  --font-size-card-heading: var(--size-card-heading);
+  --font-size-h2: var(--size-h2);
+  --font-size-h1: var(--size-h1);
+  --font-size-display: var(--size-display);
+
   /* ===== SPACING ===== */
-  /* Use with p-main, m-lg, gap-sm, space-x-md, etc */
+  --spacing-0: var(--p-0);
+  --spacing-1: var(--p-1);
+  --spacing-2: var(--p-2);
+  --spacing-3: var(--p-3);
+  --spacing-4: var(--p-4);
+  --spacing-5: var(--p-5);
+  --spacing-sm: var(--p-sm);
+  --spacing-md: var(--p-md);
+  --spacing-lg: var(--p-lg);
+  --spacing-main: var(--p-main);
+  --spacing-xl: var(--p-xl);
+  --spacing-mt: var(--p-mt);
+
+  /* ===== GAPS ===== */
   --gap-0: var(--sp-0);
   --gap-1: var(--sp-1);
   --gap-2: var(--sp-2);
@@ -426,40 +540,39 @@
   --gap-xl: var(--sp-xl);
 
   /* ===== BORDER RADIUS ===== */
-  /* Use with rounded-sm, rounded-main, rounded-lg, etc */
   --radius-sm: var(--radius-sm);
-  --radius-main: var(--radius-main);
   --radius-md: var(--radius-md);
   --radius-lg: var(--radius-lg);
   --radius-xl: var(--radius-xl);
-  --radius-xxl: var(--radius-xxl);
-  --radius-xxxl: var(--radius-xxxl);
+  --radius-2xl: var(--radius-xxl);
+  --radius-3xl: var(--radius-xxxl);
+  --radius-main: var(--radius-main);
 
   /* ===== TYPOGRAPHY ===== */
-  /* Font Families - use with font-body, font-heading, font-mono */
-  --font-body: var(--family-body);
-  --font-heading: var(--family-heading);
-  --font-display: var(--family-display);
-  --font-mono: var(--mono);
+  --font-family-body: var(--family-body);
+  --font-family-heading: var(--family-heading);
+  --font-family-display: var(--family-display);
+  /* ===== BREAKPOINTS ===== */
+  --font-sans: var(--font-geist-sans);
+  --font-family-mono: var(--mono);
+  --font-mono: var(--font-geist-mono);
+  --font-garantpro: var(--font-garantpro);
 
-  /* Font Sizes - use with text-body, text-heading, text-display */
-  --font-size-tag: var(--size-tag);
-  --font-size-body: var(--size-body);
-  --font-size-card-body: var(--size-card-body);
-  --font-size-card-heading: var(--size-card-heading);
-  --font-size-heading: var(--size-heading);
-  --font-size-display: var(--size-display);
-
-  /* Font Weights - use with font-normal, font-medium, font-semibold */
   --font-weight-light: var(--weight-lite);
   --font-weight-normal: var(--weight-normal);
   --font-weight-medium: var(--weight-normal);
   --font-weight-semibold: var(--weight-heavy);
   --font-weight-bold: var(--weight-heavy);
 
-  /* ===== SIDEBAR (existing shadcn) ===== */
+  --line-height-none: 1;
+  --line-height-tight: 1.1;
+  --line-height-snug: 1.2;
+  --line-height-normal: 1.3;
+  --line-height-relaxed: 1.5;
+
+  /* ===== SIDEBAR ===== */
   --color-sidebar: var(--nominal-card-background);
-  --color-sidebar-foreground: var(--text-body);
+  --color-sidebar-foreground: var(--text-body-color);
   --color-sidebar-primary: var(--brand-primary);
   --color-sidebar-primary-foreground: var(--button-primary-foreground);
   --color-sidebar-accent: var(--brand-accent);
@@ -467,13 +580,28 @@
   --color-sidebar-border: var(--border-stroke);
   --color-sidebar-ring: var(--border-ring);
 
-  /* ===== CHARTS (existing) ===== */
+  /* ===== CHARTS ===== */
   --color-chart-1: oklch(0.646 0.222 41.116);
   --color-chart-2: oklch(0.6 0.118 184.704);
   --color-chart-3: oklch(0.398 0.07 227.392);
   --color-chart-4: oklch(0.828 0.189 84.429);
   --color-chart-5: oklch(0.769 0.188 70.08);
+
+  /* ===== BOX SHADOWS ===== */
+  /* Use: shadow-input, shadow-card, shadow-sm, shadow-lg */
+  --box-shadow-input: var(--shadow-input);
+  --box-shadow-card: var(--shadow-card);
+  --box-shadow-button: var(--shadow-button);
+  --box-shadow-button-hover: var(--shadow-button-hover);
+  --box-shadow-sm: var(--shadow-sm);
+  --box-shadow-md: var(--shadow-md);
+  --box-shadow-lg: var(--shadow-lg);
+  --box-shadow-xl: var(--shadow-xl);
 }
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
 
 @layer base {
   * {
@@ -488,142 +616,63 @@
   }
 
   h1 {
-    font-family: var(--family-display);
-    font-size: var(--size-display);
-    font-weight: var(--weight-integer-display);
-    color: var(--text-display);
-    line-height: var(--leading-display);
-    letter-spacing: var(--letter-spacing-display);
+    font-family: var(--font-garantpro);
+    font-size: var(--size-h1);
+    font-weight: var(--weight-integer-heading);
+    color: var(--text-heading-color);
+    line-height: var(--leading-heading);
+    letter-spacing: var(--letter-spacing-heading);
   }
 
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    font-family: var(--family-heading);
-    font-size: var(--size-heading);
+  h2 {
+    font-family: var(--font-garantpro);
+    font-size: var(--size-h2);
     font-weight: var(--weight-integer-heading);
-    color: var(--text-heading);
+    color: var(--text-heading-color);
+    line-height: var(--leading-heading);
+    letter-spacing: var(--letter-spacing-heading);
+  }
+
+  h3 {
+    font-family: var(--font-garantpro);
+    font-size: var(--size-h3);
+    font-weight: var(--weight-integer-display);
+    color: var(--text-heading-color);
     line-height: var(--leading-heading);
     letter-spacing: var(--letter-spacing-heading);
   }
 }
 
-/* @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-} */
-
-/* :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-} */
-
-/* .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
-} */
-
-/* @layer base {
-  * {
-    @apply border-border outline-ring/50;
+@layer utilities {
+  .shadow-input {
+    box-shadow: var(--shadow-input);
   }
-  body {
-    @apply bg-background text-foreground;
+
+  .shadow-input-focus {
+    box-shadow: var(--shadow-input), 0 0 0 2px hsl(var(--ring) / 0.5);
   }
-} */
+
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+
+  .shadow-button {
+    box-shadow: var(--shadow-button);
+  }
+
+  .shadow-button-hover {
+    box-shadow: var(--shadow-button-hover);
+  }
+
+  .hover\:shadow-button-hover:hover {
+    box-shadow: var(--shadow-button-hover);
+  }
+}
+
+.force-white-toast {
+  color: white !important;
+}
+
+.force-white-toast * {
+  color: white !important;
+}

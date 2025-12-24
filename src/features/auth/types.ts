@@ -1,9 +1,15 @@
 import { User } from "@/interfaces/authentication";
 
-// src/features/auth/types.ts
 export interface LoginPayload {
   email: string;
   password: string;
+}
+export interface LoginResponse {
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+  tokenType: string;
+  user: User;
 }
 
 export interface AuthState {
