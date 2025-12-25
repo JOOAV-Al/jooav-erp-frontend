@@ -105,7 +105,7 @@ describe("ResetPasswordForm", () => {
     await waitFor(() => {
       expect(resetPasswordMock).toHaveBeenCalledWith({
         token: "mock-otp-token",
-        newPassword: "password123",
+        password: "password123",
       });
     });
 

@@ -12,6 +12,14 @@ export interface User {
   status: string;
   avatar: string | null;
   role: Role;
+  assignedRegions: [];
+  permissions: {
+    canManageManufacturers: boolean,
+    canApproveSMEs: boolean,
+    canManageSubAdmins: boolean,
+    canAccessAnalytics: boolean,
+    canModifySystemConfig: boolean
+  },
   lastLogin: string;
   createdAt: string;
   updatedAt: string;

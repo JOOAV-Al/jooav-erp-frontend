@@ -23,10 +23,10 @@ import PasswordInput from "@/features/auth/components/PasswordInput";
 
 const useResetPasswordSchema = z
   .object({
-    newPassword: z.string().min(8, "Password must be at least 8 characters"),
+    password: z.string().min(8, "Password must be at least 8 characters"),
     confirmPassword: z.string().min(8, "Password mismatch"),
   })
-  .refine((data) => data.confirmPassword === data.newPassword, {
+  .refine((data) => data.confirmPassword === data.password, {
     message: "Passwords do not match",
     path: ["confirmPassword"],
   });
@@ -41,7 +41,7 @@ export function ResetPasswordForm() {
     resolver: zodResolver(useResetPasswordSchema),
     mode: "onChange",
     defaultValues: {
-      newPassword: "",
+      password: "",
       confirmPassword: "",
     },
   });
@@ -57,7 +57,7 @@ export function ResetPasswordForm() {
   const onSubmit = async (values: z.infer<typeof useResetPasswordSchema>) => {
     const response = await resetPassword({
       token: otp ?? "",
-      newPassword: values.newPassword,
+      password: values.password,
     });
     dispatch(
       setCredentials({
@@ -68,7 +68,7 @@ export function ResetPasswordForm() {
     router.push("/dashboard");
   };
 
-  const watchedPassword = form.watch("newPassword");
+  const watchedPassword = form.watch("password");
 
   return (
     <div className="p-xl rounded-3xl mx-auto w-full max-w-105 bg-card shadow-card flex flex-col gap-7 h-[530px]">
@@ -85,7 +85,7 @@ export function ResetPasswordForm() {
             {/* NEW PASSWORD */}
             <Controller
               control={control}
-              name="newPassword"
+              name="password"
               render={({ field, fieldState }) => (
                 <div>
                   <Field data-invalid={fieldState.invalid}>
