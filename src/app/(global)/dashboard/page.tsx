@@ -1,5 +1,5 @@
 "use client";
-import CustomLoader from "@/components/CustomLoader";
+import CustomLoader from "@/components/general/CustomLoader";
 import LogoutButton from "@/features/auth/components/LogoutButton";
 import { useAuthHydration } from "@/features/auth/hooks/useAuthHydration";
 import { RootState } from "@/redux/store";

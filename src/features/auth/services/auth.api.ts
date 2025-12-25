@@ -1,10 +1,5 @@
-import { LoginPayload, LoginResponse } from "@/features/auth/types";
 import { api, CustomAxiosRequestConfig } from "@/lib/api/axiosInstance";
-import { useInvalidatingMutation } from "@/lib/api/useInvalidatingMutations";
-import { setCredentials } from "@/redux/slices/authSlice";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
-import { useDispatch } from "react-redux";
 
 export const useLogin = () => {
   return useMutation({
@@ -36,13 +31,13 @@ export const useFetchCurrentUser = () => {
 export const useForgotPassword = () => {
   return useMutation({
     mutationFn: (payload: { email: string }) =>
-      api.post("/admin/auth/forgot-password", payload, { noAuth: true } as CustomAxiosRequestConfig),
+      api.post("/auth/forgot-password", payload, { noAuth: true } as CustomAxiosRequestConfig),
   });
 };
 
 export const useResetPassword = () => {
   return useMutation({
-    mutationFn: (payload: { newPassword: string; token: string }) =>
+    mutationFn: (payload: { password: string; token: string }) =>
       api.post("/auth/reset-password", payload, { noAuth: true } as CustomAxiosRequestConfig),
   });
 };
