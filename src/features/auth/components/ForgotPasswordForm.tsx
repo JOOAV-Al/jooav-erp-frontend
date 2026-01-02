@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { useForgotPassword } from "@/features/auth/services/auth.api";
 import AuthCardHeader from "@/features/auth/components/AuthCardHeader";
 import { useState } from "react";
+import { MailIcon } from "lucide-react";
 
 const forgotPasswordSchema = z.object({
   email: z.email("Enter a valid email"),
@@ -77,6 +78,7 @@ export function ForgotPasswordForm({ toggleForm }: { toggleForm: () => void }) {
                       type="email"
                       placeholder="Enter your email"
                       aria-invalid={fieldState.invalid}
+                      leftIcon={<MailIcon className="h-4 w-4" />}
                     />
                   </Field>
                 </div>
