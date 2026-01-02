@@ -48,10 +48,10 @@ export function ForgotPasswordForm({ toggleForm }: { toggleForm: () => void }) {
   };
 
   return (
-    <div className="p-xl rounded-3xl mx-auto w-full max-w-105 bg-card shadow-card flex flex-col gap-7 h-[530px]">
+    <div className="auth-card shadow-card flex flex-col gap-7 h-[530px]">
       <AuthCardHeader
         header="Reset Password"
-        description="You’ll get a password reset link if we have your details in our databse"
+        description="You’ll get a password reset link if we have your details in our database"
       />
       <FieldSet className="flex flex-1">
         <form
@@ -66,7 +66,12 @@ export function ForgotPasswordForm({ toggleForm }: { toggleForm: () => void }) {
               render={({ field, fieldState }) => (
                 <div>
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel>Email</FieldLabel>
+                    <div className="flex gap-3 items-center">
+                      <FieldLabel>Email</FieldLabel>
+                      {fieldState.error && (
+                        <FieldError>: {fieldState.error.message}</FieldError>
+                      )}
+                    </div>
                     <Input
                       {...field}
                       type="email"
@@ -74,9 +79,6 @@ export function ForgotPasswordForm({ toggleForm }: { toggleForm: () => void }) {
                       aria-invalid={fieldState.invalid}
                     />
                   </Field>
-                  {fieldState.error && (
-                    <FieldError>{fieldState.error.message}</FieldError>
-                  )}
                 </div>
               )}
             />
@@ -88,7 +90,7 @@ export function ForgotPasswordForm({ toggleForm }: { toggleForm: () => void }) {
               className="w-fit h-fit p-0"
               onClick={toggleForm}
             >
-              Back to login?
+              Back to login
             </Button>
 
             {/* SERVER ERROR */}
@@ -104,11 +106,7 @@ export function ForgotPasswordForm({ toggleForm }: { toggleForm: () => void }) {
           <div className="mt-auto">
             {/* SUBMIT */}
 
-            <Button
-              type="submit"
-              className="w-full mt-7"
-              disabled={isPending}
-            >
+            <Button type="submit" className="w-full mt-7" disabled={isPending}>
               {isPending ? "Loading..." : "Get reset link"}
             </Button>
           </div>
