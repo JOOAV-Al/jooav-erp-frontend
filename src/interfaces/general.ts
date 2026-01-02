@@ -9,6 +9,14 @@ export interface GeneralFetchingParams {
   manufacturerId?: string;
   sortBy?: string;
   sortOrder?: string;
+  brandId?: string;
+  categoryId?: string;
+  variant?: string;
+  isActive?: boolean;
+  includeRelations?: boolean;
+  parentId?: string;
+  includeProductCount?: boolean;
+  includeChildren?: boolean;
 }
 
 export interface PaginatedResponse<T> {

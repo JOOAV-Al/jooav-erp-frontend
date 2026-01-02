@@ -9,7 +9,7 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
       className={cn(
         // Base styles
         "w-full min-w-0 h-11.25 rounded-md bg-white border border-transparent",
-        "px-main py-md text-base outline-none",
+        "px-main py-md text-base outline-none leading-20",
         "placeholder:text-card-body placeholder:text-body",
         "border border-transparent",
 

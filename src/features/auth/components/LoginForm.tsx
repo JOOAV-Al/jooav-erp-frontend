@@ -15,11 +15,11 @@ import {
 import { Input } from "@/components/ui/input";
 // import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useLogin } from "@/features/auth/services/auth.api";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 // import { useDispatch } from "react-redux";
 // import { setCredentials } from "@/redux/slices/authSlice";
 import AuthCardHeader from "@/features/auth/components/AuthCardHeader";
-import Cookies from "js-cookie"
+import Cookies from "js-cookie";
 import PasswordInput from "@/features/auth/components/PasswordInput";
 
 const loginSchema = z.object({
@@ -30,6 +30,17 @@ const loginSchema = z.object({
 export function LoginForm({ toggleForm }: { toggleForm: () => void }) {
   const router = useRouter();
   // const dispatch = useDispatch();
+  const pathname = usePathname();
+
+  const getFormHeader = (): string => {
+    if (pathname.includes("super-admin")) {
+      return "Super-admin login";
+    } else if (pathname.includes("sub-admin")) {
+      return "Sub-admin login";
+    } else {
+      return "Admin login";
+    }
+  };
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -65,9 +76,9 @@ export function LoginForm({ toggleForm }: { toggleForm: () => void }) {
   };
 
   return (
-    <div className="p-xl rounded-3xl mx-auto w-full max-w-105 bg-card shadow-card flex flex-col gap-7 h-[530px]">
+    <div className="auth-card shadow-card flex flex-col gap-7 h-[530px]">
       <AuthCardHeader
-        header="Super-admin login"
+        header={getFormHeader()}
         description="Log in with your admin credentials."
       />
       <FieldSet className="flex flex-1">
@@ -82,8 +93,19 @@ export function LoginForm({ toggleForm }: { toggleForm: () => void }) {
               name="email"
               render={({ field, fieldState }) => (
                 <div>
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="email">Email</FieldLabel>
+                  <Field
+                    data-invalid={fieldState.invalid}
+                  >
+                    <div className="flex gap-3 items-center">
+                      <FieldLabel
+                        htmlFor="email"
+                      >
+                        Email
+                      </FieldLabel>
+                      {fieldState.error && (
+                        <FieldError>: {fieldState.error.message}</FieldError>
+                      )}
+                    </div>
                     <Input
                       {...field}
                       type="email"
@@ -91,9 +113,6 @@ export function LoginForm({ toggleForm }: { toggleForm: () => void }) {
                       aria-invalid={fieldState.invalid}
                     />
                   </Field>
-                  {fieldState.error && (
-                    <FieldError>{fieldState.error.message}</FieldError>
-                  )}
                 </div>
               )}
             />
@@ -105,23 +124,18 @@ export function LoginForm({ toggleForm }: { toggleForm: () => void }) {
               render={({ field, fieldState }) => (
                 <div>
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel>Password</FieldLabel>
-                    {/* <Input
-                      {...field}
-                      autoComplete="off"
-                      type="password"
-                      placeholder="Enter password"
-                      aria-invalid={fieldState.invalid}
-                    /> */}
+                    <div className="flex gap-3 items-center">
+                      <FieldLabel>Password</FieldLabel>
+                      {fieldState.error && (
+                        <FieldError>: {fieldState.error.message}</FieldError>
+                      )}
+                    </div>
                     <PasswordInput
                       field={field}
                       placeholder="Enter password"
                       ariaInvalid={fieldState.invalid}
                     />
                   </Field>
-                  {fieldState.error && (
-                    <FieldError>{fieldState.error.message}</FieldError>
-                  )}
                 </div>
               )}
             />
