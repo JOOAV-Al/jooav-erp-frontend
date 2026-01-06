@@ -1,12 +1,13 @@
 import ResetPasswordForm from "@/features/auth/components/ResetPasswordForm";
-import React from "react";
+import LoadingScreen from "@/layouts/LoadingScreen";
+import React, { Suspense } from "react";
 
 const ResetPasswordPage = () => {
   return (
-    <div className="min-h-screen px-main py-10 flex justify-center">
-      <div className="w-full">
+    <div className="w-full">
+      <Suspense fallback={<LoadingScreen className="w-full"/>}>
         <ResetPasswordForm />
-      </div>
+      </Suspense>
     </div>
   );
 };
