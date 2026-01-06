@@ -1,5 +1,5 @@
 import { fetchDeletedBrands, fetchBrandDetails, fetchBrands, fetchBrandsStats, fetchBrandsByManufacturer } from "@/features/brands/services/queryFunctions";
-import { CreateBrandPayload } from "@/features/brands/types";
+import { BrandItem, CreateBrandPayload } from "@/features/brands/types";
 import { GeneralFetchingParams } from "@/interfaces/general";
 import { api } from "@/lib/api/axiosInstance";
 import { useInvalidatingMutation } from "@/lib/api/useInvalidatingMutations";
@@ -42,7 +42,7 @@ export const useGetBrandDetails = ({id}: {id: string}) => {
 export const useCreateBrand = () => {
   return useInvalidatingMutation({
     mutationFn: (payload: CreateBrandPayload) =>
-      api.post("/brands", payload), 
+      api.post<BrandItem>("/brands", payload), 
     invalidateQueries: [["all-brands"]]
   });
 };
@@ -50,7 +50,7 @@ export const useCreateBrand = () => {
 export const useUpdateBrand = () => {
   return useInvalidatingMutation({
     mutationFn: ({payload, id}: {payload: CreateBrandPayload, id: string}) =>
-      api.patch(`/brands/${id}`, payload), 
+      api.patch<BrandItem>(`/brands/${id}`, payload), 
     invalidateQueries: [["all-brands"], ["brand-details"]]
   });
 };
@@ -59,14 +59,14 @@ export const useDeleteBrand = () => {
   return useInvalidatingMutation({
     mutationFn: ({id}: {id: string}) =>
       api.delete(`/brands/${id}`), 
-    invalidateQueries: [["all-brands"]]
+    invalidateQueries: [["all-brands"], ["brand-details"]]
   });
 };
 
 export const useUpdateBrandStatus = () => {
   return useInvalidatingMutation({
     mutationFn: ({id, status}: {id: string, status: string}) =>
-      api.patch(`/brands/${id}/status`, {status}), 
+      api.patch<BrandItem>(`/brands/${id}/status`, {status}), 
     invalidateQueries: [["all-brands"], ["brand-details"]]
   });
 };
@@ -86,18 +86,17 @@ export const useDeleteBrandLogo = () => {
   });
 };
 
-
 export const useActivateBrand = () => {
   return useInvalidatingMutation({
     mutationFn: ({id}: {id: string}) =>
-      api.post(`/brands/${id}/activate`), 
+      api.post<BrandItem>(`/brands/${id}/activate`), 
     invalidateQueries: [["all-brands"], ["brand-details"]]
   });
 };
 export const useSuspendBrand = () => {
   return useInvalidatingMutation({
     mutationFn: ({id}: {id: string}) =>
-      api.post(`/brands/${id}/suspend`), 
+      api.post<BrandItem>(`/brands/${id}/suspend`), 
     invalidateQueries: [["all-brands"], ["brand-details"]]
   });
 };

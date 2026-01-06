@@ -343,8 +343,8 @@
   --shadow-input: 0px 0px 0px 2px rgba(0, 0, 0, 0.05),
     0px 3px 2px 0px rgba(6, 16, 30, 0.08);
 
-  --shadow-card: 0px 0px 0px 2px rgba(0, 0, 0, 0.05),
-    0px 3px 2px 0px rgba(6, 16, 30, 0.08);
+  --shadow-card: 0px 0px 0px 3px rgba(6, 16, 30, 0.02),
+    0px 6px 3px 0px rgba(6, 16, 30, 0.04);
 
   /* Additional common shadows (for future use) */
   --shadow-sm: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);
@@ -404,6 +404,7 @@
   --color-gray-200: var(--gray-200);
   --color-gray-300: var(--gray-300);
   --color-gray-400: var(--gray-400);
+  --color-body-passive: var(--gray-400);
   --color-gray-500: var(--gray-500);
   --color-gray-600: var(--gray-600);
   --color-gray-700: var(--gray-700);
@@ -536,6 +537,7 @@
   --spacing-main: var(--p-main);
   --spacing-xl: var(--p-xl);
   --spacing-mt: var(--p-mt); */
+  /* --spacing-fluid: 'clamp(1rem, 5vw, 3rem)'; */
 
   /* ===== GAPS ===== */
   --gap-0: var(--sp-0);
@@ -620,6 +622,25 @@
   * {
     @apply border-border outline-ring/50;
   }
+  .auth-card {
+    @apply p-xl rounded-3xl mx-auto w-full max-w-[clamp(270px,80vw,370px)] mdl:max-w-[clamp(370px,60vw,420px)] 2xl:max-w-[clamp(420px,60vw,720px)] bg-card;
+  }
+
+    html {
+    font-size: 100%;
+  }
+
+  @media (min-width: 1440px) {
+    html {
+      font-size: 108%;
+    }
+  }
+
+  @media (min-width: 1920px) {
+    html {
+      font-size: 115%;
+    }
+  }
 
   body {
     @apply bg-background text-foreground;
@@ -689,3 +710,4 @@
 .force-white-toast * {
   color: white !important;
 }
+

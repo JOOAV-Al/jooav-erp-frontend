@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { useForgotPassword } from "@/features/auth/services/auth.api";
 import AuthCardHeader from "@/features/auth/components/AuthCardHeader";
 import { useState } from "react";
+import { MailIcon } from "lucide-react";
 
 const forgotPasswordSchema = z.object({
   email: z.email("Enter a valid email"),
@@ -48,10 +49,10 @@ export function ForgotPasswordForm({ toggleForm }: { toggleForm: () => void }) {
   };
 
   return (
-    <div className="p-xl rounded-3xl mx-auto w-full max-w-105 bg-card shadow-card flex flex-col gap-7 h-[530px]">
+    <div className="auth-card shadow-card flex flex-col gap-7 h-[530px]">
       <AuthCardHeader
         header="Reset Password"
-        description="You’ll get a password reset link if we have your details in our databse"
+        description="You’ll get a password reset link if we have your details in our database"
       />
       <FieldSet className="flex flex-1">
         <form
@@ -66,17 +67,20 @@ export function ForgotPasswordForm({ toggleForm }: { toggleForm: () => void }) {
               render={({ field, fieldState }) => (
                 <div>
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel>Email</FieldLabel>
+                    <div className="flex gap-3 items-center">
+                      <FieldLabel>Email</FieldLabel>
+                      {fieldState.error && (
+                        <FieldError>: {fieldState.error.message}</FieldError>
+                      )}
+                    </div>
                     <Input
                       {...field}
                       type="email"
                       placeholder="Enter your email"
                       aria-invalid={fieldState.invalid}
+                      leftIcon={<MailIcon className="h-4 w-4" />}
                     />
                   </Field>
-                  {fieldState.error && (
-                    <FieldError>{fieldState.error.message}</FieldError>
-                  )}
                 </div>
               )}
             />
@@ -88,7 +92,7 @@ export function ForgotPasswordForm({ toggleForm }: { toggleForm: () => void }) {
               className="w-fit h-fit p-0"
               onClick={toggleForm}
             >
-              Back to login?
+              Back to login
             </Button>
 
             {/* SERVER ERROR */}
@@ -104,11 +108,7 @@ export function ForgotPasswordForm({ toggleForm }: { toggleForm: () => void }) {
           <div className="mt-auto">
             {/* SUBMIT */}
 
-            <Button
-              type="submit"
-              className="w-full mt-7"
-              disabled={isPending}
-            >
+            <Button type="submit" className="w-full mt-7" disabled={isPending}>
               {isPending ? "Loading..." : "Get reset link"}
             </Button>
           </div>

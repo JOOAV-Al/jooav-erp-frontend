@@ -1,10 +1,10 @@
-import { BrandItem, BrandOrderItem, BrandStatsItem } from "@/features/brands/types"
+import { BrandItem, BrandStatsItem } from "@/features/brands/types"
 import { GeneralFetchingParams, PaginatedResponse } from "@/interfaces/general"
 import { api, CustomAxiosRequestConfig } from "@/lib/api/axiosInstance"
 
 const LIMIT = 20
 export async function fetchBrands (params: GeneralFetchingParams): Promise<PaginatedResponse<BrandItem>> {
-  const {search, status, manufacturerId, sortBy, sortOrder, page, limit} = params
+  const {search, status, manufacturerId, sortBy, sortOrder, page, limit=LIMIT} = params
   const filterParams = new URLSearchParams({})
   if(search) filterParams.append('search', search)
   if(status) filterParams.append('status', status)
@@ -19,7 +19,7 @@ export async function fetchBrands (params: GeneralFetchingParams): Promise<Pagin
 }
 
 export async function fetchBrandsByManufacturer (params: GeneralFetchingParams): Promise<PaginatedResponse<BrandItem>> {
-  const {search, status, manufacturerId, sortBy, sortOrder, page, limit} = params
+  const {search, status, manufacturerId, sortBy, sortOrder, page, limit=LIMIT} = params
   const filterParams = new URLSearchParams({})
   if(search) filterParams.append('search', search)
   if(status) filterParams.append('status', status)
@@ -33,7 +33,7 @@ export async function fetchBrandsByManufacturer (params: GeneralFetchingParams):
 }
 
 export async function fetchDeletedBrands (params: GeneralFetchingParams): Promise<PaginatedResponse<BrandItem>> {
-  const {search, status, manufacturerId, sortBy, sortOrder, page, limit} = params
+  const {search, status, manufacturerId, sortBy, sortOrder, page, limit=LIMIT} = params
   const filterParams = new URLSearchParams({})
   if(search) filterParams.append('search', search)
   if(status) filterParams.append('status', status)

@@ -71,7 +71,7 @@ export function ResetPasswordForm() {
   const watchedPassword = form.watch("password");
 
   return (
-    <div className="p-xl rounded-3xl mx-auto w-full max-w-105 bg-card shadow-card flex flex-col gap-7 h-[530px]">
+    <div className="auth-card shadow-card flex flex-col gap-7 h-[530px]">
       <AuthCardHeader
         header="Create password"
         description="Create a new password for your login"
@@ -137,12 +137,6 @@ export function ResetPasswordForm() {
                       placeholder="Enter password"
                       ariaInvalid={fieldState.invalid}
                     />
-                    {/* <Input
-                      {...field}
-                      type="password"
-                      placeholder="Enter password"
-                      aria-invalid={fieldState.invalid}
-                    /> */}
                   </Field>
                 </div>
               )}

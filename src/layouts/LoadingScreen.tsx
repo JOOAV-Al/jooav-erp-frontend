@@ -1,9 +1,9 @@
 import CustomLoader from "@/components/general/CustomLoader";
 import React from "react";
 
-const LoadingScreen = () => {
+const LoadingScreen = ({className}: {className?: string, color?: string}) => {
   return (
-    <div className="flex justify-center items-center min-h-screen">
+    <div className={`flex justify-center items-center min-h-screen ${className}`}>
       <CustomLoader />
     </div>
   );
