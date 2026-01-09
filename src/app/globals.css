@@ -44,6 +44,8 @@
   --gray-600: hsl(0 0 20%);
   --gray-700: hsl(0 0 13%);
   --gray-800: hsl(0 0 10%);
+  --outline-passive: hsla(50, 7%, 64%);
+  --outline: hsla(0, 0%, 48%);
 
   --orange-100: hsl(21 100% 93%);
   --orange-200: hsl(21 100% 87%);
@@ -346,6 +348,10 @@
   --shadow-card: 0px 0px 0px 3px rgba(6, 16, 30, 0.02),
     0px 6px 3px 0px rgba(6, 16, 30, 0.04);
 
+  /* Sidebar links elevation effect */
+  --sidebar-link: 0px 0px 0px 2px rgba(0, 0, 0, 0.05),
+    0px 3px 2px 0px rgba(6, 16, 30, 0.08);
+
   /* Additional common shadows (for future use) */
   --shadow-sm: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);
   --shadow-md: 0px 4px 6px -1px rgba(0, 0, 0, 0.1),
@@ -405,6 +411,8 @@
   --color-gray-300: var(--gray-300);
   --color-gray-400: var(--gray-400);
   --color-body-passive: var(--gray-400);
+  --color-outline-passive: var(--outline-passive);
+  --color-outline: var(--outline);
   --color-gray-500: var(--gray-500);
   --color-gray-600: var(--gray-600);
   --color-gray-700: var(--gray-700);
@@ -485,6 +493,7 @@
   --color-input: var(--border-stroke);
   --color-nominal-input: var(--color-nominal-input);
   --color-nominal-input-hover: var(--color-nominal-input-hover);
+  --color-nominal-card-hover: var(--color-nominal-card-hover);
   --color-ring: var(--border-ring);
 
   /* ===== FONT SIZES (Tailwind-style naming) ===== */
@@ -606,6 +615,7 @@
   /* Use: shadow-input, shadow-card, shadow-sm, shadow-lg */
   --box-shadow-input: var(--shadow-input);
   --box-shadow-card: var(--shadow-card);
+  --box-shadow-sidebar-link: var(--sidebar-link);
   --box-shadow-button: var(--shadow-button);
   --box-shadow-button-hover: var(--shadow-button-hover);
   --box-shadow-sm: var(--shadow-sm);
@@ -623,7 +633,7 @@
     @apply border-border outline-ring/50;
   }
   .auth-card {
-    @apply p-xl rounded-3xl mx-auto w-full max-w-[clamp(270px,80vw,370px)] mdl:max-w-[clamp(370px,60vw,420px)] 2xl:max-w-[clamp(420px,60vw,720px)] bg-card;
+    @apply p-xl rounded-3xl mx-auto w-full max-w-[clamp(270px,80vw,370px)] mdl:max-w-[clamp(370px,60vw,420px)] 2xl:max-w-[clamp(420px,45vw,560px)] bg-card;
   }
 
     html {
@@ -681,15 +691,18 @@
   .shadow-input {
     box-shadow: var(--shadow-input);
   }
-
+  
   .shadow-input-focus {
     box-shadow: var(--shadow-input), 0 0 0 2px hsl(var(--ring) / 0.5);
   }
-
+  
   .shadow-card {
     box-shadow: var(--shadow-card);
   }
-
+  .sidebar-link {
+    box-shadow: var(--sidebar-link);
+  }
+  
   .shadow-button {
     box-shadow: var(--shadow-button);
   }

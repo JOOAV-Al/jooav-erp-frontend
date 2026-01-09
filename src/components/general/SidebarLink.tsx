@@ -13,6 +13,7 @@ import { useTransition } from "react";
 interface SidebarLinkProps {
   href: string;
   label: string;
+  className?: string;
   Icon: React.ElementType;
   isCollapsed: boolean;
 }
@@ -20,6 +21,7 @@ interface SidebarLinkProps {
 export default function SidebarLink({
   href,
   label,
+  className,
   Icon,
   isCollapsed,
 }: SidebarLinkProps) {
@@ -40,11 +42,17 @@ export default function SidebarLink({
   };
 
   return (
-    <Link className="block" href={href} onClick={handleClick}>
+    <Link
+      className={`block w-full ${
+        isCollapsed ? "mr-2 max-w-15.5" : "mx-2 max-w-50"
+      } ${className}`}
+      href={href}
+      onClick={handleClick}
+    >
       <div
-        className={`group flex items-center gap-3 px-4 py-2 rounded hover:bg-primary-500 hover:text-white transition-colors cursor-pointer ${
-          isActive ? "bg-brand-primary font-bold text-white" : ""
-        } ${isCollapsed ? "w-fit" : ""}`}
+        className={`group flex items-center gap-6 px-sm py-4 rounded-main hover:bg-gray-300 hover:text-nominal-input-hover transition-colors cursor-pointer ${
+          isActive ? "bg-gray-300 sidebar-link font-medium" : "font-medium"
+        } ${isCollapsed ? "w-fit mx-auto" : ""}`}
       >
         {isTransitioning ? (
           <CustomLoader />
@@ -52,10 +60,10 @@ export default function SidebarLink({
           <>
             {!isCollapsed ? (
               <Icon
-                size={24}
+                size={22}
                 className={`transition-colors ${
-                  isActive ? "text-white" : "text-[#6B7280]"
-                } group-hover:text-white`}
+                  isActive ? "text-outline" : "text-outline-passive"
+                } group-hover:text-nominal-input-hover`}
               />
             ) : (
               <Tooltip>
@@ -63,8 +71,8 @@ export default function SidebarLink({
                   <Icon
                     size={24}
                     className={`transition-colors ${
-                      isActive ? "text-white" : "text-[#6B7280]"
-                    } group-hover:text-white`}
+                      isActive ? "text-outline" : "text-outline-passive"
+                    } group-hover:text-nominal-input-hover`}
                   />
                 </TooltipTrigger>
                 <TooltipContent>
@@ -74,7 +82,17 @@ export default function SidebarLink({
             )}
           </>
         )}
-        {!isCollapsed && <p className="sidebar-text">{label}</p>}
+        {!isCollapsed && (
+          <p
+            className={`${
+              isActive
+                ? "text-foreground"
+                : "text-body-passive group-hover:text-nominal-input-hover w-fit"
+            }`}
+          >
+            {label}
+          </p>
+        )}
       </div>
     </Link>
   );

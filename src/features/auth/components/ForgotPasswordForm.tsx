@@ -49,7 +49,7 @@ export function ForgotPasswordForm({ toggleForm }: { toggleForm: () => void }) {
   };
 
   return (
-    <div className="auth-card shadow-card flex flex-col gap-7 h-[530px]">
+    <div className="auth-card shadow-card flex flex-col gap-7 aspect-420/530 min-h-[480px] max-h-[680px]">
       <AuthCardHeader
         header="Reset Password"
         description="You’ll get a password reset link if we have your details in our database"

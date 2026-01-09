@@ -22,8 +22,8 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     setIsCollapsed(!isCollapsed);
   };
 
-    const shouldRenderIcon = isSidebarHidden || !isSidebarOpen;
-    const visibilityClass = isSidebarHidden ? "block" : "block md:hidden";
+  const shouldRenderIcon = isSidebarHidden || !isSidebarOpen;
+  const visibilityClass = isSidebarHidden ? "block" : "block md:hidden";
   return (
     <div className="flex min-h-screen overflow-hidden">
       {auth.isUserLoading ? (
@@ -31,6 +31,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       ) : (
         <>
           {/* Sidebar */}
+
           <Sidebar
             isOpen={isSidebarOpen}
             toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -42,12 +43,14 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
           {/* Main Content */}
           <div
-            className={`flex flex-col flex-1 overflow-auto p-4 md:p-6 ${
+            className={`flex flex-col flex-1 overflow-auto mt-3 mr-3 ${
+              isCollapsed ? "" : "rounded-t-2xl"
+            } p-md bg-white ${
               isSidebarHidden
                 ? "md:ml-0"
                 : isCollapsed
-                ? "md:ml-[100px]"
-                : "md:ml-62"
+                ? "md:ml-[80]"
+                : "md:ml-57.5"
             }`}
           >
             {shouldRenderIcon && (

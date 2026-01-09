@@ -18,7 +18,7 @@ const LogoutButton = () => {
     } finally {
       Cookies.remove("refreshToken");
       Cookies.remove("authToken");
-      router.replace("/login");
+      router.replace("/super-admin/login");
     }
   };
 

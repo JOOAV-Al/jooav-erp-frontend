@@ -33,7 +33,7 @@ interface RefreshTokenResponse {
 
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BACKEND_BASE_URL || "http://localhost:8000",
-  // timeout: 30000, // 30 seconds
+  timeout: 30000, // 30 seconds
   headers: {
     "Content-Type": "application/json",
   },

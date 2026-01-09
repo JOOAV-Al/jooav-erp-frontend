@@ -71,7 +71,7 @@ export function ResetPasswordForm() {
   const watchedPassword = form.watch("password");
 
   return (
-    <div className="auth-card shadow-card flex flex-col gap-7 h-[530px]">
+    <div className="auth-card shadow-card flex flex-col gap-7 aspect-420/530 min-h-[480px] max-h-[680px]">
       <AuthCardHeader
         header="Create password"
         description="Create a new password for your login"

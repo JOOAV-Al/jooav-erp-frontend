@@ -16,6 +16,19 @@ import {
   PanelRightClose,
   MessageCircleMoreIcon,
   ChartLineIcon,
+  LayoutDashboard,
+  Bell,
+  ShoppingBag,
+  FolderPen,
+  FolderTree,
+  DiamondPlus,
+  GitBranchPlus,
+  Workflow,
+  UserPlus,
+  UserCog,
+  UserStar,
+  Users,
+  PackagePlus,
   // Router,
 } from "lucide-react";
 import SidebarLink from "./SidebarLink";
@@ -62,34 +75,81 @@ export default function Sidebar({
     }
   }, [pathname]);
 
-  const links = [
-    {
-      label: "Timetable",
-      href: "/dashboard/timetable",
-      icon: Table,
-    },
-    {
-      label: "Learning Materials",
-      href: "/dashboard/learning-materials",
-      icon: LibraryBig,
-    },
-    {
-      label: "Assignments",
-      href: "/dashboard/assignments",
-      icon: NotebookPen,
-    },
-    { label: "Exams", href: "/exams", icon: PencilRuler },
-    {
-      label: "Results",
-      href: "/dashboard/results",
-      icon: TabletSmartphone,
-    },
-    {
-      label: "School Fees",
-      href: "/dashboard/school-fees",
-      icon: CreditCard,
-    },
-  ];
+  const links = {
+    default: [
+      {
+        label: "Dashboard",
+        href: "/dashboard",
+        icon: LayoutDashboard,
+      },
+      {
+        label: "Notification",
+        href: "/dashboard/notification",
+        icon: Bell,
+      },
+      {
+        label: "Order log",
+        href: "/dashboard/order-log",
+        icon: ShoppingBag,
+      },
+    ],
+    product: [
+      {
+        label: "Product",
+        href: "/dashboard/product",
+        icon: PackagePlus,
+      },
+      {
+        label: "Draft",
+        href: "/dashboard/draft",
+        icon: FolderPen,
+      },
+    ],
+    entity: [
+      {
+        label: "Manufacturer",
+        href: "/dashboard/manufacturer",
+        icon: DiamondPlus,
+      },
+      {
+        label: "Brand",
+        href: "/dashboard/brand",
+        icon: GitBranchPlus,
+      },
+      {
+        label: "Variant",
+        href: "/dashboard/variant",
+        icon: Workflow,
+      },
+      {
+        label: "Category",
+        href: "/dashboard/category",
+        icon: FolderTree,
+      },
+    ],
+    user: [
+      {
+        label: "Super-admin",
+        href: "/dashboard/super-admin",
+        icon: UserPlus,
+      },
+      {
+        label: "Admin",
+        href: "/dashboard/admin",
+        icon: UserCog,
+      },
+      {
+        label: "Sub-admin",
+        href: "/dashboard/sub-admin",
+        icon: UserStar,
+      },
+      {
+        label: "Retailer",
+        href: "/dashboard/retailer",
+        icon: Users,
+      },
+    ],
+  };
 
   if (isHidden) return null; // completely hidden
 
@@ -105,71 +165,67 @@ export default function Sidebar({
 
       <aside
         className={`
-          fixed top-0 left-0 z-10 h-screen bg-white
+          fixed top-0 left-0 z-10 h-screen bg-background
           transform ${isOpen ? "translate-x-0" : "-translate-x-full"}
           transition-all duration-300 ease-in-out
           md:translate-x-0
           md:fixed md:h-screen md:overflow-y-auto
-          ${isCollapsed ? "max-w-[100px]" : "max-w-62"} w-full
+          ${isCollapsed ? "max-w-[80]" : "max-w-57.5"} w-full
         `}
       >
-        <div className="flex flex-col h-full overflow-y-auto p-4 py-8">
+        <div
+          className={`flex flex-col overflow-y-auto h-full ${
+            isCollapsed ? "px-sm" : "px-sm"
+          }`}
+        >
           {/* Top Section */}
-          <div className="flex items-start justify-between">
+          <div
+            className={`flex items-center justify-between ${
+              isCollapsed ? "mx-0" : "mx-2"
+            } py-lg`}
+          >
             {!isCollapsed && (
               <Image
                 src={"/auth/jooav-logo.svg"}
                 alt="JOOAV Logo"
-                width={90.7}
-                height={24}
-                className="py-xl"
+                width={75.58}
+                height={20}
               />
             )}
-            <div className="flex gap-2">
+            <div className={`flex gap-2`}>
               {/* Collapse/Expand Button */}
               <button
                 onClick={setIsCollapsed}
-                className="p-1 rounded hover:bg-gray-200 cursor-pointer"
+                className={`${
+                  isCollapsed ? "px-3" : "px-sm"
+                } rounded hover:bg-gray-200 cursor-pointer text-outline`}
               >
                 {isCollapsed ? (
-                  <PanelRightClose size={20} />
+                  <PanelRightClose size={24} />
                 ) : (
-                  <PanelRightOpen size={20} />
+                  <PanelRightOpen size={24} />
                 )}
               </button>
               {/* Hide Button */}
               <button
                 // onClick={() => setIsHidden(true)}
                 onClick={hideSidebar}
-                className="p-1 rounded hover:bg-gray-200 cursor-pointer"
+                className={`${
+                  isCollapsed ? "px-3" : "px-sm"
+                } rounded hover:bg-gray-200 cursor-pointer text-outline-passive`}
               >
-                <X size={20} />
+                <X size={24} color="red" />
               </button>
             </div>
           </div>
 
           {/* Divider */}
-          {!isCollapsed && <div className="border-t" />}
-          <ScrollArea className="min-h-72 w-full">
-            {/* Home Link */}
-            <nav className="mt-8">
-              <SidebarLink
-                href={"/dashboard"}
-                label="Home"
-                Icon={Home}
-                isCollapsed={isCollapsed}
-              />
-            </nav>
-
-            {/* Main Links */}
-            <div
-              className={`flex flex-col gap-2 ${
-                isCollapsed ? "mt-4" : "mt-12"
-              }`}
-            >
-              {!isCollapsed && <h4 className="paraMedium mb-2">MAIN MENU</h4>}
-              <nav className="space-y-2 flex flex-col gap-2">
-                {links.map((link) => (
+          {/* {!isCollapsed && <div className="border-t" />} */}
+          <ScrollArea isSidebar className="min-h-72 w-full">
+            <div className="py-main flex flex-col gap-sm">
+              {/* Default */}
+              <nav className="flex flex-col gap-7">
+                {links.default.map((link) => (
                   <SidebarLink
                     key={link.href}
                     href={link.href}
@@ -179,59 +235,81 @@ export default function Sidebar({
                   />
                 ))}
               </nav>
-            </div>
 
-            <div
-              className={`flex flex-col gap-4 ${
-                isCollapsed ? "mt-4 md:mt-4" : "mt-10 md:mt-12"
-              }`}
-            >
-              {/* Settings Link */}
-              <nav className="">
-                <SidebarLink
-                  href={"/dashboard/settings"}
-                  label="Settings"
-                  Icon={Settings}
-                  isCollapsed={isCollapsed}
-                />
-              </nav>
-              <div className="flex justify-between items-center border-t border-[#E4E7EC] pt-6">
-                <div
-                  className={`flex justify-between gap-1 ${
-                    isCollapsed ? "mr-2 w-8 h-8" : "mr-0"
-                  }`}
-                >
-                  <Image
-                    src={"/assets/dashboard/student/avatar.svg"}
-                    alt="User Avatar"
-                    width={52}
-                    height={52}
-                    className="rounded-full object-cover"
-                  />
-                  {!isCollapsed && (
-                    <div>
-                      <h4 className="header4 text-[14px]! md:text-[18px]!">
-                        {user?.firstName || ""}
-                      </h4>
-                      <p className="body-mobile text-[#667085]">
-                        {user?.email}
-                      </p>
-                    </div>
-                  )}
-                </div>
-                <div className="h-10 w-10 hover:bg-gray-100 hover:p-2 rounded-full flex justify-center items-center">
-                  <LogOut
-                    onClick={() => {
-                      // Cookies.remove("authToken");
-                      dispatch(logout());
-                      router.push(`/${user?.role.toLowerCase()}/signin`);
-                    }}
-                    className="cursor-pointer text-[#667085] hover:text-red-500 font-semibold"
-                    size={24}
-                  />
-                </div>
+              {/* Products */}
+              <div
+                className={`flex flex-col gap-7 ${
+                  isCollapsed ? "border-t-2 border-[#EDEDED] pt-main" : ""
+                }`}
+              >
+                {!isCollapsed && (
+                  <h4 className="font-mono leading-[1.2] text-sm text-body-passive mx-2">
+                    PRODUCT CRUD
+                  </h4>
+                )}
+                <nav className="flex flex-col gap-3">
+                  {links.product.map((link) => (
+                    <SidebarLink
+                      key={link.href}
+                      href={link.href}
+                      label={link.label}
+                      Icon={link.icon}
+                      isCollapsed={isCollapsed}
+                    />
+                  ))}
+                </nav>
+              </div>
+
+              {/* Entities */}
+              <div
+                className={`flex flex-col gap-7 ${
+                  isCollapsed ? "border-t-2 border-[#EDEDED] pt-main" : ""
+                }`}
+              >
+                {!isCollapsed && (
+                  <h4 className="font-mono leading-[1.2] text-sm text-body-passive mx-2">
+                    ENTITY CRUD
+                  </h4>
+                )}
+                <nav className="flex flex-col gap-3">
+                  {links.entity.map((link) => (
+                    <SidebarLink
+                      key={link.href}
+                      href={link.href}
+                      label={link.label}
+                      Icon={link.icon}
+                      isCollapsed={isCollapsed}
+                    />
+                  ))}
+                </nav>
+              </div>
+
+              {/* Users */}
+              <div
+                className={`flex flex-col gap-7 ${
+                  isCollapsed ? "border-t-2 border-[#EDEDED] pt-main" : ""
+                }`}
+              >
+                {!isCollapsed && (
+                  <h4 className="font-mono leading-[1.2] text-sm text-body-passive mx-2">
+                    USER CRUD
+                  </h4>
+                )}
+                <nav className="flex flex-col gap-3">
+                  {links.user.map((link) => (
+                    <SidebarLink
+                      key={link.href}
+                      href={link.href}
+                      label={link.label}
+                      Icon={link.icon}
+                      isCollapsed={isCollapsed}
+                    />
+                  ))}
+                </nav>
               </div>
             </div>
+
+            <div className="bg-gray-300 h-25 w-52.5 rounded-lg mt-27.5"></div>
           </ScrollArea>
         </div>
       </aside>

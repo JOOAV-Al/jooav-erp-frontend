@@ -76,7 +76,9 @@ export function LoginForm({ toggleForm }: { toggleForm: () => void }) {
   };
 
   return (
-    <div className="auth-card shadow-card flex flex-col gap-7 h-[530px]">
+    <div
+      className="auth-card shadow-card flex flex-col gap-7 aspect-420/530 min-h-[480px] max-h-[680px]"
+    >
       <AuthCardHeader
         header={getFormHeader()}
         description="Log in with your admin credentials."
@@ -93,15 +95,9 @@ export function LoginForm({ toggleForm }: { toggleForm: () => void }) {
               name="email"
               render={({ field, fieldState }) => (
                 <div>
-                  <Field
-                    data-invalid={fieldState.invalid}
-                  >
+                  <Field data-invalid={fieldState.invalid}>
                     <div className="flex gap-3 items-center">
-                      <FieldLabel
-                        htmlFor="email"
-                      >
-                        Email
-                      </FieldLabel>
+                      <FieldLabel htmlFor="email">Email</FieldLabel>
                       {fieldState.error && (
                         <FieldError>: {fieldState.error.message}</FieldError>
                       )}
