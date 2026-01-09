@@ -11,7 +11,7 @@ import { useSelector } from "react-redux";
 const SuperAdminDashboardHome = () => {
   useAuthHydration();
   const user = useSelector((state: RootState) => state.auth.user);
-  const [open, setOpen] = useState<boolean>(true);
+  const [open, setOpen] = useState<boolean>(false);
   return (
     <div className="flex justify-center items-center h-full">
       <div>
