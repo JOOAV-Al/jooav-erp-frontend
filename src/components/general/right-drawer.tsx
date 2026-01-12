@@ -37,15 +37,28 @@ const RightDrawerContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed z-50 flex flex-col bg-background shadow-lg transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-300",
+        "fixed z-50 flex flex-col bg-white shadow-lg transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-300",
         // Position from right with spacing
-        "top-3 right-3 bottom-3 w-full max-w-sm rounded-2xl border",
+        "top-3 right-3 bottom-3 w-full aspect-508/958 max-w-sm md:max-w-md lg:max-w-[508px] rounded-2xl border",
         // Slide animations from right
         "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right",
         className
       )}
       {...props}
     >
+      <div
+        style={{ background: `url("/dashboard/drawer-top-img.svg")` }}
+        className="h-30 rounded-t-2xl p-main"
+      >
+        <div className="flex justify-between items-center">
+          <div></div>
+          <RightDrawerClose>
+            <div className="size-9 rounded-full p-sm sidebar-link bg-white hover:bg-storey-foreground flex justify-center items-center text-outline cursor-pointer">
+              <X size={20} />
+            </div>
+          </RightDrawerClose>
+        </div>
+      </div>
       {children}
     </DialogPrimitive.Content>
   </RightDrawerPortal>
@@ -69,7 +82,7 @@ const RightDrawerFooter = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 p-6 border-t mt-auto",
+      "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 px-lg pt-sm pb-lg mt-auto",
       className
     )}
     {...props}
@@ -108,7 +121,7 @@ const RightDrawerBody = ({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn("flex-1 overflow-y-auto p-6", className)} {...props} />
+  <div className={cn("flex-1 overflow-y-auto", className)} {...props} />
 );
 RightDrawerBody.displayName = "RightDrawerBody";
 

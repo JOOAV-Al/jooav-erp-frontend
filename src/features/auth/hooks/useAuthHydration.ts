@@ -22,7 +22,7 @@ export const useAuthHydration = () => {
         );
       } catch {
         dispatch(logout());
-        router.push("/login")
+        router.push("/super-admin/login")
       }
     };
 

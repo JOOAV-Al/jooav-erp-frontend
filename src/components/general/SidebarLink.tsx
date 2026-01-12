@@ -1,11 +1,13 @@
 "use client";
 
 import CustomLoader from "@/components/general/CustomLoader";
+import Spinner from "@/components/general/Spinner";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTransition } from "react";
@@ -55,7 +57,7 @@ export default function SidebarLink({
         } ${isCollapsed ? "w-fit mx-auto" : ""}`}
       >
         {isTransitioning ? (
-          <CustomLoader />
+          <Spinner />
         ) : (
           <>
             {!isCollapsed ? (

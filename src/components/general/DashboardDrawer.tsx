@@ -57,30 +57,51 @@ interface DashboardDrawerProps {
   children: React.ReactNode;
   openDrawer: (isOpen: boolean) => void;
   isOpen: boolean;
+  showTrigger?: boolean;
+  // optional id of the form inside the drawer to target with footer submit
+  submitFormId?: string;
+  submitLabel?: string;
+  // when true, disable footer submit and show loading label
+  submitLoading?: boolean;
 }
 
 const DashboardDrawer = ({
   children,
   openDrawer,
   isOpen,
+  showTrigger = false,
+  submitFormId,
+  submitLabel = "Submit",
+  submitLoading = false,
 }: DashboardDrawerProps) => {
   return (
     <RightDrawer open={isOpen} onOpenChange={openDrawer}>
-      <RightDrawerTrigger asChild>
-        <Button>Open</Button>
-      </RightDrawerTrigger>
+      {showTrigger && (
+        <RightDrawerTrigger asChild>
+          <Button>Open</Button>
+        </RightDrawerTrigger>
+      )}
       <RightDrawerContent>
-        <RightDrawerHeader>
+        <RightDrawerHeader className="hidden">
           <RightDrawerTitle>Are you absolutely sure?</RightDrawerTitle>
           <RightDrawerDescription>
             This action cannot be undone.
           </RightDrawerDescription>
         </RightDrawerHeader>
 
-        <RightDrawerBody>{children}</RightDrawerBody>
+        <RightDrawerBody className="">{children}</RightDrawerBody>
 
         <RightDrawerFooter>
-          <Button>Submit</Button>
+          {/* Submit button targets the inner form using the form attribute */}
+          <Button
+            type={submitFormId ? "submit" : "button"}
+            form={submitFormId}
+            className="mr-2"
+            disabled={submitLoading}
+          >
+            {submitLoading ? "Loading..." : submitLabel}
+          </Button>
+
           <RightDrawerClose asChild>
             <Button variant="outline">Cancel</Button>
           </RightDrawerClose>

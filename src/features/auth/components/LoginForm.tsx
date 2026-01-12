@@ -76,9 +76,7 @@ export function LoginForm({ toggleForm }: { toggleForm: () => void }) {
   };
 
   return (
-    <div
-      className="auth-card shadow-card flex flex-col gap-7 aspect-420/530 min-h-[480px] max-h-[680px]"
-    >
+    <div className="auth-card shadow-card flex flex-col gap-7 aspect-370/530 sm:aspect-420/530 min-h-[530px] sm:min-h-[480px] max-h-[680px]">
       <AuthCardHeader
         header={getFormHeader()}
         description="Log in with your admin credentials."

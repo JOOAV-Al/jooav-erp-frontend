@@ -53,6 +53,81 @@ interface SidebarProps {
   isCollapsed: boolean;
   setIsCollapsed?: () => void;
 }
+const links = {
+  default: [
+    {
+      label: "Dashboard",
+      href: "/dashboard",
+      icon: LayoutDashboard,
+    },
+    {
+      label: "Notification",
+      href: "/dashboard/notification",
+      icon: Bell,
+    },
+    {
+      label: "Order log",
+      href: "/dashboard/order-log",
+      icon: ShoppingBag,
+    },
+  ],
+  product: [
+    {
+      label: "Product",
+      href: "/dashboard/product",
+      icon: PackagePlus,
+    },
+    {
+      label: "Draft",
+      href: "/dashboard/draft",
+      icon: FolderPen,
+    },
+  ],
+  entity: [
+    {
+      label: "Manufacturer",
+      href: "/dashboard/manufacturer",
+      icon: DiamondPlus,
+    },
+    {
+      label: "Brand",
+      href: "/dashboard/brand",
+      icon: GitBranchPlus,
+    },
+    {
+      label: "Variant",
+      href: "/dashboard/variant",
+      icon: Workflow,
+    },
+    {
+      label: "Category",
+      href: "/dashboard/category",
+      icon: FolderTree,
+    },
+  ],
+  user: [
+    {
+      label: "Super-admin",
+      href: "/dashboard/super-admin",
+      icon: UserPlus,
+    },
+    {
+      label: "Admin",
+      href: "/dashboard/admin",
+      icon: UserCog,
+    },
+    {
+      label: "Sub-admin",
+      href: "/dashboard/sub-admin",
+      icon: UserStar,
+    },
+    {
+      label: "Retailer",
+      href: "/dashboard/retailer",
+      icon: Users,
+    },
+  ],
+};
 
 export default function Sidebar({
   isOpen,
@@ -75,81 +150,6 @@ export default function Sidebar({
     }
   }, [pathname]);
 
-  const links = {
-    default: [
-      {
-        label: "Dashboard",
-        href: "/dashboard",
-        icon: LayoutDashboard,
-      },
-      {
-        label: "Notification",
-        href: "/dashboard/notification",
-        icon: Bell,
-      },
-      {
-        label: "Order log",
-        href: "/dashboard/order-log",
-        icon: ShoppingBag,
-      },
-    ],
-    product: [
-      {
-        label: "Product",
-        href: "/dashboard/product",
-        icon: PackagePlus,
-      },
-      {
-        label: "Draft",
-        href: "/dashboard/draft",
-        icon: FolderPen,
-      },
-    ],
-    entity: [
-      {
-        label: "Manufacturer",
-        href: "/dashboard/manufacturer",
-        icon: DiamondPlus,
-      },
-      {
-        label: "Brand",
-        href: "/dashboard/brand",
-        icon: GitBranchPlus,
-      },
-      {
-        label: "Variant",
-        href: "/dashboard/variant",
-        icon: Workflow,
-      },
-      {
-        label: "Category",
-        href: "/dashboard/category",
-        icon: FolderTree,
-      },
-    ],
-    user: [
-      {
-        label: "Super-admin",
-        href: "/dashboard/super-admin",
-        icon: UserPlus,
-      },
-      {
-        label: "Admin",
-        href: "/dashboard/admin",
-        icon: UserCog,
-      },
-      {
-        label: "Sub-admin",
-        href: "/dashboard/sub-admin",
-        icon: UserStar,
-      },
-      {
-        label: "Retailer",
-        href: "/dashboard/retailer",
-        icon: Users,
-      },
-    ],
-  };
 
   if (isHidden) return null; // completely hidden
 
@@ -316,3 +316,5 @@ export default function Sidebar({
     </>
   );
 }
+
+export {links}

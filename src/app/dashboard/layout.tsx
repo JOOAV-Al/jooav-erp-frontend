@@ -1,4 +1,5 @@
 "use client";
+import DashboardTopBar from "@/components/general/DashboardTopBar";
 import Sidebar from "@/components/general/Sidebar";
 import { useAuthHydration } from "@/features/auth/hooks/useAuthHydration";
 import LoadingScreen from "@/layouts/LoadingScreen";
@@ -24,6 +25,21 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
   const shouldRenderIcon = isSidebarHidden || !isSidebarOpen;
   const visibilityClass = isSidebarHidden ? "block" : "block md:hidden";
+  const handleSidebarToggleWithIcon = () => {
+    if (isSidebarHidden) {
+      setIsSidebarHidden(false);
+      // setIsSidebarOpen(true);
+    }
+    setIsSidebarOpen(true);
+  };
+
+  const getPageHeading = (): string => {
+    return pathname.startsWith("/dashboard/manufacturer")
+      ? "Manage manufacturer"
+      : pathname.startsWith("/dashboard/brands")
+      ? "Manage brands"
+      : "Home";
+  };
   return (
     <div className="flex min-h-screen overflow-hidden">
       {auth.isUserLoading ? (
@@ -45,7 +61,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
           <div
             className={`flex flex-col flex-1 overflow-auto mt-3 mr-3 ${
               isCollapsed ? "" : "rounded-t-2xl"
-            } p-md bg-white ${
+            } bg-white ${
               isSidebarHidden
                 ? "md:ml-0"
                 : isCollapsed
@@ -53,23 +69,12 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                 : "md:ml-57.5"
             }`}
           >
-            {shouldRenderIcon && (
-              <div
-                className={`${visibilityClass} h-8 w-8 md:h-10 md:w-10 flex items-center justify-center bg-[#E5E7EB] rounded-[10px]`}
-              >
-                <Menu
-                  className={`cursor-pointer text-black`}
-                  size={22}
-                  onClick={() => {
-                    if (isSidebarHidden) {
-                      setIsSidebarHidden(false);
-                      // setIsSidebarOpen(true);
-                    }
-                    setIsSidebarOpen(true);
-                  }}
-                />
-              </div>
-            )}
+            <DashboardTopBar
+              toggleSidebar={handleSidebarToggleWithIcon}
+              shouldRenderIcon={shouldRenderIcon}
+              visibilityClass={visibilityClass}
+              pageHeading={getPageHeading()}
+            />
             <main className="flex-1">{children}</main>
           </div>
         </>
