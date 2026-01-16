@@ -14,7 +14,7 @@ export async function fetchManufacturers (params: GeneralFetchingParams): Promis
   if(limit) filterParams.append('limit', limit.toString())
 
   const response = await api.get(`/manufacturers?${filterParams.toString()}`, { noToast: true } as CustomAxiosRequestConfig)
-  return response.data.data
+  return response.data
 }
 
 export async function fetchManufacturerProducts (params: GeneralFetchingParams): Promise<PaginatedResponse<ManufacturerProductItem>> {
@@ -25,7 +25,7 @@ export async function fetchManufacturerProducts (params: GeneralFetchingParams):
   if(limit) filterParams.append('limit', limit.toString())
 
   const response = await api.get(`/manufacturers/${id}/products?${filterParams.toString()}`, { noToast: true } as CustomAxiosRequestConfig)
-  return response.data.data
+  return response.data
 }
 
 export async function fetchManufacturerOrders (params: GeneralFetchingParams): Promise<PaginatedResponse<ManufacturerOrderItem>> {
@@ -36,7 +36,7 @@ export async function fetchManufacturerOrders (params: GeneralFetchingParams): P
   if(limit) filterParams.append('limit', limit.toString())
 
   const response = await api.get(`/manufacturers/${id}/orders?${filterParams.toString()}`, { noToast: true } as CustomAxiosRequestConfig)
-  return response.data.data
+  return response.data
 }
 
 export async function fetchDeletedManufacturers (params: GeneralFetchingParams): Promise<PaginatedResponse<ManufacturerItem>> {
@@ -50,15 +50,15 @@ export async function fetchDeletedManufacturers (params: GeneralFetchingParams):
   if(limit) filterParams.append('limit', limit.toString())
 
   const response = await api.get(`/manufacturers/deleted/list?${filterParams.toString()}`, { noToast: true } as CustomAxiosRequestConfig)
-  return response.data.data
+  return response.data
 }
 
 export async function fetchManufacturerDetails ({id}: {id: string}): Promise<ManufacturerItem> {
   const response = await api.get(`/manufacturers/${id}`, { noToast: true } as CustomAxiosRequestConfig)
-  return response.data.data
+  return response.data
 }
 
 export async function fetchManufacturersStats (): Promise<ManufacturerStatsItem> {
   const response = await api.get(`/manufacturers/stats`, { noToast: true } as CustomAxiosRequestConfig)
-  return response.data.data
+  return response.data
 }

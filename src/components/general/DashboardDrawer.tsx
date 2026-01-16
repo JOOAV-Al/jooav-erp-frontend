@@ -1,44 +1,3 @@
-// import React from 'react'
-// import {
-//   Drawer,
-//   DrawerClose,
-//   DrawerContent,
-//   DrawerDescription,
-//   DrawerFooter,
-//   DrawerHeader,
-//   DrawerTitle,
-//   DrawerTrigger,
-// } from "@/components/ui/drawer";
-// import { Button } from '@/components/ui/button';
-
-// interface DashboardDrawerProps {
-//   children: React.ReactNode;
-//   openDrawer: (isOpen: boolean) => void;
-//   isOpen: boolean;
-// }
-// const DashboardDrawer = ({ children, openDrawer, isOpen }: DashboardDrawerProps) => {
-//   return (
-//     <Drawer direction='right' open={isOpen} onOpenChange={openDrawer}>
-//       <DrawerTrigger>Open</DrawerTrigger>
-//       <DrawerContent>
-//         <DrawerHeader>
-//           <DrawerTitle>Are you absolutely sure?</DrawerTitle>
-//           <DrawerDescription>This action cannot be undone.</DrawerDescription>
-//         </DrawerHeader>
-//         <DrawerFooter>
-//           <Button>Submit</Button>
-//           <DrawerClose>
-//             <Button variant="outline">Cancel</Button>
-//           </DrawerClose>
-//         </DrawerFooter>
-//       </DrawerContent>
-//     </Drawer>
-//   );
-// };
-
-// export default DashboardDrawer
-
-
 import React from "react";
 import {
   RightDrawer,
@@ -58,6 +17,7 @@ interface DashboardDrawerProps {
   openDrawer: (isOpen: boolean) => void;
   isOpen: boolean;
   showTrigger?: boolean;
+  showFooter?: boolean;
   // optional id of the form inside the drawer to target with footer submit
   submitFormId?: string;
   submitLabel?: string;
@@ -70,6 +30,7 @@ const DashboardDrawer = ({
   openDrawer,
   isOpen,
   showTrigger = false,
+  showFooter = true,
   submitFormId,
   submitLabel = "Submit",
   submitLoading = false,
@@ -91,21 +52,23 @@ const DashboardDrawer = ({
 
         <RightDrawerBody className="">{children}</RightDrawerBody>
 
-        <RightDrawerFooter>
+        {showFooter && <RightDrawerFooter>
+          <RightDrawerClose asChild>
+            <Button size={"neutral"} variant="neutral">
+              Cancel
+            </Button>
+          </RightDrawerClose>
           {/* Submit button targets the inner form using the form attribute */}
           <Button
             type={submitFormId ? "submit" : "button"}
             form={submitFormId}
+            size={"neutral"}
             className="mr-2"
             disabled={submitLoading}
           >
             {submitLoading ? "Loading..." : submitLabel}
           </Button>
-
-          <RightDrawerClose asChild>
-            <Button variant="outline">Cancel</Button>
-          </RightDrawerClose>
-        </RightDrawerFooter>
+        </RightDrawerFooter>}
       </RightDrawerContent>
     </RightDrawer>
   );

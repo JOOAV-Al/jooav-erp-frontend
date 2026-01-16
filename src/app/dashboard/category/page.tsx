@@ -4,42 +4,42 @@ import DashboardDrawer from "@/components/general/DashboardDrawer";
 import DashboardCard from "@/components/general/DashboardCard";
 import DrawerTabs from "@/components/general/DrawerTabs";
 import EmptyState from "@/components/general/EmptyState";
-import ManufacturerForm from "@/features/manufacturers/components/ManufacturerForm";
+import CategoryForm from "@/features/categories/components/CategoryForm";
 import {
-  useCreateManufacturer,
-  useGetManufacturers,
-} from "@/features/manufacturers/services/manufacturers.api";
+  useCreateCategory,
+  useGetCategories,
+} from "@/features/categories/services/category.api";
 import { Tab } from "@/interfaces/general";
 import React, { useState } from "react";
 import DataTable from "@/components/general/DataTable";
-import { ManufacturerItem } from "@/features/manufacturers/types";
+import { CategoryItem } from "@/features/categories/types";
 
-const ManufacturerPage = () => {
+const CategoryPage = () => {
   const [page, setPage] = useState<number>(1);
   const [open, setOpen] = useState<boolean>(false);
   // lift mutation here so drawer footer can show loading and we can close on success
-  const { mutateAsync: createManufacturer, isPending } = useCreateManufacturer();
-  const [selectedManufacturer, setSelectedManufacturer] = useState<ManufacturerItem | undefined>(
+  const { mutateAsync: createCategory, isPending } = useCreateCategory();
+  const [selectedCategory, setSelectedCategory] = useState<CategoryItem | undefined>(
     undefined
   );
   const {
     data,
-    isPending: isManufacturersPending,
+    isPending: isCategoriesPending,
     isRefetching,
     refetch,
-  } = useGetManufacturers({});
+  } = useGetCategories({});
 
-  const manufacturers = data?.data;
-  console.log({ manufacturers });
+  const categories = data?.data;
+  console.log({ categories });
 
   const handleCreate = async (values: any) => {
-    await createManufacturer(values);
+    await createCategory(values);
     // close drawer on success
     setOpen(false);
     // optionally show toast or refresh list
   };
   const stats = [
-    { value: "200", label: "Total Manufacturers" },
+    { value: "200", label: "Total Categories" },
     { value: "10", label: "In Draft" },
     { value: "190", label: "Total Published" },
   ];
@@ -48,10 +48,10 @@ const ManufacturerPage = () => {
     {
       value: "manual",
       label: "Manual",
-      heading: "Enter manufacturer details",
+      heading: "Enter category details",
       content: (
-        <ManufacturerForm
-          manufacturer={selectedManufacturer}
+        <CategoryForm
+          category={selectedCategory}
           handleSubmitForm={handleCreate}
           loading={isPending}
           closeDialog={() => setOpen(false)}
@@ -61,10 +61,10 @@ const ManufacturerPage = () => {
     {
       value: "bulk",
       label: "Bulk Import",
-      // heading: "Upload manufacturer details",
+      // heading: "Upload category details",
       content: (
         <CSVUpload
-          catalog={"manufacturer"}
+          catalog={"category"}
           onCTAClick={() => setOpen(!open)}
           onDownload={() => {
             console.log("download");
@@ -76,7 +76,7 @@ const ManufacturerPage = () => {
 
   return (
     <div className="flex flex-col gap-5">
-      {manufacturers && manufacturers?.length > 0 && (
+      {categories && categories?.length > 0 && (
         <div className="flex py-main gap-6 border-y border-[#EDEDED]">
           {stats.map((stat, i) => (
             <DashboardCard
@@ -94,14 +94,14 @@ const ManufacturerPage = () => {
       <div className="flex flex-col gap-8 h-full px-xl mt-5">
         <DataTable
           onRowClick={(row) => {
-            setSelectedManufacturer(row);
+            setSelectedCategory(row);
             setOpen(!open);
           }}
-          loading={isManufacturersPending || isRefetching}
-          data={manufacturers ?? []}
+          loading={isCategoriesPending || isRefetching}
+          data={categories ?? []}
           refetch={refetch}
           columns={[
-            { key: "name", label: "Manufacturer" },
+            { key: "name", label: "Category" },
             {
               key: "variants",
               label: "No of Var.",
@@ -123,16 +123,16 @@ const ManufacturerPage = () => {
           hasNext={data?.meta?.hasNextPage}
           hasPrevious={data?.meta?.hasPreviousPage}
           onPageChange={setPage}
-          header="Create manufacturer"
-          description="No manufacturer record yet. Add records to see manufacturer list"
+          header="Create category"
+          description="No category record yet. Add records to see category list"
           image={"/dashboard/import-csv.svg"}
-          cta="Add Manufacturer"
+          cta="Add Category"
         />
 
         <DashboardDrawer
           openDrawer={() => setOpen(!open)}
           isOpen={open}
-          submitFormId="manufacturer-form"
+          submitFormId="category-form"
           submitLoading={isPending}
           submitLabel="Save record"
           children={<DrawerTabs tabs={tabs} />}
@@ -143,4 +143,4 @@ const ManufacturerPage = () => {
   );
 };
 
-export default ManufacturerPage;
+export default CategoryPage;

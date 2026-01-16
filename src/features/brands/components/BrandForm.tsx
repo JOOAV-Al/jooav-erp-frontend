@@ -3,10 +3,8 @@
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-// import { Button } from "@/components/ui/button";
 import {
   Field,
-  // FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
@@ -14,28 +12,22 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { DiamondPlus } from "lucide-react";
-// import { useCreateManufacturer } from "@/features/manufacturers/services/manufacturers.api";
 import { DialogFormProps } from "@/interfaces/general";
-import { ManufacturerItem } from "@/features/manufacturers/types";
+import { BrandItem } from "@/features/brands/types";
 
-const createManufacturerSchema = z.object({
+const createBrandSchema = z.object({
   name: z.string("Enter a valid name"),
 });
 
-export function ManufacturerForm({
-  // closeDialog,
-  // loading,
+export function BrandForm({
   handleSubmitForm,
-  manufacturer,
-}: DialogFormProps & { manufacturer?: ManufacturerItem }) {
-  // const { mutateAsync: createManufacturer, isPending } =
-  //   useCreateManufacturer();
-
-  const form = useForm<z.infer<typeof createManufacturerSchema>>({
-    resolver: zodResolver(createManufacturerSchema),
+  brand
+}: DialogFormProps & {brand?: BrandItem}) {
+  const form = useForm<z.infer<typeof createBrandSchema>>({
+    resolver: zodResolver(createBrandSchema),
     mode: "onChange",
     defaultValues: {
-      name: manufacturer?.name ?? "",
+      name: brand?.name ?? "",
     },
   });
 
@@ -45,23 +37,18 @@ export function ManufacturerForm({
     formState: { isValid },
   } = form;
 
-  const onSubmit = async (values: z.infer<typeof createManufacturerSchema>) => {
+  const onSubmit = async (values: z.infer<typeof createBrandSchema>) => {
     if (handleSubmitForm) {
       await handleSubmitForm(values);
       return;
     }
-
-    // // fallback local behavior
-    // const response = await createManufacturer(values);
-    // setMessage(response?.data?.message);
-    // if (closeDialog) closeDialog();
     console.log(values);
   };
 
   return (
     <FieldSet className="flex flex-1">
       <form
-        id="manufacturer-form"
+        id="brand-form"
         onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col flex-1"
       >
@@ -74,7 +61,7 @@ export function ManufacturerForm({
               <div>
                 <Field data-invalid={fieldState.invalid}>
                   <div className="flex gap-3 items-center">
-                    <FieldLabel>Manufacturer name</FieldLabel>
+                    <FieldLabel>Brand name</FieldLabel>
                     {fieldState.error && (
                       <FieldError>: {fieldState.error.message}</FieldError>
                     )}
@@ -82,7 +69,7 @@ export function ManufacturerForm({
                   <Input
                     {...field}
                     type="text"
-                    placeholder="Enter manufacturer name"
+                    placeholder="Enter brand name"
                     aria-invalid={fieldState.invalid}
                     leftIcon={
                       <DiamondPlus className="h-5 w-5 text-outline-passive" />
@@ -93,15 +80,9 @@ export function ManufacturerForm({
             )}
           />
         </FieldGroup>
-        {/* internal submit (kept for smaller screens or when footer not used) */}
-        {/* <div className="mt-auto">
-          <Button type="submit" className="w-full mt-7" disabled={loading}>
-            {loading ? "Loading..." : "Create"}
-          </Button>
-        </div> */}
       </form>
     </FieldSet>
   );
 }
 
-export default ManufacturerForm;
+export default BrandForm;

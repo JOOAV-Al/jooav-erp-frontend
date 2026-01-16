@@ -15,7 +15,7 @@ export async function fetchCategories (params: GeneralFetchingParams): Promise<P
   if(limit) filterParams.append('limit', limit.toString())
 
   const response = await api.get(`/categories?${filterParams.toString()}`, { noToast: true } as CustomAxiosRequestConfig)
-  return response.data.data
+  return response.data
 }
 
 export async function fetchCategoriesTree (params: GeneralFetchingParams): Promise<PaginatedResponse<CategoryItem>> {
@@ -30,7 +30,7 @@ export async function fetchCategoriesTree (params: GeneralFetchingParams): Promi
   if(limit) filterParams.append('limit', limit.toString())
 
   const response = await api.get(`/categories/tree?${filterParams.toString()}`, { noToast: true } as CustomAxiosRequestConfig)
-  return response.data.data
+  return response.data
 }
 
 export async function fetchCategoriesSubcategories (params: GeneralFetchingParams): Promise<PaginatedResponse<CategoryItem>> {
@@ -45,7 +45,7 @@ export async function fetchCategoriesSubcategories (params: GeneralFetchingParam
   if(limit) filterParams.append('limit', limit.toString())
 
   const response = await api.get(`/categories/subcategories?${filterParams.toString()}`, { noToast: true } as CustomAxiosRequestConfig)
-  return response.data.data
+  return response.data
 }
 
 export async function fetchDeactivatedCategories (params: GeneralFetchingParams): Promise<PaginatedResponse<CategoryItem>> {
@@ -61,15 +61,15 @@ export async function fetchDeactivatedCategories (params: GeneralFetchingParams)
   if(limit) filterParams.append('limit', limit.toString())
 
   const response = await api.get(`/categories/deactivated?${filterParams.toString()}`, { noToast: true } as CustomAxiosRequestConfig)
-  return response.data.data
+  return response.data
 }
 
 export async function fetchCategoryDetails ({id}: {id: string}): Promise<CategoryItem> {
   const response = await api.get(`/categories/${id}`, { noToast: true } as CustomAxiosRequestConfig)
-  return response.data.data
+  return response.data
 }
 
 export async function fetchCategoriesStats (): Promise<CategoryStatsItem> {
   const response = await api.get(`/categories/stats`, { noToast: true } as CustomAxiosRequestConfig)
-  return response.data.data
+  return response.data
 }

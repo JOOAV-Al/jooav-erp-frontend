@@ -52,7 +52,7 @@ export default function SidebarLink({
       onClick={handleClick}
     >
       <div
-        className={`group flex items-center gap-6 px-sm py-4 rounded-main hover:bg-gray-300 hover:text-nominal-input-hover transition-colors cursor-pointer ${
+        className={`group flex items-center gap-6 px-sm py-5 rounded-main hover:bg-gray-300 hover:text-nominal-input-hover transition-colors cursor-pointer ${
           isActive ? "bg-gray-300 sidebar-link font-medium" : "font-medium"
         } ${isCollapsed ? "w-fit mx-auto" : ""}`}
       >
@@ -62,10 +62,10 @@ export default function SidebarLink({
           <>
             {!isCollapsed ? (
               <Icon
-                size={22}
+                size={18}
                 className={`transition-colors ${
                   isActive ? "text-outline" : "text-outline-passive"
-                } group-hover:text-nominal-input-hover`}
+                } group-hover:text-outline`}
               />
             ) : (
               <Tooltip>
@@ -74,7 +74,7 @@ export default function SidebarLink({
                     size={24}
                     className={`transition-colors ${
                       isActive ? "text-outline" : "text-outline-passive"
-                    } group-hover:text-nominal-input-hover`}
+                    } group-hover:text-outline`}
                   />
                 </TooltipTrigger>
                 <TooltipContent>
@@ -89,8 +89,8 @@ export default function SidebarLink({
             className={`${
               isActive
                 ? "text-foreground"
-                : "text-body-passive group-hover:text-nominal-input-hover w-fit"
-            }`}
+                : "text-nominal-input-hover group-hover:text-nominal-input-hover w-fit"
+            } text-[15px]`}
           >
             {label}
           </p>

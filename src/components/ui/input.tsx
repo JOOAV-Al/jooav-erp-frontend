@@ -37,7 +37,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             // Logic: Base padding is 16px (px-main)
             // With left icon: 12px (pl-3) + 4px wrapper padding + icon width = total left space
             // The pl-12 (48px) gives us: 12px + 4px padding + ~20px icon + 12px text offset = flush at 16px from wrapper edge
-            hasLeftIcon && !hasRightIcon && "pl-10 pr-main",
+            hasLeftIcon && !hasRightIcon && "pl-11 pr-main",
             !hasLeftIcon && hasRightIcon && "pl-main pr-10",
             hasLeftIcon && hasRightIcon && "pl-10 pr-10",
             !hasLeftIcon && !hasRightIcon && "px-main",

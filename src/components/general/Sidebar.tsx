@@ -2,33 +2,36 @@
 "use client";
 import { useEffect } from "react";
 import {
-  CreditCard,
-  Home,
-  LibraryBig,
-  NotebookPen,
-  PencilRuler,
-  Table,
-  TabletSmartphone,
+  // CreditCard,
+  // Home,
+  // LibraryBig,
+  // NotebookPen,
+  // PencilRuler,
+  // Table,
+  // TabletSmartphone,
   X,
-  Settings,
-  LogOut,
+  // Settings,
+  // LogOut,
   PanelRightOpen,
   PanelRightClose,
-  MessageCircleMoreIcon,
-  ChartLineIcon,
+  // MessageCircleMoreIcon,
+  // ChartLineIcon,
   LayoutDashboard,
   Bell,
   ShoppingBag,
-  FolderPen,
-  FolderTree,
+  // FolderPen,
+  // FolderTree,
   DiamondPlus,
   GitBranchPlus,
   Workflow,
   UserPlus,
   UserCog,
-  UserStar,
-  Users,
+  // UserStar,
+  // Users,
   PackagePlus,
+  Bike,
+  CheckCheck,
+  ListTree,
   // Router,
 } from "lucide-react";
 import SidebarLink from "./SidebarLink";
@@ -39,12 +42,12 @@ import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 // import { RootState } from '@/store';
-import Cookies from "js-cookie";
+// import Cookies from "js-cookie";
 // import { RootState } from "@/store";
 // import { truncateText } from "@/lib/utils";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { RootState } from "@/redux/store";
-import { logout } from "@/redux/slices/authSlice";
+// import { logout } from "@/redux/slices/authSlice";
 interface SidebarProps {
   isOpen: boolean;
   toggleSidebar: () => void;
@@ -54,7 +57,7 @@ interface SidebarProps {
   setIsCollapsed?: () => void;
 }
 const links = {
-  default: [
+  overview: [
     {
       label: "Dashboard",
       href: "/dashboard",
@@ -65,25 +68,30 @@ const links = {
       href: "/dashboard/notification",
       icon: Bell,
     },
+  ],
+  order: [
     {
       label: "Order log",
       href: "/dashboard/order-log",
       icon: ShoppingBag,
     },
+    {
+      label: "Logistics",
+      href: "/dashboard/logistics",
+      icon: Bike,
+    },
+    {
+      label: "Fulfillment",
+      href: "/dashboard/fulfillment",
+      icon: CheckCheck,
+    },
   ],
-  product: [
+  catalog: [
     {
       label: "Product",
       href: "/dashboard/product",
       icon: PackagePlus,
     },
-    {
-      label: "Draft",
-      href: "/dashboard/draft",
-      icon: FolderPen,
-    },
-  ],
-  entity: [
     {
       label: "Manufacturer",
       href: "/dashboard/manufacturer",
@@ -102,29 +110,19 @@ const links = {
     {
       label: "Category",
       href: "/dashboard/category",
-      icon: FolderTree,
+      icon: ListTree,
     },
   ],
   user: [
     {
-      label: "Super-admin",
-      href: "/dashboard/super-admin",
+      label: "Users",
+      href: "/dashboard/users",
       icon: UserPlus,
     },
     {
-      label: "Admin",
-      href: "/dashboard/admin",
+      label: "Roles & Permissions",
+      href: "/dashboard/roles",
       icon: UserCog,
-    },
-    {
-      label: "Sub-admin",
-      href: "/dashboard/sub-admin",
-      icon: UserStar,
-    },
-    {
-      label: "Retailer",
-      href: "/dashboard/retailer",
-      icon: Users,
     },
   ],
 };
@@ -150,7 +148,6 @@ export default function Sidebar({
     }
   }, [pathname]);
 
-
   if (isHidden) return null; // completely hidden
 
   return (
@@ -174,7 +171,7 @@ export default function Sidebar({
         `}
       >
         <div
-          className={`flex flex-col overflow-y-auto h-full ${
+          className={`flex flex-col gap-main overflow-y-auto h-full ${
             isCollapsed ? "px-sm" : "px-sm"
           }`}
         >
@@ -220,35 +217,21 @@ export default function Sidebar({
           </div>
 
           {/* Divider */}
-          {/* {!isCollapsed && <div className="border-t" />} */}
           <ScrollArea isSidebar className="min-h-72 w-full">
             <div className="py-main flex flex-col gap-sm">
-              {/* Default */}
-              <nav className="flex flex-col gap-7">
-                {links.default.map((link) => (
-                  <SidebarLink
-                    key={link.href}
-                    href={link.href}
-                    label={link.label}
-                    Icon={link.icon}
-                    isCollapsed={isCollapsed}
-                  />
-                ))}
-              </nav>
-
-              {/* Products */}
+              {/* Overview */}
               <div
                 className={`flex flex-col gap-7 ${
                   isCollapsed ? "border-t-2 border-[#EDEDED] pt-main" : ""
                 }`}
               >
                 {!isCollapsed && (
-                  <h4 className="font-mono leading-[1.2] text-sm text-body-passive mx-2">
-                    PRODUCT CRUD
-                  </h4>
+                  <h5 className="font-mono leading-[1.2] text-sm text-body-passive mx-2">
+                    OVERVIEW
+                  </h5>
                 )}
                 <nav className="flex flex-col gap-3">
-                  {links.product.map((link) => (
+                  {links.overview.map((link) => (
                     <SidebarLink
                       key={link.href}
                       href={link.href}
@@ -260,19 +243,43 @@ export default function Sidebar({
                 </nav>
               </div>
 
-              {/* Entities */}
+              {/* Order */}
               <div
                 className={`flex flex-col gap-7 ${
                   isCollapsed ? "border-t-2 border-[#EDEDED] pt-main" : ""
                 }`}
               >
                 {!isCollapsed && (
-                  <h4 className="font-mono leading-[1.2] text-sm text-body-passive mx-2">
-                    ENTITY CRUD
-                  </h4>
+                  <h5 className="font-mono leading-[1.2] text-sm text-body-passive mx-2">
+                    ORDER
+                  </h5>
                 )}
                 <nav className="flex flex-col gap-3">
-                  {links.entity.map((link) => (
+                  {links.order.map((link) => (
+                    <SidebarLink
+                      key={link.href}
+                      href={link.href}
+                      label={link.label}
+                      Icon={link.icon}
+                      isCollapsed={isCollapsed}
+                    />
+                  ))}
+                </nav>
+              </div>
+
+              {/* Catalog */}
+              <div
+                className={`flex flex-col gap-7 ${
+                  isCollapsed ? "border-t-2 border-[#EDEDED] pt-main" : ""
+                }`}
+              >
+                {!isCollapsed && (
+                  <h5 className="font-mono leading-[1.2] text-sm text-body-passive mx-2">
+                    CATALOG CRUD
+                  </h5>
+                )}
+                <nav className="flex flex-col gap-3">
+                  {links.catalog.map((link) => (
                     <SidebarLink
                       key={link.href}
                       href={link.href}
@@ -291,9 +298,9 @@ export default function Sidebar({
                 }`}
               >
                 {!isCollapsed && (
-                  <h4 className="font-mono leading-[1.2] text-sm text-body-passive mx-2">
+                  <h5 className="font-mono leading-[1.2] text-sm text-body-passive mx-2">
                     USER CRUD
-                  </h4>
+                  </h5>
                 )}
                 <nav className="flex flex-col gap-3">
                   {links.user.map((link) => (
@@ -308,13 +315,21 @@ export default function Sidebar({
                 </nav>
               </div>
             </div>
-
-            <div className="bg-gray-300 h-25 w-52.5 rounded-lg mt-27.5"></div>
           </ScrollArea>
+          <div className="py-main px-sm">
+            <div className="w-full rounded-lg">
+              <Image
+                height={150}
+                width={300}
+                src={"/dashboard/drawer-top-img.svg"}
+                alt="sidebar image"
+              />
+            </div>
+          </div>
         </div>
       </aside>
     </>
   );
 }
 
-export {links}
+export { links };

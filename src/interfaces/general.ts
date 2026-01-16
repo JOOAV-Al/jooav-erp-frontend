@@ -20,16 +20,38 @@ export interface GeneralFetchingParams {
 }
 
 export interface PaginatedResponse<T> {
-  result: T[];
-  count: number;
-  next: boolean;
-  prev: boolean;
+  status: string;
+  success: boolean;
+  data: T[];
+  meta: {
+    page: number;
+    limit: number;
+    totalItems: number;
+    nextPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  }
+  // result: T[];
+  // count: number;
+  // next: boolean;
+  // prev: boolean;
 }
 export interface PaginatedObjectResponse<T> {
-  result: T;
-  count: number;
-  next: boolean;
-  prev: boolean;
+  status: string;
+  success: boolean;
+  data: T;
+  meta: {
+    page: number;
+    limit: number;
+    totalItems: number;
+    nextPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  }
+  // result: T;
+  // count: number;
+  // next: boolean;
+  // prev: boolean;
 }
 
 export interface Tab {

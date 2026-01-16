@@ -1,9 +1,9 @@
-import { BrandItem, BrandStatsItem } from "@/features/brands/types"
+import { VariantItem, VariantStatsItem } from "@/features/variants/types"
 import { GeneralFetchingParams, PaginatedResponse } from "@/interfaces/general"
 import { api, CustomAxiosRequestConfig } from "@/lib/api/axiosInstance"
 
 const LIMIT = 20
-export async function fetchBrands (params: GeneralFetchingParams): Promise<PaginatedResponse<BrandItem>> {
+export async function fetchVariants (params: GeneralFetchingParams): Promise<PaginatedResponse<VariantItem>> {
   const {search, status, manufacturerId, sortBy, sortOrder, page, limit=LIMIT} = params
   const filterParams = new URLSearchParams({})
   if(search) filterParams.append('search', search)
@@ -14,11 +14,11 @@ export async function fetchBrands (params: GeneralFetchingParams): Promise<Pagin
   if(page) filterParams.append('page', page.toString())
   if(limit) filterParams.append('limit', limit.toString())
 
-  const response = await api.get(`/brands?${filterParams.toString()}`, { noToast: true } as CustomAxiosRequestConfig)
+  const response = await api.get(`/variants?${filterParams.toString()}`, { noToast: true } as CustomAxiosRequestConfig)
   return response.data
 }
 
-export async function fetchBrandsByManufacturer (params: GeneralFetchingParams): Promise<PaginatedResponse<BrandItem>> {
+export async function fetchVariantsByManufacturer (params: GeneralFetchingParams): Promise<PaginatedResponse<VariantItem>> {
   const {search, status, manufacturerId, sortBy, sortOrder, page, limit=LIMIT} = params
   const filterParams = new URLSearchParams({})
   if(search) filterParams.append('search', search)
@@ -28,11 +28,11 @@ export async function fetchBrandsByManufacturer (params: GeneralFetchingParams):
   if(page) filterParams.append('page', page.toString())
   if(limit) filterParams.append('limit', limit.toString())
 
-  const response = await api.get(`/brands/manufacturer/${manufacturerId}/products?${filterParams.toString()}`, { noToast: true } as CustomAxiosRequestConfig)
+  const response = await api.get(`/variants/manufacturer/${manufacturerId}/products?${filterParams.toString()}`, { noToast: true } as CustomAxiosRequestConfig)
   return response.data
 }
 
-export async function fetchDeletedBrands (params: GeneralFetchingParams): Promise<PaginatedResponse<BrandItem>> {
+export async function fetchDeletedVariants (params: GeneralFetchingParams): Promise<PaginatedResponse<VariantItem>> {
   const {search, status, manufacturerId, sortBy, sortOrder, page, limit=LIMIT} = params
   const filterParams = new URLSearchParams({})
   if(search) filterParams.append('search', search)
@@ -43,16 +43,16 @@ export async function fetchDeletedBrands (params: GeneralFetchingParams): Promis
   if(page) filterParams.append('page', page.toString())
   if(limit) filterParams.append('limit', limit.toString())
 
-  const response = await api.get(`/brands/deleted?${filterParams.toString()}`, { noToast: true } as CustomAxiosRequestConfig)
+  const response = await api.get(`/variants/deleted?${filterParams.toString()}`, { noToast: true } as CustomAxiosRequestConfig)
   return response.data
 }
 
-export async function fetchBrandDetails ({id}: {id: string}): Promise<BrandItem> {
-  const response = await api.get(`/brands/${id}`, { noToast: true } as CustomAxiosRequestConfig)
+export async function fetchVariantDetails ({id}: {id: string}): Promise<VariantItem> {
+  const response = await api.get(`/variants/${id}`, { noToast: true } as CustomAxiosRequestConfig)
   return response.data
 }
 
-export async function fetchBrandsStats (): Promise<BrandStatsItem> {
-  const response = await api.get(`/brands/stats`, { noToast: true } as CustomAxiosRequestConfig)
+export async function fetchVariantsStats (): Promise<VariantStatsItem> {
+  const response = await api.get(`/variants/stats`, { noToast: true } as CustomAxiosRequestConfig)
   return response.data
 }

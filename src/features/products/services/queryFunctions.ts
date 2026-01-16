@@ -16,7 +16,7 @@ export async function fetchProducts (params: GeneralFetchingParams): Promise<Pag
   if(limit) filterParams.append('limit', limit.toString())
 
   const response = await api.get(`/products?${filterParams.toString()}`, { noToast: true } as CustomAxiosRequestConfig)
-  return response.data.data
+  return response.data
 }
 
 export async function fetchProductsByManufacturer (params: GeneralFetchingParams): Promise<PaginatedResponse<ProductItem>> {
@@ -32,7 +32,7 @@ const {manufacturerId, search, brandId, categoryId, variant, isActive, includeRe
   if(limit) filterParams.append('limit', limit.toString())
 
   const response = await api.get(`/products/manufacturer/${manufacturerId}/products?${filterParams.toString()}`, { noToast: true } as CustomAxiosRequestConfig)
-  return response.data.data
+  return response.data
 }
 
 export async function fetchDeactivatedProducts (params: GeneralFetchingParams): Promise<PaginatedResponse<ProductItem>> {
@@ -48,15 +48,15 @@ export async function fetchDeactivatedProducts (params: GeneralFetchingParams): 
   if(limit) filterParams.append('limit', limit.toString())
 
   const response = await api.get(`/products/deactivated?${filterParams.toString()}`, { noToast: true } as CustomAxiosRequestConfig)
-  return response.data.data
+  return response.data
 }
 
 export async function fetchProductDetails ({id}: {id: string}): Promise<ProductItem> {
   const response = await api.get(`/products/${id}`, { noToast: true } as CustomAxiosRequestConfig)
-  return response.data.data
+  return response.data
 }
 
 export async function fetchProductsStats (): Promise<ProductStatsItem> {
   const response = await api.get(`/products/stats`, { noToast: true } as CustomAxiosRequestConfig)
-  return response.data.data
+  return response.data
 }

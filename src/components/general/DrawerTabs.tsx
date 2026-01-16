@@ -15,7 +15,7 @@ const DrawerTabs = ({ tabs }: DrawerTabsProps) => {
           </TabsList>
         </div>
         {tabs?.map((tab, i) => (
-          <TabsContent key={i} value={tab.value} className="px-xl">
+          <TabsContent key={i} value={tab.value} className="px-xl py-main flex flex-col gap-main">
             <h3>{tab?.heading ?? ""}</h3>
             {tab?.content}
           </TabsContent>

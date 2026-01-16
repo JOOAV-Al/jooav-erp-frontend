@@ -36,8 +36,14 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const getPageHeading = (): string => {
     return pathname.startsWith("/dashboard/manufacturer")
       ? "Manage manufacturer"
-      : pathname.startsWith("/dashboard/brands")
+      : pathname.startsWith("/dashboard/brand")
       ? "Manage brands"
+      : pathname.startsWith("/dashboard/variant")
+      ? "Manage variant"
+      : pathname.startsWith("/dashboard/category")
+      ? "Manage category"
+      : pathname.startsWith("/dashboard/product")
+      ? "Manage product"
       : "Home";
   };
   return (

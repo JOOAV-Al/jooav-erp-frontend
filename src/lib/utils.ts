@@ -19,3 +19,10 @@ export const normalizeRoleForRoute = (role: string): string => {
   // All other roles use their own route
   return normalized;
 };
+
+export function formatBytesToKB(bytes: number = 0): string {
+  if (bytes === 0) return "0 KB";
+  if (bytes < 1024) return `${bytes} B`;
+  const kb = bytes / 1024;
+  return `${kb.toFixed(2)} KB`;
+}
