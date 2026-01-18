@@ -1,43 +1,68 @@
 "use client";
 import CSVUpload from "@/features/uploads/components/CSVUpload";
 import DashboardDrawer from "@/components/general/DashboardDrawer";
-import DashboardCard from "@/components/general/DashboardCard";
 import DrawerTabs from "@/components/general/DrawerTabs";
-import EmptyState from "@/components/general/EmptyState";
 import VariantForm from "@/features/variants/components/VariantForm";
 import {
   useCreateVariant,
   useGetVariants,
+  useUpdateVariant,
 } from "@/features/variants/services/variants.api";
 import { Tab } from "@/interfaces/general";
 import React, { useState } from "react";
 import DataTable from "@/components/general/DataTable";
 import { VariantItem } from "@/features/variants/types";
+import FilterContainer from "@/components/filters/FilterContainer";
+import AllFilter from "@/components/filters/AllFilter";
+import SortFilter from "@/components/filters/SortFilter";
+import SearchBox from "@/components/filters/SearchBox";
+import { useDebounce } from "@/hooks/useDebounce";
+import StatsContainer from "@/components/general/StatsContainer";
 
 const VariantPage = () => {
   const [page, setPage] = useState<number>(1);
   const [open, setOpen] = useState<boolean>(false);
-  // lift mutation here so drawer footer can show loading and we can close on success
-  const { mutateAsync: createVariant, isPending } = useCreateVariant();
+  const [query, setQuery] = useState<string>("");
+  const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
+
+  const { mutateAsync: updateVariant, isPending: updating } =
+    useUpdateVariant();
+  const { mutateAsync: createVariant, isPending: creating } =
+    useCreateVariant();
   const [selectedVariant, setSelectedVariant] = useState<
     VariantItem | undefined
   >(undefined);
+  const [selectedVariants, setSelectedVariants] = useState<VariantItem[] | []>(
+    []
+  );
+  const debouncedQuery = useDebounce(query);
+
   const {
     data,
     isPending: isVariantsPending,
     isRefetching,
     refetch,
-  } = useGetVariants({});
+  } = useGetVariants({ search: debouncedQuery, sortOrder });
 
   const variants = data?.data;
-  console.log({ variants });
 
   const handleCreate = async (values: any) => {
-    await createVariant(values);
+    if (selectedVariant) {
+      await updateVariant(values);
+    } else {
+      await createVariant(values);
+    }
     // close drawer on success
     setOpen(false);
-    // optionally show toast or refresh list
+    setSelectedVariant(undefined);
   };
+
+  const handleBulkDelete = async (
+    selectedVariants: VariantItem[]
+  ) => {
+    console.log({ selectedVariants });
+  };
+
   const stats = [
     { value: "200", label: "Total Variants" },
     { value: "10", label: "In Draft" },
@@ -53,7 +78,7 @@ const VariantPage = () => {
         <VariantForm
           variant={selectedVariant}
           handleSubmitForm={handleCreate}
-          loading={isPending}
+          loading={creating || updating}
           closeDialog={() => setOpen(false)}
         />
       ),
@@ -76,26 +101,57 @@ const VariantPage = () => {
 
   return (
     <div className="flex flex-col gap-5">
-      {variants && variants?.length > 0 && (
-        <div className="flex py-main gap-6 border-y border-[#EDEDED]">
-          {stats.map((stat, i) => (
-            <DashboardCard
-              className={`${
-                i !== stats.length - 1 ? "border-r border-[#EDEDED]" : ""
-              }`}
-              key={i}
-              value={stat.value}
-              label={stat.label}
-            />
-          ))}
-        </div>
-      )}
+      {variants && variants?.length > 0 && <StatsContainer stats={stats} />}
 
-      <div className="flex flex-col gap-8 h-full px-xl mt-5">
+      <div className="px-xl pt-xl pb-1 flex flex-col gap-7">
+        <div className="flex justify-between flex-wrap gap-6">
+          <FilterContainer label="Filter">
+            <AllFilter />
+            <SortFilter
+              value={sortOrder}
+              onChange={(value) => setSortOrder(value)}
+            />
+          </FilterContainer>
+          <div className="flex items-center gap-6">
+            <SearchBox
+              value={query}
+              onChange={(value) => {
+                setPage(1);
+                setQuery(value);
+              }}
+            />
+            <DashboardDrawer
+              showTrigger
+              openDrawer={(isOpen) => {
+                if (isOpen) {
+                  setSelectedVariant(undefined);
+                }
+                setOpen(isOpen);
+              }}
+              isOpen={open}
+              submitFormId={"variant-form"}
+              submitLoading={updating || creating}
+              submitLabel="Save record"
+              children={<DrawerTabs tabs={tabs} />}
+              showFooter
+            />
+          </div>
+        </div>
         <DataTable
           onRowClick={(row) => {
             setSelectedVariant(row);
             setOpen(!open);
+          }}
+          withCheckbox
+          getRowId={(row) => row.id}
+          onSelectionChange={(selectedRows) => {
+            console.log("Selected rows:", selectedRows);
+            setSelectedVariants(selectedRows);
+          }}
+          onDelete={(selectedRows) => {
+            console.log("Delete these:", selectedRows);
+            // Call your delete API here
+            handleBulkDelete(selectedRows);
           }}
           loading={isVariantsPending || isRefetching}
           data={variants ?? []}
@@ -103,16 +159,12 @@ const VariantPage = () => {
           columns={[
             { key: "name", label: "Variant" },
             {
-              key: "variants",
-              label: "No of Var.",
-            },
-            {
               key: "logo",
               label: "Logo",
             },
             {
-              key: "manufacturer",
-              label: "Manufacturer",
+              key: "brand.name",
+              label: "Brand",
             },
             { key: "updatedAt", label: "Modified" },
             { key: "createdAt", label: "Created" },
@@ -127,16 +179,6 @@ const VariantPage = () => {
           description="No variant record yet. Add records to see variant list"
           image={"/dashboard/import-csv.svg"}
           cta="Add Variant"
-        />
-
-        <DashboardDrawer
-          openDrawer={() => setOpen(!open)}
-          isOpen={open}
-          submitFormId="variant-form"
-          submitLoading={isPending}
-          submitLabel="Save record"
-          children={<DrawerTabs tabs={tabs} />}
-          showFooter
         />
       </div>
     </div>

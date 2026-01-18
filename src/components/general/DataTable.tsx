@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Table,
   TableBody,
@@ -10,6 +10,8 @@ import {
 import EmptyState from "@/components/general/EmptyState";
 import Spinner from "@/components/general/Spinner";
 import { format } from "date-fns";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Trash2, X } from "lucide-react";
 // import Pagination from "./Pagination";
 // import CustomLoader from "@/components/layouts/landing-page/CustomLoader";
 // import NoDataBox from "./NoDataBox";
@@ -42,7 +44,23 @@ interface DataTableProps<T> {
   description: string;
   cta?: string;
   onCTAClick?: () => void;
+  withCheckbox?: boolean;
+  onSelectionChange?: (selectedRows: any[]) => void;
+  getRowId?: (row: T) => any;
+  onDelete?: (selectedRows: T[]) => void;
 }
+
+//Helper function to get nested values (e.g., "brand.name")
+const getNestedValue = (obj: any, path: string): any => {
+  return path.split(".").reduce((acc, part) => acc?.[part], obj);
+};
+
+// Helper to check if a string is a valid ISO date
+const isISODate = (str: string): boolean => {
+  // Match ISO 8601 format (YYYY-MM-DD or full ISO string)
+  const isoPattern = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d{3})?Z?)?$/;
+  return isoPattern.test(str);
+};
 
 function DataTable<T>({
   data,
@@ -62,13 +80,82 @@ function DataTable<T>({
   description,
   cta,
   onCTAClick,
+  withCheckbox,
+  onSelectionChange,
+  getRowId = (row: any) => row.id,
+  onDelete,
 }: // isRefetching = false,
 DataTableProps<T>) {
+  const [selectedRows, setSelectedRows] = useState<Set<any>>(new Set());
+  // Handle select all checkbox
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      const allIds = new Set(data.map(getRowId));
+      setSelectedRows(allIds);
+      onSelectionChange?.(data);
+    } else {
+      setSelectedRows(new Set());
+      onSelectionChange?.([]);
+    }
+  };
+
+  // Handle individual row selection
+  const handleSelectRow = (row: T, checked: boolean) => {
+    const rowId = getRowId(row);
+    const newSelected = new Set(selectedRows);
+
+    if (checked) {
+      newSelected.add(rowId);
+    } else {
+      newSelected.delete(rowId);
+    }
+
+    setSelectedRows(newSelected);
+
+    // Get actual selected row objects
+    const selectedRowObjects = data.filter((r) => newSelected.has(getRowId(r)));
+    onSelectionChange?.(selectedRowObjects);
+  };
+
+  // Clear all selections
+  const handleClearSelection = () => {
+    setSelectedRows(new Set());
+    onSelectionChange?.([]);
+  };
+
+  // Handle delete action
+  const handleDelete = () => {
+    const selectedRowObjects = data.filter((r) =>
+      selectedRows.has(getRowId(r))
+    );
+    onDelete?.(selectedRowObjects);
+    handleClearSelection();
+  };
+
+  const isAllSelected = data.length > 0 && selectedRows.size === data.length;
+  const isSomeSelected =
+    selectedRows.size > 0 && selectedRows.size < data.length;
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 relative">
       <Table>
-        <TableHeader className="bg-primary-50 hover:bg-primary-100">
+        <TableHeader className="bg-[#F7F7F7] h-10.5 gap-8">
           <TableRow>
+            {withCheckbox && (
+              <TableHead className="w-12">
+                <Checkbox
+                  checked={isAllSelected}
+                  onCheckedChange={handleSelectAll}
+                  aria-label="Select all"
+                  className={` border-[#D4D0C4]!
+                    ${
+                      isSomeSelected
+                        ? "data-[state=checked]:bg-brand-primary"
+                        : ""
+                    }
+                  `}
+                />
+              </TableHead>
+            )}
             {columns.map((col, i) => (
               <TableHead key={i}>{col.label}</TableHead>
             ))}
@@ -77,7 +164,10 @@ DataTableProps<T>) {
         {loading ? (
           <TableBody>
             <TableRow>
-              <TableCell colSpan={columns.length} className="hover:bg-white">
+              <TableCell
+                colSpan={columns.length + (withCheckbox ? 1 : 0)}
+                className="hover:bg-white"
+              >
                 <div className="bg-white flex flex-col items-center justify-center rounded-[10px] py-8 px-4 overflow-hidden h-[400px]">
                   <Spinner className="text-brand-primary" />
                 </div>
@@ -87,7 +177,7 @@ DataTableProps<T>) {
         ) : data?.length === 0 ? (
           <TableBody>
             <TableRow className="hover:bg-white">
-              <TableCell colSpan={columns.length}>
+              <TableCell colSpan={columns.length + (withCheckbox ? 1 : 0)}>
                 <EmptyState
                   header={header ?? "Create brand"}
                   description={description}
@@ -100,34 +190,70 @@ DataTableProps<T>) {
           </TableBody>
         ) : (
           <TableBody>
-            {data?.map((row, i) => (
-              <TableRow
-                key={i}
-                onClick={() => onRowClick?.(row)}
-                className={`${onRowClick ? "cursor-pointer" : ""}`}
-              >
-                {columns?.map((col, j) => (
-                  <TableCell key={j}>
-                    {(() => {
-                      if (!col.key) return "nil";
-                      if (col.render) return col.render(row);
+            {data?.map((row, i) => {
+              const rowId = getRowId(row);
+              const isSelected = selectedRows.has(rowId);
+              return (
+                <TableRow
+                  key={i}
+                  onClick={(e) => {
+                    // Don't trigger row click if clicking checkbox
+                    if (
+                      // !withCheckbox &&
+                      !(e.target as HTMLElement).closest('[role="checkbox"]')
+                    ) {
+                      onRowClick?.(row);
+                    }
+                  }}
+                  className={`${
+                    onRowClick || withCheckbox ? "cursor-pointer" : ""
+                  } 
+                    ${isSelected ? "bg-[#EBF4FF]" : "hover:bg-muted/50"}`}
+                  data-state={isSelected ? "selected" : undefined}
+                >
+                  {withCheckbox && (
+                    <TableCell className="w-12">
+                      <Checkbox
+                        checked={isSelected}
+                        onCheckedChange={(checked) =>
+                          handleSelectRow(row, !!checked)
+                        }
+                        aria-label={`Select row ${i + 1}`}
+                      />
+                    </TableCell>
+                  )}
+                  {columns?.map((col, j) => (
+                    <TableCell key={j}>
+                      {(() => {
+                        if (!col.key) return "nil";
+                        if (col.render) return col.render(row);
 
-                      const val = row[col.key as keyof T];
-                      // If it's already a Date
-                      if (val instanceof Date) return format(val, "dd MMMM, yyyy");
+                        // Support nested keys (e.g., "brand.name")
+                        const val = (col.key as string).includes(".")
+                          ? getNestedValue(row, col.key as string)
+                          : row[col.key as keyof T];
 
-                      // If it's a string or number that can be parsed as a date (ISO, timestamp, etc.)
-                      if (typeof val === "string" || typeof val === "number") {
-                        const parsed = new Date(val as any);
-                        if (!isNaN(parsed.getTime())) return format(parsed, "dd/MM/yyyy");
-                      }
+                        // If it's already a Date object
+                        if (val instanceof Date) {
+                          return format(val, "dd MMMM, yyyy");
+                        }
 
-                      return String(val ?? "nil");
-                    })()}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
+                        // Only parse strings that match ISO date format
+                        if (typeof val === "string" && isISODate(val)) {
+                          const parsed = new Date(val);
+                          if (!isNaN(parsed.getTime())) {
+                            return format(parsed, "dd/MM/yyyy");
+                          }
+                        }
+
+                        // Return as-is for everything else (numbers, non-ISO strings, etc.)
+                        return String(val ?? "nil");
+                      })()}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              );
+            })}
           </TableBody>
         )}
       </Table>
@@ -147,6 +273,38 @@ DataTableProps<T>) {
             isLoading={loading}
           />
         )} */}
+      {/* Floating Selection Actions - Shows when items are selected */}
+      {withCheckbox && selectedRows.size > 0 && (
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-6">
+          {/* Selection count card */}
+          <div className="bg-storey-foreground rounded-lg shadow-input flex items-center">
+            <span
+              className=" 
+            text-[#333] px-md py-sm border-r-2 border-border-main"
+            >
+              {selectedRows.size} Selected
+            </span>
+            <button
+              onClick={handleClearSelection}
+              className="flex items-center justify-center px-md py-3 cursor-pointer group"
+              aria-label="Clear selection"
+            >
+              <X className="w-5 h-5 text-outline group-hover:scale-108 group-hover:text-brand-primary" />
+            </button>
+          </div>
+
+          {/* Delete button */}
+          {onDelete && (
+            <button
+              onClick={handleDelete}
+              className="bg-storey-foreground rounded-lg shadow-input px-main py-md flex items-center gap-5 group cursor-pointer"
+              aria-label="Delete selected"
+            >
+              <Trash2 className="w-5 h-5 text-outline group-hover:text-red-500 group-hover:scale-105" />
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

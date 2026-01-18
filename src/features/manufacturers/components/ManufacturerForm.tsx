@@ -6,7 +6,6 @@ import { Controller, useForm } from "react-hook-form";
 // import { Button } from "@/components/ui/button";
 import {
   Field,
-  // FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
@@ -14,9 +13,9 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { DiamondPlus } from "lucide-react";
-// import { useCreateManufacturer } from "@/features/manufacturers/services/manufacturers.api";
 import { DialogFormProps } from "@/interfaces/general";
 import { ManufacturerItem } from "@/features/manufacturers/types";
+import { useEffect } from "react";
 
 const createManufacturerSchema = z.object({
   name: z.string("Enter a valid name"),
@@ -31,7 +30,8 @@ export function ManufacturerForm({
   // const { mutateAsync: createManufacturer, isPending } =
   //   useCreateManufacturer();
 
-  const form = useForm<z.infer<typeof createManufacturerSchema>>({
+  type ManufacturerData = z.infer<typeof createManufacturerSchema>;
+  const form = useForm<ManufacturerData>({
     resolver: zodResolver(createManufacturerSchema),
     mode: "onChange",
     defaultValues: {
@@ -42,14 +42,34 @@ export function ManufacturerForm({
   const {
     handleSubmit,
     control,
-    formState: { isValid },
+    formState: { dirtyFields },
+    reset,
   } = form;
 
+  useEffect(() => {
+    reset({
+      name: manufacturer?.name ?? "",
+    });
+  }, [manufacturer?.id, reset]);
+
   const onSubmit = async (values: z.infer<typeof createManufacturerSchema>) => {
-    if (handleSubmitForm) {
-      await handleSubmitForm(values);
+    if (!handleSubmitForm) return;
+    console.log({ manufacturer });
+    console.log({ values });
+    if (manufacturer?.id) {
+      //Build partial payload using dirty fields
+      const changes: Partial<ManufacturerData> = {};
+      for (const key of Object.keys(dirtyFields) as Array<keyof ManufacturerData>) {
+        const val = values[key];
+        if (val !== undefined) {
+          changes[key] = val;
+        }
+      }
+      const payload = Object.keys(changes).length ? changes : values;
+      await handleSubmitForm({ payload, id: manufacturer?.id });
       return;
     }
+    await handleSubmitForm(values);
 
     // // fallback local behavior
     // const response = await createManufacturer(values);
@@ -59,12 +79,12 @@ export function ManufacturerForm({
   };
 
   return (
-    <FieldSet className="flex flex-1">
-      <form
-        id="manufacturer-form"
-        onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col flex-1"
-      >
+    <form
+      id="manufacturer-form"
+      onSubmit={handleSubmit(onSubmit)}
+      className="flex flex-col flex-1"
+    >
+      <FieldSet className="flex flex-1">
         <FieldGroup className="flex flex-col gap-7">
           {/* NAME */}
           <Controller
@@ -99,8 +119,8 @@ export function ManufacturerForm({
             {loading ? "Loading..." : "Create"}
           </Button>
         </div> */}
-      </form>
-    </FieldSet>
+      </FieldSet>
+    </form>
   );
 }
 

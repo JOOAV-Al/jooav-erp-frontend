@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { DiamondPlus } from "lucide-react";
 import { DialogFormProps } from "@/interfaces/general";
 import { BrandItem } from "@/features/brands/types";
+import { useEffect } from "react";
 
 const createBrandSchema = z.object({
   name: z.string("Enter a valid name"),
@@ -21,9 +22,10 @@ const createBrandSchema = z.object({
 
 export function BrandForm({
   handleSubmitForm,
-  brand
-}: DialogFormProps & {brand?: BrandItem}) {
-  const form = useForm<z.infer<typeof createBrandSchema>>({
+  brand,
+}: DialogFormProps & { brand?: BrandItem }) {
+  type BrandData = z.infer<typeof createBrandSchema>;
+  const form = useForm<BrandData>({
     resolver: zodResolver(createBrandSchema),
     mode: "onChange",
     defaultValues: {
@@ -34,24 +36,42 @@ export function BrandForm({
   const {
     handleSubmit,
     control,
-    formState: { isValid },
+    formState: { dirtyFields },
+    reset,
   } = form;
 
   const onSubmit = async (values: z.infer<typeof createBrandSchema>) => {
-    if (handleSubmitForm) {
-      await handleSubmitForm(values);
+    if (!handleSubmitForm) return;
+    console.log({ brand });
+    console.log({ values });
+    if (brand?.id) {
+      //Build partial payload using dirty fields
+      const changes: Partial<BrandData> = {};
+      for (const key of Object.keys(dirtyFields) as Array<keyof BrandData>) {
+        const val = values[key];
+        if (val !== undefined) {
+          changes[key] = val;
+        }
+      }
+      const payload = Object.keys(changes).length ? changes : values;
+      await handleSubmitForm({ payload, id: brand?.id });
       return;
     }
-    console.log(values);
+    await handleSubmitForm(values);
   };
 
+  useEffect(() => {
+    reset({
+      name: brand?.name ?? "",
+    });
+  }, [brand?.id, reset]);
   return (
-    <FieldSet className="flex flex-1">
-      <form
-        id="brand-form"
-        onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col flex-1"
-      >
+    <form
+      id="brand-form"
+      onSubmit={handleSubmit(onSubmit)}
+      className="flex flex-col flex-1"
+    >
+      <FieldSet className="flex flex-1">
         <FieldGroup className="flex flex-col gap-7">
           {/* NAME */}
           <Controller
@@ -80,8 +100,8 @@ export function BrandForm({
             )}
           />
         </FieldGroup>
-      </form>
-    </FieldSet>
+      </FieldSet>
+    </form>
   );
 }
 

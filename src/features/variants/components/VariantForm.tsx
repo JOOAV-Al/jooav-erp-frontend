@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { DiamondPlus } from "lucide-react";
 import { DialogFormProps } from "@/interfaces/general";
 import { VariantItem } from "@/features/variants/types";
+import { useEffect } from "react";
 
 const createVariantSchema = z.object({
   name: z.string("Enter a valid name"),
@@ -23,7 +24,8 @@ export function VariantForm({
   handleSubmitForm,
   variant,
 }: DialogFormProps & { variant?: VariantItem }) {
-  const form = useForm<z.infer<typeof createVariantSchema>>({
+  type VariantData = z.infer<typeof createVariantSchema>;
+  const form = useForm<VariantData>({
     resolver: zodResolver(createVariantSchema),
     mode: "onChange",
     defaultValues: {
@@ -34,24 +36,42 @@ export function VariantForm({
   const {
     handleSubmit,
     control,
-    formState: { isValid },
+    formState: { dirtyFields },
+    reset,
   } = form;
 
   const onSubmit = async (values: z.infer<typeof createVariantSchema>) => {
-    if (handleSubmitForm) {
-      await handleSubmitForm(values);
+    if (!handleSubmitForm) return;
+    console.log({ variant });
+    console.log({ values });
+    if (variant?.id) {
+      //Build partial payload using dirty fields
+      const changes: Partial<VariantData> = {};
+      for (const key of Object.keys(dirtyFields) as Array<keyof VariantData>) {
+        const val = values[key];
+        if (val !== undefined) {
+          changes[key] = val;
+        }
+      }
+      const payload = Object.keys(changes).length ? changes : values;
+      await handleSubmitForm({ payload, id: variant?.id });
       return;
     }
-    console.log(values);
+    await handleSubmitForm(values);
   };
 
+  useEffect(() => {
+    reset({
+      name: variant?.name ?? "",
+    });
+  }, [variant?.id, reset]);
   return (
-    <FieldSet className="flex flex-1">
-      <form
-        id="variant-form"
-        onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col flex-1"
-      >
+    <form
+      id="variant-form"
+      onSubmit={handleSubmit(onSubmit)}
+      className="flex flex-col flex-1"
+    >
+      <FieldSet className="flex flex-1">
         <FieldGroup className="flex flex-col gap-7">
           {/* NAME */}
           <Controller
@@ -80,8 +100,8 @@ export function VariantForm({
             )}
           />
         </FieldGroup>
-      </form>
-    </FieldSet>
+      </FieldSet>
+    </form>
   );
 }
 

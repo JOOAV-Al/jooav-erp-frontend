@@ -146,7 +146,7 @@
 :root {
   /* Borders */
   --border-accent: hsl(0 0 100%);
-  --border-main: hsl(0 0 100%);
+  --border-main: hsla(0, 0%, 93%, 1);
   --border-primary: hsl(0 0 100%);
   --border-ring: hsl(0 0 100%);
   --border-secondary: hsl(0 0 100%);
@@ -352,6 +352,10 @@
   --sidebar-link: 0px 0px 0px 2px rgba(0, 0, 0, 0.05),
     0px 3px 2px 0px rgba(6, 16, 30, 0.08);
 
+  /* Sidebar links elevation effect */
+  --table-selected: 0px 0px 0px 1px rgba(0, 0, 0, 0.1),
+    0px 1.5px 0.25px 0px rgba(6, 16, 30, 0.08);
+
   /* Additional common shadows (for future use) */
   --shadow-sm: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);
   --shadow-md: 0px 4px 6px -1px rgba(0, 0, 0, 0.1),
@@ -424,6 +428,7 @@
   --color-blue-600: var(--blue-600);
   --color-blue-700: var(--blue-700);
   --color-blue-800: var(--blue-800);
+  --color-heading: var(--text-heading-color);
 
   --color-gray-100: var(--gray-100);
   --color-gray-200: var(--gray-200);
@@ -510,6 +515,7 @@
   --color-destructive: var(--states-danger);
   --color-destructive-foreground: var(--gray-100);
   --color-border: var(--border-stroke);
+  --color-border-main: var(--border-main);
   --color-input: var(--border-stroke);
   --color-nominal-input: var(--color-nominal-input);
   --color-nominal-input-hover: var(--color-nominal-input-hover);
@@ -636,6 +642,7 @@
   --box-shadow-input: var(--shadow-input);
   --box-shadow-card: var(--shadow-card);
   --box-shadow-sidebar-link: var(--sidebar-link);
+  --box-shadow-table-selected: var(--table-selected);
   --box-shadow-button: var(--shadow-button);
   --box-shadow-button-hover: var(--shadow-button-hover);
   --box-shadow-button-neutral: var(--shadow-button-neutral);
@@ -715,6 +722,14 @@
     line-height: var(--leading-heading);
     letter-spacing: var(--letter-spacing-heading);
   }
+  h5 {
+    font-family: var(--font-garantpro);
+    font-size: var(--size-h5);
+    font-weight: var(--weight-integer-display);
+    color: var(--text-heading-color);
+    line-height: var(--leading-heading);
+    letter-spacing: var(--letter-spacing-heading);
+  }
 }
 
 @layer utilities {
@@ -731,6 +746,9 @@
   }
   .sidebar-link {
     box-shadow: var(--sidebar-link);
+  }
+  .table-selected {
+    box-shadow: var(--table-selected);
   }
 
   .shadow-button {

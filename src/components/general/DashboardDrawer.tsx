@@ -11,6 +11,7 @@ import {
   RightDrawerBody,
 } from "@/components/general/right-drawer";
 import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
 interface DashboardDrawerProps {
   children: React.ReactNode;
@@ -39,7 +40,12 @@ const DashboardDrawer = ({
     <RightDrawer open={isOpen} onOpenChange={openDrawer}>
       {showTrigger && (
         <RightDrawerTrigger asChild>
-          <Button>Open</Button>
+          <Button size={"neutral"} className="mr-2">
+            <span className="h-4 w-5 flex justify-center">
+              <Plus size={16} />
+            </span>
+            {"Add new"}
+          </Button>
         </RightDrawerTrigger>
       )}
       <RightDrawerContent>
@@ -52,23 +58,25 @@ const DashboardDrawer = ({
 
         <RightDrawerBody className="">{children}</RightDrawerBody>
 
-        {showFooter && <RightDrawerFooter>
-          <RightDrawerClose asChild>
-            <Button size={"neutral"} variant="neutral">
-              Cancel
+        {showFooter && (
+          <RightDrawerFooter>
+            <RightDrawerClose asChild>
+              <Button size={"neutral"} variant="neutral">
+                Cancel
+              </Button>
+            </RightDrawerClose>
+            {/* Submit button targets the inner form using the form attribute */}
+            <Button
+              type={submitFormId ? "submit" : "button"}
+              form={submitFormId}
+              size={"neutral"}
+              className="mr-2"
+              disabled={submitLoading}
+            >
+              {submitLoading ? "Loading..." : submitLabel}
             </Button>
-          </RightDrawerClose>
-          {/* Submit button targets the inner form using the form attribute */}
-          <Button
-            type={submitFormId ? "submit" : "button"}
-            form={submitFormId}
-            size={"neutral"}
-            className="mr-2"
-            disabled={submitLoading}
-          >
-            {submitLoading ? "Loading..." : submitLabel}
-          </Button>
-        </RightDrawerFooter>}
+          </RightDrawerFooter>
+        )}
       </RightDrawerContent>
     </RightDrawer>
   );

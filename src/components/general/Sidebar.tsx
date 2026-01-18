@@ -226,9 +226,9 @@ export default function Sidebar({
                 }`}
               >
                 {!isCollapsed && (
-                  <h5 className="font-mono leading-[1.2] text-sm text-body-passive mx-2">
+                  <h6 className="font-mono leading-[1.2] text-sm text-body-passive mx-2">
                     OVERVIEW
-                  </h5>
+                  </h6>
                 )}
                 <nav className="flex flex-col gap-3">
                   {links.overview.map((link) => (
@@ -250,9 +250,9 @@ export default function Sidebar({
                 }`}
               >
                 {!isCollapsed && (
-                  <h5 className="font-mono leading-[1.2] text-sm text-body-passive mx-2">
+                  <h6 className="font-mono leading-[1.2] text-sm text-body-passive mx-2">
                     ORDER
-                  </h5>
+                  </h6>
                 )}
                 <nav className="flex flex-col gap-3">
                   {links.order.map((link) => (
@@ -274,9 +274,9 @@ export default function Sidebar({
                 }`}
               >
                 {!isCollapsed && (
-                  <h5 className="font-mono leading-[1.2] text-sm text-body-passive mx-2">
+                  <h6 className="font-mono leading-[1.2] text-sm text-body-passive mx-2">
                     CATALOG CRUD
-                  </h5>
+                  </h6>
                 )}
                 <nav className="flex flex-col gap-3">
                   {links.catalog.map((link) => (
@@ -298,9 +298,9 @@ export default function Sidebar({
                 }`}
               >
                 {!isCollapsed && (
-                  <h5 className="font-mono leading-[1.2] text-sm text-body-passive mx-2">
+                  <h6 className="font-mono leading-[1.2] text-sm text-body-passive mx-2">
                     USER CRUD
-                  </h5>
+                  </h6>
                 )}
                 <nav className="flex flex-col gap-3">
                   {links.user.map((link) => (

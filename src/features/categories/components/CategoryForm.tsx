@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { DiamondPlus } from "lucide-react";
 import { DialogFormProps } from "@/interfaces/general";
 import { CategoryItem } from "@/features/categories/types";
+import { useEffect } from "react";
 
 const createCategorySchema = z.object({
   name: z.string("Enter a valid name"),
@@ -22,8 +23,10 @@ const createCategorySchema = z.object({
 export function CategoryForm({
   handleSubmitForm,
   category,
-}: DialogFormProps & { category?: CategoryItem }) {
-  const form = useForm<z.infer<typeof createCategorySchema>>({
+  formId = "category-form",
+}: DialogFormProps & { category?: CategoryItem; formId?: string }) {
+  type CategoryData = z.infer<typeof createCategorySchema>;
+  const form = useForm<CategoryData>({
     resolver: zodResolver(createCategorySchema),
     mode: "onChange",
     defaultValues: {
@@ -34,24 +37,43 @@ export function CategoryForm({
   const {
     handleSubmit,
     control,
-    formState: { isValid },
+    formState: { dirtyFields },
+    reset,
   } = form;
 
-  const onSubmit = async (values: z.infer<typeof createCategorySchema>) => {
-    if (handleSubmitForm) {
-      await handleSubmitForm(values);
+  useEffect(() => {
+    reset({
+      name: category?.name ?? "",
+    });
+  }, [category?.id, reset]);
+
+  const onSubmit = async (values: CategoryData) => {
+    if (!handleSubmitForm) return;
+    console.log({ category });
+    console.log({ values });
+    if (category?.id) {
+      //Build partial payload using dirty fields
+      const changes: Partial<CategoryData> = {};
+      for (const key of Object.keys(dirtyFields) as Array<keyof CategoryData>) {
+        const val = values[key];
+        if (val !== undefined) {
+          changes[key] = val;
+        }
+      }
+      const payload = Object.keys(changes).length ? changes : values;
+      await handleSubmitForm({ payload, id: category?.id });
       return;
     }
-    console.log(values);
+    await handleSubmitForm(values);
   };
 
   return (
-    <FieldSet className="flex flex-1">
-      <form
-        id="category-form"
-        onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col flex-1"
-      >
+    <form
+      id={formId}
+      onSubmit={handleSubmit(onSubmit)}
+      className="flex flex-col flex-1"
+    >
+      <FieldSet id="" className="flex flex-1">
         <FieldGroup className="flex flex-col gap-7">
           {/* NAME */}
           <Controller
@@ -74,14 +96,19 @@ export function CategoryForm({
                     leftIcon={
                       <DiamondPlus className="h-5 w-5 text-outline-passive" />
                     }
+                    rightIcon={
+                      category && (
+                        <DiamondPlus className="h-5 w-5 text-outline-passive" />
+                      )
+                    }
                   />
                 </Field>
               </div>
             )}
           />
         </FieldGroup>
-      </form>
-    </FieldSet>
+      </FieldSet>
+    </form>
   );
 }
 

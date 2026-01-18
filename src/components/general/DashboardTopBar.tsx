@@ -28,7 +28,7 @@ const DashboardTopBar = ({
             />
           </div>
         )}
-        <h3 className="py-5">{pageHeading}</h3>
+        <h3 className="py-5 hidden smd:block">{pageHeading}</h3>
       </div>
       <div className="size-9 rounded-full p-sm sidebar-link bg-storey-foreground"></div>
     </div>

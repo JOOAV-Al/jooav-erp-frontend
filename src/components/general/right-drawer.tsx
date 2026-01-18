@@ -39,7 +39,7 @@ const RightDrawerContent = React.forwardRef<
       className={cn(
         "fixed z-50 flex flex-col bg-white shadow-lg transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-300",
         // Position from right with spacing
-        "top-3 right-3 bottom-3 w-full aspect-508/958 max-w-sm md:max-w-md lg:max-w-[508px] rounded-2xl border",
+        "top-3 right-3 bottom-3 w-[calc(100%-2rem)] aspect-508/958 max-w-sm md:max-w-md lg:max-w-[508px] rounded-2xl border",
         // Slide animations from right
         "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right",
         className
