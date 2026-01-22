@@ -15,11 +15,26 @@ export interface CategoryItem {
   name: string;
   slug: string;
   description: string;
-  parentId: number;
+  parentId: string | null;
   sortOrder: number;
-  parent: string;
+  parent: ParentCategoryItem[];
   productCount: number;
-  children: string[];
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string;
+  deletedBy: string;
+  updatedBy: string;
+}
+export interface ParentCategoryItem {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  parentId: string | null;
+  sortOrder: number;
+  productCount: number;
+  children: CategoryItem[];
   isActive: boolean;
   createdAt: string;
   updatedAt: string;

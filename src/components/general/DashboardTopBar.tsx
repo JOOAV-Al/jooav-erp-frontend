@@ -15,7 +15,7 @@ const DashboardTopBar = ({
   pageHeading,
 }: DashboardTopBarProps) => {
   return (
-    <div className="py-md px-xl border-b-[0.5] border-[#EDEDED] flex justify-between gap-main items-center">
+    <div className="py-md px-xl max-h-15 h-full border-b-[0.5] border-[#EDEDED] flex justify-between gap-main items-center">
       <div className="flex justify-between gap-main items-center">
         {shouldRenderIcon && (
           <div

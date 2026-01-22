@@ -23,7 +23,7 @@ const CategoryPage = () => {
   const [page, setPage] = useState<number>(1);
   const [open, setOpen] = useState<boolean>(false);
   const [query, setQuery] = useState<string>("");
-  const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
   const { mutateAsync: updateCategory, isPending: updating } =
     useUpdateCategory();
@@ -163,19 +163,19 @@ const CategoryPage = () => {
           data={categories ?? []}
           refetch={refetch}
           columns={[
-            // { key: "name", label: "Category" },
-            // {
-            //   key: "subCategory",
-            //   label: "Sub Category",
-            // },
             {
-              key: "parent.name",
+              key: "name",
               label: "Category",
             },
             {
-              key: "name",
-              label: "Sub Category",
+              key: "parentId",
+              label: "Type",
+              render: (category) => <span>{category.parentId ? "Sub" : "Major"}</span>,
             },
+            // {
+            //   key: "parent.name",
+            //   label: "Parent Category",
+            // },
             { key: "updatedAt", label: "Modified" },
             { key: "createdAt", label: "Created" },
           ]}

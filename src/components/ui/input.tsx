@@ -1,15 +1,17 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
+import { PenLine } from "lucide-react";
 
 interface InputProps extends React.ComponentProps<"input"> {
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
+  isEdit?: boolean;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, leftIcon, rightIcon, ...props }, ref) => {
+  ({ className, type, leftIcon, rightIcon, isEdit=false, ...props }, ref) => {
     const hasLeftIcon = Boolean(leftIcon);
-    const hasRightIcon = Boolean(rightIcon);
+    const hasRightIcon = Boolean(rightIcon) || isEdit;
 
     return (
       <div className="relative w-full">
@@ -28,7 +30,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           data-slot="input"
           className={cn(
             // Base styles
-            "w-full min-w-0 h-11.25 rounded-md bg-white border border-transparent",
+            "w-full min-w-0 h-12 rounded-md bg-white border border-transparent",
             "py-md text-base outline-none leading-20",
             "placeholder:text-card-body placeholder:text-body",
             "border border-transparent",
@@ -38,7 +40,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             // With left icon: 12px (pl-3) + 4px wrapper padding + icon width = total left space
             // The pl-12 (48px) gives us: 12px + 4px padding + ~20px icon + 12px text offset = flush at 16px from wrapper edge
             hasLeftIcon && !hasRightIcon && "pl-11 pr-main",
-            !hasLeftIcon && hasRightIcon && "pl-main pr-10",
+            !hasLeftIcon && hasRightIcon && "pl-main pr-11",
             hasLeftIcon && hasRightIcon && "pl-10 pr-10",
             !hasLeftIcon && !hasRightIcon && "px-main",
 
@@ -61,7 +63,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             // Selection
             "selection:bg-primary selection:text-primary-foreground",
 
-            className
+            className,
           )}
           {...props}
         />
@@ -70,6 +72,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {hasRightIcon && (
           <div className="absolute inset-y-0 right-3 flex items-center pointer-events-auto">
             <div className="p-1 flex items-center justify-center">
+              {isEdit && <PenLine strokeWidth={2.5} className="h-5 w-5 text-outline-passive" />}
               {rightIcon}
             </div>
           </div>

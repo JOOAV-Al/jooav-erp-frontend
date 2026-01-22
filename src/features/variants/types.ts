@@ -11,7 +11,7 @@ export interface VariantItem {
   name: string;
   description: string;
   logo: string;
-  manufacturerId: string;
+  brandId: string;
   status: VariantStatus;
   createdAt: string;
   updatedAt: string;
@@ -37,7 +37,7 @@ export interface VariantOrderItem {
 }
 
 export interface VariantStatsItem {
-  total: number;
+  totalVariants: number;
   active: number;
   inactive: number;
   recentlyAdded: number;

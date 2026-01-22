@@ -11,7 +11,7 @@ import {
   FieldSet,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { DiamondPlus } from "lucide-react";
+import { DiamondPlus, FolderTree } from "lucide-react";
 import { DialogFormProps } from "@/interfaces/general";
 import { CategoryItem } from "@/features/categories/types";
 import { useEffect } from "react";
@@ -94,13 +94,12 @@ export function CategoryForm({
                     placeholder="Enter category name"
                     aria-invalid={fieldState.invalid}
                     leftIcon={
-                      <DiamondPlus className="h-5 w-5 text-outline-passive" />
+                      <FolderTree
+                        strokeWidth={2.5}
+                        className="h-5 w-5 text-outline-passive"
+                      />
                     }
-                    rightIcon={
-                      category && (
-                        <DiamondPlus className="h-5 w-5 text-outline-passive" />
-                      )
-                    }
+                    isEdit={!!category}
                   />
                 </Field>
               </div>

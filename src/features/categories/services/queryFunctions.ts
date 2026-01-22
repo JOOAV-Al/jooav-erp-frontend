@@ -71,5 +71,5 @@ export async function fetchCategoryDetails ({id}: {id: string}): Promise<Categor
 
 export async function fetchCategoriesStats (): Promise<CategoryStatsItem> {
   const response = await api.get(`/categories/stats`, { noToast: true } as CustomAxiosRequestConfig)
-  return response.data
+  return response.data.data
 }

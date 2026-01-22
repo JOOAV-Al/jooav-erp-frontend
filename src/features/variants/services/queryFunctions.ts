@@ -54,5 +54,5 @@ export async function fetchVariantDetails ({id}: {id: string}): Promise<VariantI
 
 export async function fetchVariantsStats (): Promise<VariantStatsItem> {
   const response = await api.get(`/variants/stats`, { noToast: true } as CustomAxiosRequestConfig)
-  return response.data
+  return response.data.data
 }

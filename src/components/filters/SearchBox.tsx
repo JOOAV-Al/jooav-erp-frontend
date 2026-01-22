@@ -6,6 +6,7 @@ interface SearchBoxProps {
   value?: string;
   onChange?: (value: string) => void;
   className?: string;
+  inputClassName?: string;
 }
 
 const SearchBox: React.FC<SearchBoxProps> = ({
@@ -13,6 +14,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
   value,
   onChange,
   className = "",
+  inputClassName = "",
 }) => {
   const [searchValue, setSearchValue] = useState(value || "");
 
@@ -23,14 +25,14 @@ const SearchBox: React.FC<SearchBoxProps> = ({
   };
 
   return (
-    <div className={`relative py-4 ${className}`}>
+    <div className={`relative ${className}`}>
       <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-outline-passive" />
       <input
         type="text"
         placeholder={placeholder}
         value={searchValue}
         onChange={handleChange}
-        className="pl-7 pr-4 py-4 border border-border-main table-selected rounded-lg text-sm focus:outline-none max-w-42.5 w-full"
+        className={`pl-7 pr-4 py-4 border border-border-main table-selected rounded-lg text-sm focus:outline-none max-w-42.5 w-full h-10 ${inputClassName}`}
       />
     </div>
   );

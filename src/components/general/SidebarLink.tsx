@@ -63,15 +63,17 @@ export default function SidebarLink({
             {!isCollapsed ? (
               <Icon
                 size={18}
+                strokeWidth={2.5}
                 className={`transition-colors ${
                   isActive ? "text-outline" : "text-outline-passive"
                 } group-hover:text-outline`}
               />
             ) : (
               <Tooltip>
-                <TooltipTrigger asChild>
+                <TooltipTrigger asChild className="">
                   <Icon
-                    size={24}
+                    strokeWidth={2.5}
+                    size={18}
                     className={`transition-colors ${
                       isActive ? "text-outline" : "text-outline-passive"
                     } group-hover:text-outline`}

@@ -23,7 +23,7 @@ const ProductPage = () => {
   const [page, setPage] = useState<number>(1);
   const [open, setOpen] = useState<boolean>(false);
   const [query, setQuery] = useState<string>("");
-  const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
   const { mutateAsync: updateProduct, isPending: updating } =
     useUpdateProduct();

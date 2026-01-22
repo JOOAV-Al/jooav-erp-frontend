@@ -3,17 +3,17 @@ import { ListEnd, ListStart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface SortFilterProps {
-  value?: "oldest" | "newest";
-  onChange?: (value: "oldest" | "newest") => void;
+  value?: "desc" | "asc";
+  onChange?: (value: "desc" | "asc") => void;
 }
 
 const SortFilter: React.FC<SortFilterProps> = ({
-  value = "newest",
+  value = "asc",
   onChange,
 }) => {
-  const [sortOrder, setSortOrder] = useState<"oldest" | "newest">(value);
+  const [sortOrder, setSortOrder] = useState<"desc" | "asc">(value);
 
-  const handleToggle = (newValue: "oldest" | "newest") => {
+  const handleToggle = (newValue: "desc" | "asc") => {
     setSortOrder(newValue);
     onChange?.(newValue);
   };
@@ -23,10 +23,10 @@ const SortFilter: React.FC<SortFilterProps> = ({
       <Button
         size={"filter"}
         variant={"filter"}
-        onClick={() => handleToggle("oldest")}
+        onClick={() => handleToggle("desc")}
         className={`
           
-          ${sortOrder === "oldest" ? "bg-storey-foreground text-heading" : ""}
+          ${sortOrder === "desc" ? "bg-storey-foreground text-heading" : ""}
         `}
       >
         <ListEnd className="w-4 h-4 text-outline-passive" />
@@ -34,12 +34,12 @@ const SortFilter: React.FC<SortFilterProps> = ({
       </Button>
 
       <Button
-        onClick={() => handleToggle("newest")}
+        onClick={() => handleToggle("asc")}
         size={"filter"}
         variant={"filter"}
         className={`
           
-          ${sortOrder === "newest" ? "bg-storey-foreground text-heading" : ""}
+          ${sortOrder === "asc" ? "bg-storey-foreground text-heading" : ""}
         `}
       >
         <ListStart className="w-4 h-4 text-outline-passive" />

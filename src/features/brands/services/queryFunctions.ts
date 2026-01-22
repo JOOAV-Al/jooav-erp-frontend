@@ -54,5 +54,5 @@ export async function fetchBrandDetails ({id}: {id: string}): Promise<BrandItem>
 
 export async function fetchBrandsStats (): Promise<BrandStatsItem> {
   const response = await api.get(`/brands/stats`, { noToast: true } as CustomAxiosRequestConfig)
-  return response.data
+  return response.data.data
 }

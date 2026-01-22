@@ -51,7 +51,7 @@ export const useCreateCategory = () => {
   return useInvalidatingMutation({
     mutationFn: (payload: CreateCategoryPayload) =>
       api.post<CategoryItem>("/categories", payload), 
-    invalidateQueries: [["all-categories"]]
+    invalidateQueries: [["all-categories"], ["categories-stats"]]
   });
 };
 
@@ -67,7 +67,7 @@ export const useDeleteCategory = () => {
   return useInvalidatingMutation({
     mutationFn: ({id}: {id: string}) =>
       api.delete<CategoryItem>(`/categories/${id}`), 
-    invalidateQueries: [["all-categories"], ["category-details"]]
+    invalidateQueries: [["all-categories"], ["category-details"], ["categories-stats"]]
   });
 };
 

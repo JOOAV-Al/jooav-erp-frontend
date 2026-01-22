@@ -12,7 +12,7 @@ import {
   FieldSet,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { DiamondPlus } from "lucide-react";
+import { DiamondPlus, PenLine } from "lucide-react";
 import { DialogFormProps } from "@/interfaces/general";
 import { ManufacturerItem } from "@/features/manufacturers/types";
 import { useEffect } from "react";
@@ -105,8 +105,12 @@ export function ManufacturerForm({
                     placeholder="Enter manufacturer name"
                     aria-invalid={fieldState.invalid}
                     leftIcon={
-                      <DiamondPlus className="h-5 w-5 text-outline-passive" />
+                      <DiamondPlus
+                        strokeWidth={2.5}
+                        className="h-5 w-5 text-outline-passive"
+                      />
                     }
+                    isEdit={!!manufacturer}
                   />
                 </Field>
               </div>

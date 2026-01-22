@@ -27,7 +27,7 @@ const CSVUpload = ({
         <div className="p-sm flex flex-col gap-5 max-w-[340px] text-center">
           <h4 className="text-heading">{`Import ${catalog} CSV`}</h4>
           <p className="text-body-passive text-sm font-light">
-            CSV import populates all entity field across the {catalog} catalog.{" "}
+            CSV import populates all entity field across the {catalog} catalog.{" "} <br />
             <span
               onClick={onDownload}
               className="text-primary underline cursor-pointer"

@@ -60,5 +60,5 @@ export async function fetchManufacturerDetails ({id}: {id: string}): Promise<Man
 
 export async function fetchManufacturersStats (): Promise<ManufacturerStatsItem> {
   const response = await api.get(`/manufacturers/stats`, { noToast: true } as CustomAxiosRequestConfig)
-  return response.data
+  return response.data.data
 }

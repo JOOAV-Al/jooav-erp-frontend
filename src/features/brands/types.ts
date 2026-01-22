@@ -3,7 +3,7 @@ export interface CreateBrandPayload {
   name?: string;
   description?: string;
   manufacturerId?: string;
-  logo?: string;
+  logo?: File | null;
   status?: string;
 }
 export interface BrandItem {

@@ -6,6 +6,7 @@ import VariantForm from "@/features/variants/components/VariantForm";
 import {
   useCreateVariant,
   useGetVariants,
+  useGetVariantsStats,
   useUpdateVariant,
 } from "@/features/variants/services/variants.api";
 import { Tab } from "@/interfaces/general";
@@ -23,7 +24,8 @@ const VariantPage = () => {
   const [page, setPage] = useState<number>(1);
   const [open, setOpen] = useState<boolean>(false);
   const [query, setQuery] = useState<string>("");
-  const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const debouncedQuery = useDebounce(query);
 
   const { mutateAsync: updateVariant, isPending: updating } =
     useUpdateVariant();
@@ -35,13 +37,14 @@ const VariantPage = () => {
   const [selectedVariants, setSelectedVariants] = useState<VariantItem[] | []>(
     []
   );
-  const debouncedQuery = useDebounce(query);
 
+   const { data: stats } = useGetVariantsStats();
   const {
     data,
     isPending: isVariantsPending,
     isRefetching,
     refetch,
+    isInitialLoading,
   } = useGetVariants({ search: debouncedQuery, sortOrder });
 
   const variants = data?.data;
@@ -63,17 +66,20 @@ const VariantPage = () => {
     console.log({ selectedVariants });
   };
 
-  const stats = [
-    { value: "200", label: "Total Variants" },
-    { value: "10", label: "In Draft" },
-    { value: "190", label: "Total Published" },
+  const displayStats = [
+    {
+      value: stats?.totalVariants ? `${stats?.totalVariants}` : "0",
+      label: "Variants",
+    },
+    { value: stats?.active ? `${stats?.active}` : "0", label: "Brands" },
+    { value: stats?.active ? `${stats?.inactive}` : "0", label: "Archived" },
   ];
 
   const tabs: Tab[] = [
     {
       value: "manual",
       label: "Manual",
-      heading: "Enter variant details",
+      heading: `${selectedVariant ? "Edit" : "Enter"} variant details`,
       content: (
         <VariantForm
           variant={selectedVariant}
@@ -101,7 +107,10 @@ const VariantPage = () => {
 
   return (
     <div className="flex flex-col gap-5">
-      {variants && variants?.length > 0 && <StatsContainer stats={stats} />}
+      {!isInitialLoading &&
+        !isVariantsPending &&
+        variants &&
+        variants?.length > 0 && <StatsContainer stats={displayStats} />}
 
       <div className="px-xl pt-xl pb-1 flex flex-col gap-7">
         <div className="flex justify-between flex-wrap gap-6">
@@ -161,6 +170,10 @@ const VariantPage = () => {
             {
               key: "logo",
               label: "Logo",
+            },
+            {
+              key: "packSize",
+              label: "Pack Size",
             },
             {
               key: "brand.name",

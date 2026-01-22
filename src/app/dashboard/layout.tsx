@@ -71,7 +71,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
               isSidebarHidden
                 ? "md:ml-0"
                 : isCollapsed
-                ? "md:ml-[80]"
+                ? "md:ml-17"
                 : "md:ml-57.5"
             }`}
           >

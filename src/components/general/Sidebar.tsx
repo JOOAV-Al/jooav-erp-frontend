@@ -167,19 +167,15 @@ export default function Sidebar({
           transition-all duration-300 ease-in-out
           md:translate-x-0
           md:fixed md:h-screen md:overflow-y-auto
-          ${isCollapsed ? "max-w-[80]" : "max-w-57.5"} w-full
+          ${isCollapsed ? "max-w-17" : "max-w-57.5"} w-full
         `}
       >
-        <div
-          className={`flex flex-col gap-main overflow-y-auto h-full ${
-            isCollapsed ? "px-sm" : "px-sm"
-          }`}
-        >
+        <div className={`flex flex-col gap-main overflow-y-auto h-full pl-3`}>
           {/* Top Section */}
           <div
-            className={`flex items-center justify-between ${
-              isCollapsed ? "mx-0" : "mx-2"
-            } py-lg`}
+            className={`flex items-center justify-between border-b border-border-main ${
+              isCollapsed ? "justify-center" : ""
+            } py-lg max-h-18 h-full px-main`}
           >
             {!isCollapsed && (
               <Image
@@ -204,7 +200,7 @@ export default function Sidebar({
                 )}
               </button>
               {/* Hide Button */}
-              <button
+              {/* <button
                 // onClick={() => setIsHidden(true)}
                 onClick={hideSidebar}
                 className={`${
@@ -212,17 +208,17 @@ export default function Sidebar({
                 } rounded hover:bg-gray-200 cursor-pointer text-outline-passive`}
               >
                 <X size={24} color="red" />
-              </button>
+              </button> */}
             </div>
           </div>
 
           {/* Divider */}
           <ScrollArea isSidebar className="min-h-72 w-full">
-            <div className="py-main flex flex-col gap-sm">
+            <div className="pb-main py-2.5 flex flex-col gap-sm px-sm">
               {/* Overview */}
               <div
                 className={`flex flex-col gap-7 ${
-                  isCollapsed ? "border-t-2 border-[#EDEDED] pt-main" : ""
+                  isCollapsed ? "border-t-2 border-border-main pt-main" : ""
                 }`}
               >
                 {!isCollapsed && (
@@ -230,7 +226,7 @@ export default function Sidebar({
                     OVERVIEW
                   </h6>
                 )}
-                <nav className="flex flex-col gap-3">
+                <nav className="flex flex-col gap-4">
                   {links.overview.map((link) => (
                     <SidebarLink
                       key={link.href}
@@ -254,7 +250,7 @@ export default function Sidebar({
                     ORDER
                   </h6>
                 )}
-                <nav className="flex flex-col gap-3">
+                <nav className="flex flex-col gap-4">
                   {links.order.map((link) => (
                     <SidebarLink
                       key={link.href}
@@ -278,7 +274,7 @@ export default function Sidebar({
                     CATALOG CRUD
                   </h6>
                 )}
-                <nav className="flex flex-col gap-3">
+                <nav className="flex flex-col gap-4">
                   {links.catalog.map((link) => (
                     <SidebarLink
                       key={link.href}
@@ -302,7 +298,7 @@ export default function Sidebar({
                     USER CRUD
                   </h6>
                 )}
-                <nav className="flex flex-col gap-3">
+                <nav className="flex flex-col gap-4">
                   {links.user.map((link) => (
                     <SidebarLink
                       key={link.href}

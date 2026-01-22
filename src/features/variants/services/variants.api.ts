@@ -43,7 +43,7 @@ export const useCreateVariant = () => {
   return useInvalidatingMutation({
     mutationFn: (payload: CreateVariantPayload) =>
       api.post<VariantItem>("/variants", payload), 
-    invalidateQueries: [["all-variants"]]
+    invalidateQueries: [["all-variants"], ["variants-stats"]]
   });
 };
 
@@ -59,7 +59,7 @@ export const useDeleteVariant = () => {
   return useInvalidatingMutation({
     mutationFn: ({id}: {id: string}) =>
       api.delete(`/variants/${id}`), 
-    invalidateQueries: [["all-variants"], ["variant-details"]]
+    invalidateQueries: [["all-variants"], ["variant-details"], ["variants-stats"]]
   });
 };
 

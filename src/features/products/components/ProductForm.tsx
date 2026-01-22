@@ -11,7 +11,7 @@ import {
   FieldSet,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { DiamondPlus } from "lucide-react";
+import { PackagePlus } from "lucide-react";
 import { DialogFormProps } from "@/interfaces/general";
 import { ProductItem } from "@/features/products/types";
 import { useEffect } from "react";
@@ -92,8 +92,12 @@ export function ProductForm({
                     placeholder="Enter product name"
                     aria-invalid={fieldState.invalid}
                     leftIcon={
-                      <DiamondPlus className="h-5 w-5 text-outline-passive" />
+                      <PackagePlus
+                        strokeWidth={2.5}
+                        className="h-5 w-5 text-outline-passive"
+                      />
                     }
+                    isEdit={!!product}
                   />
                 </Field>
               </div>

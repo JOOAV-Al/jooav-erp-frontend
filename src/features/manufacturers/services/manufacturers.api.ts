@@ -53,7 +53,7 @@ export const useCreateManufacturer = () => {
   return useInvalidatingMutation({
     mutationFn: (payload: CreateManufacturerPayload) =>
       api.post("/manufacturers", payload), 
-    invalidateQueries: [["all-manufacturers"]]
+    invalidateQueries: [["all-manufacturers"], ["manufacturers-stats"]]
   });
 };
 
@@ -69,7 +69,7 @@ export const useDeleteManufacturer = () => {
   return useInvalidatingMutation({
     mutationFn: ({id}: {id: string}) =>
       api.delete(`/manufacturers/${id}`), 
-    invalidateQueries: [["all-manufacturers"]]
+    invalidateQueries: [["all-manufacturers"], ["manufacturers-stats"]]
   });
 };
 

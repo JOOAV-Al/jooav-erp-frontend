@@ -4,6 +4,7 @@ import { GeneralFetchingParams } from "@/interfaces/general";
 import { api } from "@/lib/api/axiosInstance";
 import { useInvalidatingMutation } from "@/lib/api/useInvalidatingMutations";
 import { useQuery } from "@tanstack/react-query";
+import { AxiosHeaders, AxiosRequestHeaders } from "axios";
 
 
 export const useGetBrands = (params: GeneralFetchingParams) => {
@@ -42,15 +43,19 @@ export const useGetBrandDetails = ({id}: {id: string}) => {
 export const useCreateBrand = () => {
   return useInvalidatingMutation({
     mutationFn: (payload: CreateBrandPayload) =>
-      api.post<BrandItem>("/brands", payload), 
-    invalidateQueries: [["all-brands"]]
+      api.post<BrandItem>("/brands", payload, {headers: {
+          "Content-Type": "multipart/form-data",
+        } as AxiosRequestHeaders}), 
+    invalidateQueries: [["all-brands"], ["brands-stats"]]
   });
 };
 
 export const useUpdateBrand = () => {
   return useInvalidatingMutation({
     mutationFn: ({payload, id}: {payload: CreateBrandPayload, id: string}) =>
-      api.patch<BrandItem>(`/brands/${id}`, payload), 
+      api.patch<BrandItem>(`/brands/${id}`, payload, {headers: {
+          "Content-Type": "multipart/form-data",
+        } as AxiosRequestHeaders}), 
     invalidateQueries: [["all-brands"], ["brand-details"]]
   });
 };
@@ -59,7 +64,7 @@ export const useDeleteBrand = () => {
   return useInvalidatingMutation({
     mutationFn: ({id}: {id: string}) =>
       api.delete(`/brands/${id}`), 
-    invalidateQueries: [["all-brands"], ["brand-details"]]
+    invalidateQueries: [["all-brands"], ["brand-details"], ["brands-stats"]]
   });
 };
 

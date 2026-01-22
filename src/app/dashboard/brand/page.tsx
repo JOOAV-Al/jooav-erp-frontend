@@ -5,7 +5,9 @@ import DrawerTabs from "@/components/general/DrawerTabs";
 import BrandForm from "@/features/brands/components/BrandForm";
 import {
   useCreateBrand,
+  useDeleteBrand,
   useGetBrands,
+  useGetBrandsStats,
   useUpdateBrand,
 } from "@/features/brands/services/brands.api";
 import { Tab } from "@/interfaces/general";
@@ -18,31 +20,36 @@ import SortFilter from "@/components/filters/SortFilter";
 import SearchBox from "@/components/filters/SearchBox";
 import { useDebounce } from "@/hooks/useDebounce";
 import StatsContainer from "@/components/general/StatsContainer";
+import Image from "next/image";
 
 const BrandPage = () => {
   const [page, setPage] = useState<number>(1);
   const [open, setOpen] = useState<boolean>(false);
   const [query, setQuery] = useState<string>("");
-  const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const debouncedQuery = useDebounce(query);
 
   const { mutateAsync: updateBrand, isPending: updating } = useUpdateBrand();
   const { mutateAsync: createBrand, isPending: creating } = useCreateBrand();
+  const { mutateAsync: deleteBrand, isPending: deleting } = useDeleteBrand();
+
   const [selectedBrand, setSelectedBrand] = useState<BrandItem | undefined>(
-    undefined
+    undefined,
   );
   const [selectedBrands, setSelectedBrands] = useState<BrandItem[] | []>([]);
-  const debouncedQuery = useDebounce(query);
 
+  const { data: stats } = useGetBrandsStats();
   const {
     data,
     isPending: isBrandsPending,
     isRefetching,
     refetch,
+    isInitialLoading,
   } = useGetBrands({ search: debouncedQuery, sortOrder });
-
   const brands = data?.data;
 
   const handleCreate = async (values: any) => {
+    console.log({ finalValues: values });
     if (selectedBrand) {
       await updateBrand(values);
     } else {
@@ -55,19 +62,20 @@ const BrandPage = () => {
 
   const handleBulkDelete = async (selectedBrands: BrandItem[]) => {
     console.log({ selectedBrands });
+    // const response = await deleteBrand({ id: selectedBrands.map((brand) => brand.id) });
   };
 
-  const stats = [
-    { value: "200", label: "Total Brands" },
-    { value: "10", label: "In Draft" },
-    { value: "190", label: "Total Published" },
+  const displayStats = [
+    { value: stats?.total ? `${stats?.total}` : "0", label: "Brands" },
+    { value: stats?.active ? `${stats?.active}` : "0", label: "Manufacturers" },
+    { value: stats?.inactive ? `${stats?.inactive}` : "0", label: "Archived" },
   ];
 
   const tabs: Tab[] = [
     {
       value: "manual",
       label: "Manual",
-      heading: "Enter brand details",
+      heading: `${selectedBrand ? "Edit" : "Enter"} brand details`,
       content: (
         <BrandForm
           brand={selectedBrand}
@@ -95,7 +103,10 @@ const BrandPage = () => {
 
   return (
     <div className="flex flex-col gap-5">
-      {brands && brands?.length > 0 && <StatsContainer stats={stats} />}
+      {!isInitialLoading &&
+        !isBrandsPending &&
+        brands &&
+        brands?.length > 0 && <StatsContainer stats={displayStats} />}
 
       <div className="px-xl pt-xl pb-1 flex flex-col gap-7">
         <div className="flex justify-between flex-wrap gap-6">
@@ -159,6 +170,18 @@ const BrandPage = () => {
             {
               key: "logo",
               label: "Logo",
+              render: (item) => (
+                <div>
+                  {item?.logo ? (
+                    <Image
+                      src={item?.logo ?? ""}
+                      alt="Brand logo"
+                      width={31.2}
+                      height={28}
+                    />
+                  ): <span>N/A</span>}
+                </div>
+              ),
             },
             {
               key: "manufacturer",

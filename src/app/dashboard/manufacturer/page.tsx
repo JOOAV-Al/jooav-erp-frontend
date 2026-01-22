@@ -6,6 +6,7 @@ import ManufacturerForm from "@/features/manufacturers/components/ManufacturerFo
 import {
   useCreateManufacturer,
   useGetManufacturers,
+  useGetManufacturersStats,
   useUpdateManufacturer,
 } from "@/features/manufacturers/services/manufacturers.api";
 import { Tab } from "@/interfaces/general";
@@ -23,7 +24,8 @@ const ManufacturerPage = () => {
   const [page, setPage] = useState<number>(1);
   const [open, setOpen] = useState<boolean>(false);
   const [query, setQuery] = useState<string>("");
-  const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const debouncedQuery = useDebounce(query);
 
   const { mutateAsync: updateManufacturer, isPending: updating } =
     useUpdateManufacturer();
@@ -36,12 +38,14 @@ const ManufacturerPage = () => {
   const [selectedManufacturers, setSelectedManufacturers] = useState<
     ManufacturerItem[] | []
   >([]);
-  const debouncedQuery = useDebounce(query);
+  
+  const {data: stats} = useGetManufacturersStats()
   const {
     data,
     isPending: isManufacturersPending,
     isRefetching,
     refetch,
+    isInitialLoading
   } = useGetManufacturers({ search: debouncedQuery, sortOrder });
 
   const manufacturers = data?.data;
@@ -63,17 +67,17 @@ const ManufacturerPage = () => {
     console.log({ selectedManufacturers });
   };
   
-  const stats = [
-    { value: "200", label: "Total Manufacturers" },
-    { value: "10", label: "In Draft" },
-    { value: "190", label: "Total Published" },
+  const displayStats = [
+    { value: stats?.total ? `${stats?.total}` : "0", label: "Manufacturers" },
+    { value: stats?.inactive ? `${stats?.inactive}` : "0", label: "Archived" },
+    { value: stats?.suspended ? `${stats?.suspended}` : "0", label: "Suspended" },
   ];
 
   const tabs: Tab[] = [
     {
       value: "manual",
       label: "Manual",
-      heading: "Enter manufacturer details",
+      heading: `${selectedManufacturer ? "Edit" : "Enter"} manufacturer details`,
       content: (
         <ManufacturerForm
           manufacturer={selectedManufacturer}
@@ -101,11 +105,11 @@ const ManufacturerPage = () => {
 
   return (
     <div className="flex flex-col gap-5">
-      {manufacturers && manufacturers?.length > 0 && (
-        <StatsContainer stats={stats} />
+      {!isInitialLoading && !isManufacturersPending && manufacturers && manufacturers?.length > 0 && (
+        <StatsContainer stats={displayStats} />
       )}
 
-      <div className="px-xl pt-xl pb-1 flex flex-col gap-7 mb-24">
+      <div className="px-xl pt-xl pb-1 flex flex-col gap-7">
         <div className="flex justify-between flex-wrap gap-6">
           <FilterContainer label="Filter">
             <AllFilter />

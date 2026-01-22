@@ -11,25 +11,47 @@ import {
   FieldSet,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { DiamondPlus } from "lucide-react";
+import { DiamondPlus, Package, PenLine } from "lucide-react";
 import { DialogFormProps } from "@/interfaces/general";
 import { BrandItem } from "@/features/brands/types";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Select } from "@/components/general/Select";
+import { FileInput } from "@/components/ui/FileInput";
+import { useGetManufacturers } from "@/features/manufacturers/services/manufacturers.api";
 
 const createBrandSchema = z.object({
-  name: z.string("Enter a valid name"),
+  logo: z.any().optional(),
+  name: z.string().min(1, "Brand name is required"),
+  manufacturerId: z.string().min(1, "Manufacturer is required"),
 });
+
+// Mock manufacturer options - replace with your actual data
+const manufacturerOptions = [
+  { value: "nestle", label: "Nestlé" },
+  { value: "unilever", label: "Unilever" },
+  { value: "pz-cussons", label: "PZ Cussons" },
+  { value: "coca-cola", label: "Coca-Cola" },
+  { value: "pepsico", label: "PepsiCo" },
+  { value: "procter-gamble", label: "Procter & Gamble" },
+  { value: "diageo", label: "Diageo" },
+  { value: "tiger-brands", label: "Tiger Brands" },
+  { value: "dangote-group", label: "Dangote Group" },
+];
 
 export function BrandForm({
   handleSubmitForm,
   brand,
 }: DialogFormProps & { brand?: BrandItem }) {
   type BrandData = z.infer<typeof createBrandSchema>;
+  const [logoFileName, setLogoFileName] = useState<string>("");
+  const {data: manufacturers} = useGetManufacturers({})
   const form = useForm<BrandData>({
     resolver: zodResolver(createBrandSchema),
     mode: "onChange",
     defaultValues: {
       name: brand?.name ?? "",
+      manufacturerId: brand?.manufacturerId ?? "",
+      logo: null,
     },
   });
 
@@ -38,14 +60,16 @@ export function BrandForm({
     control,
     formState: { dirtyFields },
     reset,
+    setValue,
   } = form;
 
   const onSubmit = async (values: z.infer<typeof createBrandSchema>) => {
     if (!handleSubmitForm) return;
     console.log({ brand });
     console.log({ values });
+
     if (brand?.id) {
-      //Build partial payload using dirty fields
+      // Build partial payload using dirty fields
       const changes: Partial<BrandData> = {};
       for (const key of Object.keys(dirtyFields) as Array<keyof BrandData>) {
         const val = values[key];
@@ -63,8 +87,15 @@ export function BrandForm({
   useEffect(() => {
     reset({
       name: brand?.name ?? "",
+      manufacturerId: brand?.manufacturerId ?? "",
+      logo: null,
     });
+    // If editing and brand has logo filename, set it
+    if (brand?.logo) {
+      setLogoFileName(brand.logo);
+    }
   }, [brand?.id, reset]);
+
   return (
     <form
       id="brand-form"
@@ -72,8 +103,42 @@ export function BrandForm({
       className="flex flex-col flex-1"
     >
       <FieldSet className="flex flex-1">
-        <FieldGroup className="flex flex-col gap-7">
-          {/* NAME */}
+        <FieldGroup className="flex flex-col gap-7 pb-12">
+          {/* BRAND LOGO */}
+          <Controller
+            control={control}
+            name="logo"
+            render={({ field: { onChange, value, ...field }, fieldState }) => (
+              <div>
+                <Field data-invalid={fieldState.invalid}>
+                  <div className="flex gap-3 items-center">
+                    <FieldLabel>Brand logo</FieldLabel>
+                    {fieldState.error && (
+                      <FieldError>: {fieldState.error.message}</FieldError>
+                    )}
+                  </div>
+                  <FileInput
+                    {...field}
+                    accept="image/*"
+                    fileName={logoFileName}
+                    onFileSelect={(file) => {
+                      onChange(file);
+                      if (file) {
+                        setLogoFileName(file.name);
+                      }
+                    }}
+                    onClear={() => {
+                      onChange(null);
+                      setLogoFileName("");
+                    }}
+                    aria-invalid={fieldState.invalid}
+                  />
+                </Field>
+              </div>
+            )}
+          />
+
+          {/* BRAND NAME */}
           <Controller
             control={control}
             name="name"
@@ -89,10 +154,45 @@ export function BrandForm({
                   <Input
                     {...field}
                     type="text"
-                    placeholder="Enter brand name"
+                    placeholder="Nestlé"
                     aria-invalid={fieldState.invalid}
                     leftIcon={
-                      <DiamondPlus className="h-5 w-5 text-outline-passive" />
+                      <DiamondPlus
+                        className="h-5 w-5 text-outline-passive"
+                        strokeWidth={2.5}
+                      />
+                    }
+                    isEdit={!!brand}
+                  />
+                </Field>
+              </div>
+            )}
+          />
+
+          {/* MANUFACTURER */}
+          <Controller
+            control={control}
+            name="manufacturerId"
+            render={({ field: { onChange, value }, fieldState }) => (
+              <div>
+                <Field data-invalid={fieldState.invalid}>
+                  <div className="flex gap-3 items-center">
+                    <FieldLabel>Manufacturer</FieldLabel>
+                    {fieldState.error && (
+                      <FieldError>: {fieldState.error.message}</FieldError>
+                    )}
+                  </div>
+                  <Select
+                    options={manufacturers?.data?.map((m, i) => ({ label: m.name, value: m.id })) || []}
+                    value={value}
+                    onChange={onChange}
+                    placeholder="Select manufacturer"
+                    searchable
+                    leftIcon={
+                      <Package
+                        className="h-5 w-5 text-outline-passive"
+                        strokeWidth={2.5}
+                      />
                     }
                   />
                 </Field>
