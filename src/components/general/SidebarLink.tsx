@@ -56,10 +56,10 @@ export default function SidebarLink({
           isActive ? "bg-gray-300 sidebar-link font-medium" : "font-medium"
         } ${isCollapsed ? "w-fit mx-auto" : ""}`}
       >
-        {isTransitioning ? (
+        {/* {isTransitioning ? (
           <Spinner />
         ) : (
-          <>
+          <> */}
             {!isCollapsed ? (
               <Icon
                 size={18}
@@ -83,8 +83,8 @@ export default function SidebarLink({
                   <p>{label}</p>
                 </TooltipContent>
               </Tooltip>
-            )}
-          </>
+          //   )}
+          // </>
         )}
         {!isCollapsed && (
           <p

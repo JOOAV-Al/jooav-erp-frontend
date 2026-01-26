@@ -5,6 +5,8 @@ import DrawerTabs from "@/components/general/DrawerTabs";
 import ManufacturerForm from "@/features/manufacturers/components/ManufacturerForm";
 import {
   useCreateManufacturer,
+  useDeleteManufacturer,
+  useDeleteMultipleManufacturers,
   useGetManufacturers,
   useGetManufacturersStats,
   useUpdateManufacturer,
@@ -19,6 +21,7 @@ import SortFilter from "@/components/filters/SortFilter";
 import SearchBox from "@/components/filters/SearchBox";
 import { useDebounce } from "@/hooks/useDebounce";
 import StatsContainer from "@/components/general/StatsContainer";
+import FormDropdown from "@/components/general/FormDropdown";
 
 const ManufacturerPage = () => {
   const [page, setPage] = useState<number>(1);
@@ -32,22 +35,27 @@ const ManufacturerPage = () => {
   // lift mutation here so drawer footer can show loading and we can close on success
   const { mutateAsync: createManufacturer, isPending: creating } =
     useCreateManufacturer();
+  const {
+    mutateAsync: deleteMultipleManufacturers,
+    isPending: deletingMultiple,
+    status,
+  } = useDeleteMultipleManufacturers();
+  const { mutateAsync: deleteManufacturer, isPending: deleting } =
+    useDeleteManufacturer();
   const [selectedManufacturer, setSelectedManufacturer] = useState<
     ManufacturerItem | undefined
   >(undefined);
   const [selectedManufacturers, setSelectedManufacturers] = useState<
     ManufacturerItem[] | []
   >([]);
-  
-  const {data: stats} = useGetManufacturersStats()
+
+  const { data: stats } = useGetManufacturersStats();
   const {
     data,
     isPending: isManufacturersPending,
     isRefetching,
     refetch,
-    isInitialLoading
   } = useGetManufacturers({ search: debouncedQuery, sortOrder });
-
   const manufacturers = data?.data;
 
   const handleCreate = async (values: any) => {
@@ -62,15 +70,26 @@ const ManufacturerPage = () => {
   };
 
   const handleBulkDelete = async (
-    selectedManufacturers: ManufacturerItem[]
+    selectedManufacturers: ManufacturerItem[],
   ) => {
-    console.log({ selectedManufacturers });
+    const idsToDelete = selectedManufacturers.map(
+      (manufacturer) => manufacturer?.id,
+    );
+    await deleteMultipleManufacturers({ manufacturerIds: idsToDelete });
   };
-  
+
+  const handleDelete = async () => {
+    await deleteManufacturer({ id: selectedManufacturer?.id ?? "" });
+    setOpen(false);
+    setSelectedManufacturer(undefined);
+  };
+
   const displayStats = [
     { value: stats?.total ? `${stats?.total}` : "0", label: "Manufacturers" },
-    { value: stats?.inactive ? `${stats?.inactive}` : "0", label: "Archived" },
-    { value: stats?.suspended ? `${stats?.suspended}` : "0", label: "Suspended" },
+    {
+      value: stats?.suspended ? `${stats?.suspended}` : "0",
+      label: "Archived",
+    },
   ];
 
   const tabs: Tab[] = [
@@ -86,6 +105,9 @@ const ManufacturerPage = () => {
           closeDialog={() => setOpen(false)}
         />
       ),
+      ...(selectedManufacturer
+        ? { actionDropdown: <FormDropdown deleteAction={handleDelete} /> }
+        : {}),
     },
     {
       value: "bulk",
@@ -105,9 +127,7 @@ const ManufacturerPage = () => {
 
   return (
     <div className="flex flex-col gap-5">
-      {!isInitialLoading && !isManufacturersPending && manufacturers && manufacturers?.length > 0 && (
-        <StatsContainer stats={displayStats} />
-      )}
+      {manufacturers?.length != 0 && <StatsContainer stats={displayStats} />}
 
       <div className="px-xl pt-xl pb-1 flex flex-col gap-7">
         <div className="flex justify-between flex-wrap gap-6">
@@ -136,7 +156,7 @@ const ManufacturerPage = () => {
               }}
               isOpen={open}
               submitFormId={"manufacturer-form"}
-              submitLoading={updating || creating}
+              submitLoading={updating || creating || deleting}
               submitLabel="Save record"
               children={<DrawerTabs tabs={tabs} />}
               showFooter
@@ -157,10 +177,11 @@ const ManufacturerPage = () => {
           }}
           onDelete={(selectedRows) => {
             console.log("Delete these:", selectedRows);
-            // Call your delete API here
             handleBulkDelete(selectedRows);
           }}
           loading={isManufacturersPending || isRefetching}
+          deletingMultiple={deletingMultiple}
+          deletingMultipleStatus={status}
           data={manufacturers ?? []}
           refetch={refetch}
           columns={[

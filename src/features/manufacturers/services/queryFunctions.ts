@@ -4,12 +4,13 @@ import { api, CustomAxiosRequestConfig } from "@/lib/api/axiosInstance"
 
 const LIMIT = 20
 export async function fetchManufacturers (params: GeneralFetchingParams): Promise<PaginatedResponse<ManufacturerItem>> {
-  const {search, status, country, state, page, limit=LIMIT} = params
+  const {search, status, country, sortOrder, state, page, limit=LIMIT} = params
   const filterParams = new URLSearchParams({})
   if(search) filterParams.append('search', search)
   if(status) filterParams.append('status', status)
   if(country) filterParams.append('country', country)
   if(state) filterParams.append('state', state)
+  if(sortOrder) filterParams.append('sortOrder', sortOrder)
   if(page) filterParams.append('page', page.toString())
   if(limit) filterParams.append('limit', limit.toString())
 

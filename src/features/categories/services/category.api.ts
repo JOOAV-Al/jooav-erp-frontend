@@ -32,8 +32,9 @@ export const useGetCategoriesTree = (params: GeneralFetchingParams) => {
 };
 
 export const useGetCategoriesSubcategories = (params: GeneralFetchingParams) => {
+  const {search, status, manufacturerId, sortBy, sortOrder, page, limit} = params
   return useQuery({
-    queryKey: ["all-categories-subcategories"],
+    queryKey: ["all-categories-subcategories", search, status, manufacturerId, sortBy, sortOrder, page, limit],
     queryFn: () => fetchCategoriesSubcategories(params),
     retry: 2,
   });

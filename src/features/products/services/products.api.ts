@@ -63,6 +63,14 @@ export const useDeleteProduct = () => {
   });
 };
 
+export const useDeleteMultipleProducts = () => {
+  return useInvalidatingMutation({
+    mutationFn: ({productIds}: {productIds: string[]}) =>
+      api.post(`/products/bulk-delete`, {productIds}), 
+    invalidateQueries: [["all-products"], ["product-details"], ["products-stats"]]
+  });
+};
+
 export const useDeactivateProduct = () => {
   return useInvalidatingMutation({
     mutationFn: ({id}: {id: string}) =>

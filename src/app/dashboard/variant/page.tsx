@@ -35,10 +35,10 @@ const VariantPage = () => {
     VariantItem | undefined
   >(undefined);
   const [selectedVariants, setSelectedVariants] = useState<VariantItem[] | []>(
-    []
+    [],
   );
 
-   const { data: stats } = useGetVariantsStats();
+  const { data: stats } = useGetVariantsStats();
   const {
     data,
     isPending: isVariantsPending,
@@ -60,9 +60,7 @@ const VariantPage = () => {
     setSelectedVariant(undefined);
   };
 
-  const handleBulkDelete = async (
-    selectedVariants: VariantItem[]
-  ) => {
+  const handleBulkDelete = async (selectedVariants: VariantItem[]) => {
     console.log({ selectedVariants });
   };
 
@@ -107,10 +105,7 @@ const VariantPage = () => {
 
   return (
     <div className="flex flex-col gap-5">
-      {!isInitialLoading &&
-        !isVariantsPending &&
-        variants &&
-        variants?.length > 0 && <StatsContainer stats={displayStats} />}
+      {variants?.length != 0 && <StatsContainer stats={displayStats} />}
 
       <div className="px-xl pt-xl pb-1 flex flex-col gap-7">
         <div className="flex justify-between flex-wrap gap-6">

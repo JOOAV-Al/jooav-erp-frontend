@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -12,6 +12,7 @@ import Spinner from "@/components/general/Spinner";
 import { format } from "date-fns";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Trash2, X } from "lucide-react";
+import { TableSkeleton } from "@/components/general/TableSkeleton";
 // import Pagination from "./Pagination";
 // import CustomLoader from "@/components/layouts/landing-page/CustomLoader";
 // import NoDataBox from "./NoDataBox";
@@ -28,6 +29,8 @@ interface DataTableProps<T> {
   columns: Column<T>[];
   withPagination?: boolean;
   loading?: boolean;
+  deletingMultiple?: boolean;
+  deletingMultipleStatus?: string;
   page?: number;
   pageSize?: number;
   totalCount?: number;
@@ -66,6 +69,8 @@ function DataTable<T>({
   data,
   columns,
   loading = false,
+  deletingMultiple = false,
+  deletingMultipleStatus,
   withPagination = true,
   page,
   pageSize,
@@ -124,17 +129,35 @@ DataTableProps<T>) {
   };
 
   // Handle delete action
-  const handleDelete = () => {
+  const handleDelete = async () => {
     const selectedRowObjects = data.filter((r) =>
-      selectedRows.has(getRowId(r))
+      selectedRows.has(getRowId(r)),
     );
     onDelete?.(selectedRowObjects);
-    handleClearSelection();
   };
+
+  useEffect(() => {
+    if (deletingMultipleStatus !== "success") return;
+    handleClearSelection();
+  }, [deletingMultipleStatus]);
 
   const isAllSelected = data.length > 0 && selectedRows.size === data.length;
   const isSomeSelected =
     selectedRows.size > 0 && selectedRows.size < data.length;
+
+  // Show skeleton while loading
+  if (loading) {
+    return (
+      <div className="flex flex-col gap-4 relative">
+        <TableSkeleton
+          columns={columns.length}
+          rows={10}
+          withCheckbox={withCheckbox}
+          columnLabels={columns.map((col) => col.label)}
+        />
+      </div>
+    );
+  }
   return (
     <div className="flex flex-col gap-4 relative">
       <Table>
@@ -161,7 +184,7 @@ DataTableProps<T>) {
             ))}
           </TableRow>
         </TableHeader>
-        {loading ? (
+        {/* loading ? (
           <TableBody>
             <TableRow>
               <TableCell
@@ -174,7 +197,8 @@ DataTableProps<T>) {
               </TableCell>
             </TableRow>
           </TableBody>
-        ) : data?.length === 0 ? (
+        ) :  */}
+        {data?.length === 0 ? (
           <TableBody>
             <TableRow className="hover:bg-white">
               <TableCell colSpan={columns.length + (withCheckbox ? 1 : 0)}>
@@ -300,7 +324,11 @@ DataTableProps<T>) {
               className="bg-storey-foreground rounded-lg shadow-input px-main py-md flex items-center gap-5 group cursor-pointer"
               aria-label="Delete selected"
             >
-              <Trash2 className="w-5 h-5 text-outline group-hover:text-red-500 group-hover:scale-105" />
+              {deletingMultiple ? (
+                <Spinner color="red" />
+              ) : (
+                <Trash2 className="w-5 h-5 text-outline group-hover:text-red-500 group-hover:scale-105" />
+              )}
             </button>
           )}
         </div>

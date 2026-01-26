@@ -1,63 +1,78 @@
 import * as React from "react";
-import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { X } from "lucide-react";
 
 interface TagInputProps {
-  value: string[];
-  onChange: (tags: string[]) => void;
+  value?: string[];
+  onChange?: (tags: string[]) => void;
   placeholder?: string;
-  className?: string;
   leftIcon?: React.ReactNode;
-  disabled?: boolean;
+  className?: string;
+  existingTags?: string[];
+  onRemoveExisting?: (tag: string) => void;
 }
 
-export const TagInput = React.forwardRef<HTMLDivElement, TagInputProps>(
+const TagInput = React.forwardRef<HTMLDivElement, TagInputProps>(
   (
-    { value = [], onChange, placeholder, className, leftIcon, disabled },
+    {
+      value = [],
+      onChange,
+      placeholder = "Add tag",
+      leftIcon,
+      className,
+      existingTags = [],
+      onRemoveExisting,
+    },
     ref,
   ) => {
     const [inputValue, setInputValue] = React.useState("");
+    const [internalTags, setInternalTags] = React.useState<string[]>(value);
     const inputRef = React.useRef<HTMLInputElement>(null);
+    const containerRef = React.useRef<HTMLDivElement>(null);
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === "Enter" || e.key === ",") {
-        e.preventDefault();
-        addTag();
-      } else if (
-        e.key === "Backspace" &&
-        inputValue === "" &&
-        value.length > 0
-      ) {
-        // Remove last tag when backspace is pressed on empty input
-        removeTag(value.length - 1);
-      }
-    };
+    React.useImperativeHandle(ref, () => containerRef.current!);
 
-    const addTag = () => {
-      const trimmedValue = inputValue.trim();
-      if (trimmedValue && !value.includes(trimmedValue)) {
-        onChange([...value, trimmedValue]);
+    const hasLeftIcon = Boolean(leftIcon);
+
+    // Sync internal state with external value
+    React.useEffect(() => {
+      setInternalTags(value);
+    }, [value]);
+
+    const addTag = (tag: string) => {
+      const trimmedTag = tag.trim();
+      if (trimmedTag && !internalTags.includes(trimmedTag)) {
+        const newTags = [...internalTags, trimmedTag];
+        setInternalTags(newTags);
+        onChange?.(newTags);
         setInputValue("");
       }
     };
 
-    const removeTag = (indexToRemove: number) => {
-      onChange(value.filter((_, index) => index !== indexToRemove));
+    const removeTag = (tagToRemove: string) => {
+      const newTags = internalTags.filter((tag) => tag !== tagToRemove);
+      setInternalTags(newTags);
+      onChange?.(newTags);
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        if (inputValue.trim()) {
+          addTag(inputValue);
+        }
+      } else if (
+        e.key === "Backspace" &&
+        !inputValue &&
+        internalTags.length > 0
+      ) {
+        // Remove last tag when backspacing with empty input
+        removeTag(internalTags[internalTags.length - 1]);
+      }
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newValue = e.target.value;
-      // Check if user typed a comma
-      if (newValue.includes(",")) {
-        const parts = newValue.split(",");
-        const newTag = parts[0].trim();
-        if (newTag && !value.includes(newTag)) {
-          onChange([...value, newTag]);
-        }
-        setInputValue("");
-      } else {
-        setInputValue(newValue);
-      }
+      setInputValue(e.target.value);
     };
 
     const handleContainerClick = () => {
@@ -65,71 +80,98 @@ export const TagInput = React.forwardRef<HTMLDivElement, TagInputProps>(
     };
 
     return (
-      <div
-        ref={ref}
-        onClick={handleContainerClick}
-        className={cn(
-          "w-full min-w-0 min-h-12 rounded-lg bg-white border border-transparent",
-          "py-md text-base outline-none leading-20",
-          "shadow-input focus-within:shadow-input",
-          "transition-[color,box-shadow]",
-          "cursor-text",
-          "flex items-center flex-wrap gap-2",
-          leftIcon ? "pl-15 pr-4" : "px-4",
-          disabled && "opacity-50 cursor-not-allowed",
-          className,
-        )}
-      >
-        {/* Left Icon */}
-        {leftIcon && (
-          <div className="absolute inset-y-0 left-0 px-main py-md rounded-l-lg flex items-center justify-center pointer-events-none bg-storey-foreground border-r-2 border-border-main max-w-12">
-            <div className="p-3 flex items-center justify-center">
-              {leftIcon}
-            </div>
+      <div className="w-full space-y-3">
+        {/* Existing Tags (when editing) */}
+        {existingTags.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {existingTags.map((tag, index) => (
+              <div
+                key={`existing-${index}`}
+                className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-200 text-foreground rounded-md text-sm"
+              >
+                <span>{tag}</span>
+                <button
+                  type="button"
+                  onClick={() => onRemoveExisting?.(tag)}
+                  className="flex items-center justify-center hover:bg-gray-300 rounded transition-colors"
+                >
+                  <X className="h-4 w-4 text-outline-passive hover:text-outline" />
+                </button>
+              </div>
+            ))}
           </div>
         )}
 
-        {/* Tags */}
-        {value.map((tag, index) => (
-          <span
-            key={index}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-foreground rounded-md text-sm"
-          >
-            {tag}
-            {!disabled && (
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  removeTag(index);
-                }}
-                className="hover:bg-gray-200 rounded p-0.5 transition-colors"
-              >
-                <X className="h-3.5 w-3.5 text-outline-passive" />
-              </button>
-            )}
-          </span>
-        ))}
-
-        {/* Input */}
-        <input
-          ref={inputRef}
-          type="text"
-          value={inputValue}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          onBlur={addTag}
-          placeholder={value.length === 0 ? placeholder : ""}
-          disabled={disabled}
-          className={cn(
-            "flex-1 min-w-[120px] bg-transparent outline-none",
-            "placeholder:text-body-passive",
-            disabled && "cursor-not-allowed",
+        {/* Input Field with New Tags */}
+        <div className="relative w-full">
+          {/* Left Icon - positioned absolutely relative to this container */}
+          {hasLeftIcon && (
+            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none z-10">
+              <div className="p-3 flex items-center justify-center">
+                {leftIcon}
+              </div>
+            </div>
           )}
-        />
+
+          <div
+            ref={containerRef}
+            onClick={handleContainerClick}
+            className={cn(
+              // Base styles
+              "w-full min-h-12 rounded-md bg-white border border-transparent",
+              "py-2 text-base outline-none",
+              "shadow-input focus-within:shadow-input",
+              "transition-[color,box-shadow]",
+              "cursor-text",
+              "flex flex-wrap items-center gap-2",
+
+              // Padding based on icon
+              hasLeftIcon ? "pl-11 pr-main" : "px-main",
+
+              className,
+            )}
+          >
+            {/* Tags inside input */}
+            {internalTags.map((tag, index) => (
+              <div
+                key={`tag-${index}`}
+                className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-200 text-foreground rounded-md text-sm"
+              >
+                <span>{tag}</span>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeTag(tag);
+                  }}
+                  className="flex items-center justify-center hover:bg-gray-300 rounded transition-colors"
+                >
+                  <X className="h-4 w-4 text-outline-passive hover:text-outline" />
+                </button>
+              </div>
+            ))}
+
+            {/* Input */}
+            <input
+              ref={inputRef}
+              type="text"
+              value={inputValue}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+              placeholder={internalTags.length === 0 ? placeholder : ""}
+              className={cn(
+                "flex-1 min-w-[120px] bg-transparent outline-none border-none",
+                "placeholder:text-body-passive text-foreground",
+                "py-1",
+              )}
+            />
+          </div>
+        </div>
       </div>
     );
   },
 );
 
 TagInput.displayName = "TagInput";
+
+export { TagInput };

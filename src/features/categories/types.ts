@@ -17,7 +17,7 @@ export interface CategoryItem {
   description: string;
   parentId: string | null;
   sortOrder: number;
-  parent: ParentCategoryItem[];
+  parent: ParentCategoryItem;
   productCount: number;
   isActive: boolean;
   createdAt: string;

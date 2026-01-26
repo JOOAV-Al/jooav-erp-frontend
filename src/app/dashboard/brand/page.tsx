@@ -6,6 +6,7 @@ import BrandForm from "@/features/brands/components/BrandForm";
 import {
   useCreateBrand,
   useDeleteBrand,
+  useDeleteMultipleBrands,
   useGetBrands,
   useGetBrandsStats,
   useUpdateBrand,
@@ -21,6 +22,7 @@ import SearchBox from "@/components/filters/SearchBox";
 import { useDebounce } from "@/hooks/useDebounce";
 import StatsContainer from "@/components/general/StatsContainer";
 import Image from "next/image";
+import FormDropdown from "@/components/general/FormDropdown";
 
 const BrandPage = () => {
   const [page, setPage] = useState<number>(1);
@@ -32,6 +34,11 @@ const BrandPage = () => {
   const { mutateAsync: updateBrand, isPending: updating } = useUpdateBrand();
   const { mutateAsync: createBrand, isPending: creating } = useCreateBrand();
   const { mutateAsync: deleteBrand, isPending: deleting } = useDeleteBrand();
+  const {
+    mutateAsync: deleteMultipleBrands,
+    isPending: deletingMultiple,
+    status,
+  } = useDeleteMultipleBrands();
 
   const [selectedBrand, setSelectedBrand] = useState<BrandItem | undefined>(
     undefined,
@@ -60,11 +67,20 @@ const BrandPage = () => {
     setSelectedBrand(undefined);
   };
 
-  const handleBulkDelete = async (selectedBrands: BrandItem[]) => {
-    console.log({ selectedBrands });
-    // const response = await deleteBrand({ id: selectedBrands.map((brand) => brand.id) });
+  const handleBulkDelete = async (
+    selectedBrands: BrandItem[],
+  ) => {
+    const idsToDelete = selectedBrands.map(
+      (brand) => brand?.id,
+    );
+    await deleteMultipleBrands({ brandIds: idsToDelete });
   };
 
+  const handleDelete = async () => {
+    await deleteBrand({ id: selectedBrand?.id ?? "" });
+    setOpen(false);
+    setSelectedBrand(undefined);
+  };
   const displayStats = [
     { value: stats?.total ? `${stats?.total}` : "0", label: "Brands" },
     { value: stats?.active ? `${stats?.active}` : "0", label: "Manufacturers" },
@@ -84,6 +100,10 @@ const BrandPage = () => {
           closeDialog={() => setOpen(false)}
         />
       ),
+      ...(selectedBrand
+              ? { actionDropdown: <FormDropdown deleteAction={handleDelete} /> }
+              : {}),
+          
     },
     {
       value: "bulk",
@@ -103,10 +123,8 @@ const BrandPage = () => {
 
   return (
     <div className="flex flex-col gap-5">
-      {!isInitialLoading &&
-        !isBrandsPending &&
-        brands &&
-        brands?.length > 0 && <StatsContainer stats={displayStats} />}
+      {
+        brands?.length != 0 && <StatsContainer stats={displayStats} />}
 
       <div className="px-xl pt-xl pb-1 flex flex-col gap-7">
         <div className="flex justify-between flex-wrap gap-6">
@@ -135,7 +153,7 @@ const BrandPage = () => {
               }}
               isOpen={open}
               submitFormId={"brand-form"}
-              submitLoading={updating || creating}
+              submitLoading={updating || creating || deleting}
               submitLabel="Save record"
               children={<DrawerTabs tabs={tabs} />}
               showFooter
@@ -155,10 +173,11 @@ const BrandPage = () => {
           }}
           onDelete={(selectedRows) => {
             console.log("Delete these:", selectedRows);
-            // Call your delete API here
             handleBulkDelete(selectedRows);
           }}
           loading={isBrandsPending || isRefetching}
+                    deletingMultiple={deletingMultiple}
+          deletingMultipleStatus={status}
           data={brands ?? []}
           refetch={refetch}
           columns={[
@@ -171,7 +190,7 @@ const BrandPage = () => {
               key: "logo",
               label: "Logo",
               render: (item) => (
-                <div>
+                <div className="w-[31.2px] h-7 flex items-center justify-center">
                   {item?.logo ? (
                     <Image
                       src={item?.logo ?? ""}
@@ -184,7 +203,7 @@ const BrandPage = () => {
               ),
             },
             {
-              key: "manufacturer",
+              key: "manufacturer.name",
               label: "Manufacturer",
             },
             { key: "updatedAt", label: "Modified" },

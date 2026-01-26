@@ -177,13 +177,18 @@ export function BrandForm({
               <div>
                 <Field data-invalid={fieldState.invalid}>
                   <div className="flex gap-3 items-center">
-                    <FieldLabel>Manufacturer</FieldLabel>
+                    <FieldLabel>Manufacturer name</FieldLabel>
                     {fieldState.error && (
                       <FieldError>: {fieldState.error.message}</FieldError>
                     )}
                   </div>
                   <Select
-                    options={manufacturers?.data?.map((m, i) => ({ label: m.name, value: m.id })) || []}
+                    options={
+                      manufacturers?.data?.map((m, i) => ({
+                        label: m.name,
+                        value: m.id,
+                      })) || []
+                    }
                     value={value}
                     onChange={onChange}
                     placeholder="Select manufacturer"
@@ -199,6 +204,7 @@ export function BrandForm({
               </div>
             )}
           />
+
         </FieldGroup>
       </FieldSet>
     </form>

@@ -5,7 +5,8 @@ import DrawerTabs from "@/components/general/DrawerTabs";
 import CategoryForm from "@/features/categories/components/CategoryForm";
 import {
   useCreateCategory,
-  useGetCategories,
+  useGetCategoriesStats,
+  useGetCategoriesSubcategories,
   useUpdateCategory,
 } from "@/features/categories/services/category.api";
 import { Tab } from "@/interfaces/general";
@@ -18,6 +19,7 @@ import SortFilter from "@/components/filters/SortFilter";
 import SearchBox from "@/components/filters/SearchBox";
 import { useDebounce } from "@/hooks/useDebounce";
 import StatsContainer from "@/components/general/StatsContainer";
+import StatsSkeleton from "@/components/general/StatsSkeleton";
 
 const CategoryPage = () => {
   const [page, setPage] = useState<number>(1);
@@ -37,12 +39,13 @@ const CategoryPage = () => {
   >([]);
   const debouncedQuery = useDebounce(query);
 
+  const { data: stats, isPending: isStatsPending } = useGetCategoriesStats();
   const {
     data,
     isPending: isCategoriesPending,
     isRefetching,
     refetch,
-  } = useGetCategories({
+  } = useGetCategoriesSubcategories({
     search: debouncedQuery,
     sortOrder,
   });
@@ -60,16 +63,17 @@ const CategoryPage = () => {
     setSelectedCategory(undefined);
   };
 
-  const handleBulkDelete = async (
-    selectedCategories: CategoryItem[]
-  ) => {
+  const handleBulkDelete = async (selectedCategories: CategoryItem[]) => {
     console.log({ selectedCategories });
   };
 
-  const stats = [
-    { value: "200", label: "Total Categories" },
-    { value: "10", label: "In Draft" },
-    { value: "190", label: "Total Published" },
+  const displayStats = [
+    {
+      value: stats?.total ? `${stats?.total}` : "0",
+      label: "categories",
+    },
+    { value: stats?.active ? `${stats?.active}` : "0", label: "Brands" },
+    { value: stats?.active ? `${stats?.inactive}` : "0", label: "Archived" },
   ];
 
   const formId = `category-form`;
@@ -80,7 +84,7 @@ const CategoryPage = () => {
       heading: "Enter category details",
       content: (
         <CategoryForm
-          category={selectedCategory}
+          category={selectedCategory?.parent}
           handleSubmitForm={(values) => handleCreate(values)}
           loading={creating || updating}
           closeDialog={() => setOpen(false)}
@@ -106,7 +110,11 @@ const CategoryPage = () => {
 
   return (
     <div className="flex flex-col gap-5">
-      {categories && categories?.length > 0 && <StatsContainer stats={stats} />}
+      {isStatsPending ? (
+        <StatsSkeleton count={4} />
+      ) : (
+        categories?.length != 0 && <StatsContainer stats={displayStats} />
+      )}
 
       <div className="px-xl pt-xl pb-1 flex flex-col gap-7">
         <div className="flex justify-between flex-wrap gap-6">
@@ -164,18 +172,14 @@ const CategoryPage = () => {
           refetch={refetch}
           columns={[
             {
-              key: "name",
+              key: "parent.name",
               label: "Category",
             },
             {
-              key: "parentId",
-              label: "Type",
-              render: (category) => <span>{category.parentId ? "Sub" : "Major"}</span>,
+              key: "name",
+              label: "Sub Category",
+              // render: (category) => <span>{category.parentId ? "Sub" : "Major"}</span>,
             },
-            // {
-            //   key: "parent.name",
-            //   label: "Parent Category",
-            // },
             { key: "updatedAt", label: "Modified" },
             { key: "createdAt", label: "Created" },
           ]}

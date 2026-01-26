@@ -18,7 +18,7 @@ const EmptyState = ({
   onCTAClick,
 }: EmptyStateProps) => {
   return (
-    <div className="flex justify-center my-10  px-sm">
+    <div className="flex justify-center my-10 px-sm">
       <div className="flex flex-col items-center gap-main px-main py-1 rounded-2xl bg-transparent max-w-[372px] w-full">
         <Image
           src={""}
@@ -27,14 +27,16 @@ const EmptyState = ({
           width={200}
           className="rounded-2xl bg-storey-foreground"
         />
-        <div className="p-sm flex flex-col gap-6 max-w-[340px] text-center">
+        <div className="py-sm px-2xl flex flex-col gap-6 max-w-[340px] text-center">
           <h3 className="text-heading">{header}</h3>
-          <p className="text-body-passive font-medium">{description}</p>
+          <p className="text-body-passive font-medium text-wrap">
+            {description}
+          </p>
         </div>
         <Button
           size={"neutral"}
           type="submit"
-          className="w-full"
+          className="w-full mx-auto"
           onClick={onCTAClick}
         >
           <span className="h-4 w-5 flex justify-center">

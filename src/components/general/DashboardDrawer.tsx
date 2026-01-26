@@ -73,7 +73,9 @@ const DashboardDrawer = ({
               className="mr-2"
               disabled={submitLoading}
             >
-              {submitLoading ? "Loading..." : submitLabel}
+              <span className="">
+                {submitLoading ? "Loading..." : submitLabel}
+              </span>
             </Button>
           </RightDrawerFooter>
         )}

@@ -16,7 +16,10 @@ const DrawerTabs = ({ tabs }: DrawerTabsProps) => {
         </div>
         {tabs?.map((tab, i) => (
           <TabsContent key={i} value={tab.value} className="px-xl py-main flex flex-col gap-main">
+            <div className="flex justify-between items-center gap-5">
             <h3>{tab?.heading ?? ""}</h3>
+            {tab?.actionDropdown && <div>{tab?.actionDropdown}</div>}
+            </div>
             {tab?.content}
           </TabsContent>
         ))}

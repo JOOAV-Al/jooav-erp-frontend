@@ -59,6 +59,7 @@ export interface Tab {
   label: string;
   heading?: string;
   content: React.ReactNode;
+  actionDropdown?: React.ReactNode;
 }
 export interface DrawerTabsProps {
   tabs: Tab[];

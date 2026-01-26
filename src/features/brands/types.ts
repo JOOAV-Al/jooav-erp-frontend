@@ -1,3 +1,5 @@
+import { ManufacturerItem } from "@/features/manufacturers/types";
+
 export type BrandStatus = "DISCONTINUED" | "ACTIVE" | "INACTIVE"
 export interface CreateBrandPayload {
   name?: string;
@@ -18,6 +20,7 @@ export interface BrandItem {
   createdBy: string;
   deletedBy: string;
   updatedBy: string;
+  manufacturer: ManufacturerItem
 }
 
 export interface BrandProductItem {

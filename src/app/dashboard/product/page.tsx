@@ -5,8 +5,11 @@ import DrawerTabs from "@/components/general/DrawerTabs";
 import ProductForm from "@/features/products/components/ProductForm";
 import {
   useCreateProduct,
+  useDeleteProduct,
+  useDeleteMultipleProducts,
   useGetProducts,
   useUpdateProduct,
+  useGetProductsStats,
 } from "@/features/products/services/products.api";
 import { Tab } from "@/interfaces/general";
 import React, { useState } from "react";
@@ -18,6 +21,7 @@ import SortFilter from "@/components/filters/SortFilter";
 import SearchBox from "@/components/filters/SearchBox";
 import { useDebounce } from "@/hooks/useDebounce";
 import StatsContainer from "@/components/general/StatsContainer";
+import FormDropdown from "@/components/general/FormDropdown";
 
 const ProductPage = () => {
   const [page, setPage] = useState<number>(1);
@@ -29,21 +33,29 @@ const ProductPage = () => {
     useUpdateProduct();
   const { mutateAsync: createProduct, isPending: creating } =
     useCreateProduct();
+  const {
+    mutateAsync: deleteMultipleProducts,
+    isPending: deletingMultiple,
+    status,
+  } = useDeleteMultipleProducts();
+  const { mutateAsync: deleteProduct, isPending: deleting } =
+    useDeleteProduct();
   const [selectedProduct, setSelectedProduct] = useState<
     ProductItem | undefined
   >(undefined);
   const [selectedProducts, setSelectedProducts] = useState<ProductItem[] | []>(
-    []
+    [],
   );
   const debouncedQuery = useDebounce(query);
 
+  const { data: stats } = useGetProductsStats();
   const {
     data,
     isPending: isProductsPending,
     isRefetching,
+    isInitialLoading,
     refetch,
   } = useGetProducts({ search: debouncedQuery, sortOrder });
-
   const products = data?.data;
 
   const handleCreate = async (values: any) => {
@@ -57,23 +69,28 @@ const ProductPage = () => {
     setSelectedProduct(undefined);
   };
 
-  const handleBulkDelete = async (
-    selectedProducts: ProductItem[]
-  ) => {
-    console.log({ selectedProducts });
+  const handleBulkDelete = async (selectedProducts: ProductItem[]) => {
+    const idsToDelete = selectedProducts.map((product) => product?.id);
+    await deleteMultipleProducts({ productIds: idsToDelete });
   };
 
-  const stats = [
-    { value: "200", label: "Total Products" },
-    { value: "10", label: "In Draft" },
-    { value: "190", label: "Total Published" },
+  const handleDelete = async () => {
+    await deleteProduct({ id: selectedProduct?.id ?? "" });
+    setOpen(false);
+    setSelectedProduct(undefined);
+  };
+
+  const displayStats = [
+    { value: stats?.total ? `${stats?.total}` : "0", label: "Total Products" },
+    { value: stats?.total ? `${stats?.total}` : "0", label: "In Draft" },
+    { value: stats?.total ? `${stats?.total}` : "0", label: "Total Published" },
   ];
 
   const tabs: Tab[] = [
     {
       value: "manual",
       label: "Manual",
-      heading: "Enter product details",
+      heading: `${selectedProduct ? "Edit" : "Enter"} product details`,
       content: (
         <ProductForm
           product={selectedProduct}
@@ -82,6 +99,9 @@ const ProductPage = () => {
           closeDialog={() => setOpen(false)}
         />
       ),
+      ...(selectedProduct
+        ? { actionDropdown: <FormDropdown deleteAction={handleDelete} /> }
+        : {}),
     },
     {
       value: "bulk",
@@ -101,7 +121,7 @@ const ProductPage = () => {
 
   return (
     <div className="flex flex-col gap-5">
-      {products && products?.length > 0 && <StatsContainer stats={stats} />}
+      {products?.length != 0 && <StatsContainer stats={displayStats} />}
 
       <div className="px-xl pt-xl pb-1 flex flex-col gap-7">
         <div className="flex justify-between flex-wrap gap-6">
@@ -130,7 +150,7 @@ const ProductPage = () => {
               }}
               isOpen={open}
               submitFormId={"product-form"}
-              submitLoading={updating || creating}
+              submitLoading={updating || creating || deleting}
               submitLabel="Save record"
               children={<DrawerTabs tabs={tabs} />}
               showFooter
@@ -150,10 +170,11 @@ const ProductPage = () => {
           }}
           onDelete={(selectedRows) => {
             console.log("Delete these:", selectedRows);
-            // Call your delete API here
             handleBulkDelete(selectedRows);
           }}
           loading={isProductsPending || isRefetching}
+          deletingMultiple={deletingMultiple}
+          deletingMultipleStatus={status}
           data={products ?? []}
           refetch={refetch}
           columns={[

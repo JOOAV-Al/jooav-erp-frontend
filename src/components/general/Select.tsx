@@ -16,6 +16,9 @@ interface SelectProps {
   leftIcon?: React.ReactNode;
   searchable?: boolean;
   className?: string;
+  marginBottom?: string;
+  disableAutoMargin?: boolean;
+
 }
 
 const Select = React.forwardRef<HTMLDivElement, SelectProps>(
@@ -28,12 +31,19 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
       leftIcon,
       searchable = false,
       className,
+      marginBottom="mb-62",
+      disableAutoMargin= false,
     },
     ref,
   ) => {
     const [isOpen, setIsOpen] = React.useState(false);
     const [searchQuery, setSearchQuery] = React.useState("");
     const containerRef = React.useRef<HTMLDivElement>(null);
+
+    const dropdownRef = React.useRef<HTMLDivElement | null>(null);
+    const [measuredMargin, setMeasuredMargin] = React.useState<
+      number | null
+    >(null);
 
     React.useImperativeHandle(ref, () => containerRef.current!);
 
@@ -51,6 +61,26 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
       setIsOpen(false);
       setSearchQuery("");
     };
+
+    // measure dropdown height when open, options change or window resizes
+    React.useEffect(() => {
+      if (!isOpen) {
+        setMeasuredMargin(null);
+        return;
+      }
+
+      const measure = () => {
+        const height = dropdownRef.current?.offsetHeight ?? 0;
+        const gap = 12; // extra space so it doesn't touch
+        setMeasuredMargin(height + gap);
+      };
+
+      // measure after next paint (dropdown just mounted)
+      requestAnimationFrame(measure);
+
+      window.addEventListener("resize", measure);
+      return () => window.removeEventListener("resize", measure);
+    }, [isOpen, filteredOptions]);
 
     // Close dropdown when clicking outside
     React.useEffect(() => {
@@ -72,7 +102,15 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
     const hasLeftIcon = Boolean(leftIcon);
 
     return (
-      <div ref={containerRef} className="relative w-full">
+      <div
+        ref={containerRef}
+        style={
+          !disableAutoMargin && measuredMargin
+            ? { marginBottom: `${measuredMargin}px` }
+            : undefined
+        }
+        className={`relative w-full ${isOpen && disableAutoMargin ? marginBottom : ""}`}
+      >
         {/* Select Trigger */}
         <div
           onClick={() => setIsOpen(!isOpen)}
@@ -124,7 +162,10 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
 
         {/* Dropdown */}
         {isOpen && (
-          <div className="absolute p-md z-50 w-full mt-3 bg-white rounded-lg select-dropdown-shadow max-h-90 overflow-hidden">
+          <div
+            ref={dropdownRef}
+            className="absolute p-md z-50 w-full mt-3 bg-white rounded-lg select-dropdown-shadow max-h-60 overflow-hidden"
+          >
             {/* Search Input */}
             {searchable && (
               <SearchBox

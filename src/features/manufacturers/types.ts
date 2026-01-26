@@ -1,3 +1,5 @@
+import { BrandItem } from "@/features/brands/types";
+
 export type ManufacturerStatus = "PENDING_APPROVAL" | "ACTIVE" | "SUSPENDED" | "INACTIVE"
 export interface CreateManufacturerPayload {
   name?: string;
@@ -47,6 +49,7 @@ export interface ManufacturerItem {
   productsCount: number;
   ordersCount: number;
   products: ManufacturerProductItem[];
+  brands: BrandItem[];
 }
 
 export interface ManufacturerProductItem {

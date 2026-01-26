@@ -7,9 +7,9 @@ import { useQuery } from "@tanstack/react-query";
 
 
 export const useGetManufacturers = (params: GeneralFetchingParams) => {
-  const {search, status, country, state, page, limit} = params
+  const {search, status, country, sortOrder, state, page, limit} = params
   return useQuery({
-    queryKey: ["all-manufacturers", search, status, country, state, page, limit],
+    queryKey: ["all-manufacturers", search, status, country, state, sortOrder, page, limit],
     queryFn: () => fetchManufacturers(params),
     retry: 2,
   });
@@ -69,6 +69,14 @@ export const useDeleteManufacturer = () => {
   return useInvalidatingMutation({
     mutationFn: ({id}: {id: string}) =>
       api.delete(`/manufacturers/${id}`), 
+    invalidateQueries: [["all-manufacturers"], ["manufacturers-stats"]]
+  });
+};
+
+export const useDeleteMultipleManufacturers = () => {
+  return useInvalidatingMutation({
+    mutationFn: ({manufacturerIds}: {manufacturerIds: string[]}) =>
+      api.post(`/manufacturers/bulk-delete`, {manufacturerIds}), 
     invalidateQueries: [["all-manufacturers"], ["manufacturers-stats"]]
   });
 };
