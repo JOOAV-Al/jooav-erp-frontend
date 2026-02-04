@@ -81,32 +81,11 @@ const TagInput = React.forwardRef<HTMLDivElement, TagInputProps>(
 
     return (
       <div className="w-full space-y-3">
-        {/* Existing Tags (when editing) */}
-        {existingTags.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {existingTags.map((tag, index) => (
-              <div
-                key={`existing-${index}`}
-                className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-200 text-foreground rounded-md text-sm"
-              >
-                <span>{tag}</span>
-                <button
-                  type="button"
-                  onClick={() => onRemoveExisting?.(tag)}
-                  className="flex items-center justify-center hover:bg-gray-300 rounded transition-colors"
-                >
-                  <X className="h-4 w-4 text-outline-passive hover:text-outline" />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-
         {/* Input Field with New Tags */}
         <div className="relative w-full">
           {/* Left Icon - positioned absolutely relative to this container */}
           {hasLeftIcon && (
-            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none z-10">
+            <div className="absolute left-3 top-3 flex items-center pointer-events-none z-10">
               <div className="p-3 flex items-center justify-center">
                 {leftIcon}
               </div>
@@ -119,26 +98,38 @@ const TagInput = React.forwardRef<HTMLDivElement, TagInputProps>(
             className={cn(
               // Base styles
               "w-full min-h-12 rounded-md bg-white border border-transparent",
-              "py-2 text-base outline-none",
-              "shadow-input focus-within:shadow-input",
+              "text-base outline-none",
+              "shadow-input focus-within:shadow-input focus-visible:shadow-input",
               "transition-[color,box-shadow]",
               "cursor-text",
               "flex flex-wrap items-center gap-2",
+              `${internalTags.length === 0 ? "py-2" : "py-md"}`,
 
               // Padding based on icon
               hasLeftIcon ? "pl-11 pr-main" : "px-main",
+
+              // Focus state
+              "focus-visible:bg-background",
+
+              // Disabled state
+              "disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none",
 
               className,
             )}
           >
             {/* Tags inside input */}
-            {internalTags.map((tag, index) => (
-              <div
-                key={`tag-${index}`}
-                className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-200 text-foreground rounded-md text-sm"
-              >
-                <span>{tag}</span>
-                <button
+            <div className="flex flex-wrap gap-x-4 gap-y-6">
+              {internalTags.map((tag, index) => (
+                <div
+                  key={`tag-${index}`}
+                  className="inline-flex items-center gap-6 px-4 py-5 bg-storey-foreground border border-border-main table-selected rounded-md"
+                >
+                  <p className="h-[9px] flex justify-center items-center">
+                    <span className="text-body rounded-md text-[13px] font-semibold">
+                      {tag}
+                    </span>
+                  </p>
+                  {/* <button
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
@@ -147,9 +138,10 @@ const TagInput = React.forwardRef<HTMLDivElement, TagInputProps>(
                   className="flex items-center justify-center hover:bg-gray-300 rounded transition-colors"
                 >
                   <X className="h-4 w-4 text-outline-passive hover:text-outline" />
-                </button>
-              </div>
-            ))}
+                </button> */}
+                </div>
+              ))}
+            </div>
 
             {/* Input */}
             <input
@@ -167,6 +159,30 @@ const TagInput = React.forwardRef<HTMLDivElement, TagInputProps>(
             />
           </div>
         </div>
+        {/* Existing Tags (when editing) */}
+        {existingTags.length > 0 && (
+          <div className="flex flex-wrap gap-5">
+            {existingTags.map((tag, index) => (
+              <div
+                key={`existing-${index}`}
+                className="inline-flex items-center gap-5 px-sm py-5 bg-[#F6F9FE] border-[0.5px] border-[#97BDF5] table-selected rounded-main"
+              >
+                <p className="h-[17px] flex justify-center items-center">
+                  <span className="text-body rounded-md text-[13px] font-semibold">
+                    {tag}
+                  </span>
+                </p>
+                <button
+                  type="button"
+                  onClick={() => onRemoveExisting?.(tag)}
+                  className="flex items-center justify-center cursor-pointer hover:bg-gray-300 rounded transition-colors"
+                >
+                  <X className="h-4 w-4 text-outline-passive hover:text-outline" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     );
   },

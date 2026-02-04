@@ -13,7 +13,7 @@ const buttonVariants = cva(
           "bg-primary text-primary-foreground hover:bg-primary/90 shadow-button text-shadow-xs text-shadow-[#10284C66]",
         neutral: "bg-white hover:bg-white/90 shadow-button-neutral",
         filter:
-          "bg-white hover:bg-white/90 table-selected text-outline-passive",
+          "bg-white hover:bg-white/90 table-selected text-body-passive font-semibold",
         destructive:
           "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
         outline:
@@ -27,7 +27,7 @@ const buttonVariants = cva(
       size: {
         default: "h-11 p-main has-[>svg]:px-3 rounded-lg",
         neutral: "h-9 px-md py-sm has-[>svg]:px-3 rounded-lg",
-        filter: "h-8.25 px-sm! has-[>svg]:px-3 rounded-lg",
+        filter: "h-7.25 px-sm! py-5! has-[>svg]:px-3 rounded-lg",
         ghost: "has-[>svg]:px-3 rounded-lg",
         sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
         lg: "h-10 rounded-md px-6 has-[>svg]:px-4",

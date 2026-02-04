@@ -51,6 +51,7 @@ interface DataTableProps<T> {
   onSelectionChange?: (selectedRows: any[]) => void;
   getRowId?: (row: T) => any;
   onDelete?: (selectedRows: T[]) => void;
+  onPublish?: (selectedRows: T[]) => void;
 }
 
 //Helper function to get nested values (e.g., "brand.name")
@@ -89,6 +90,7 @@ function DataTable<T>({
   onSelectionChange,
   getRowId = (row: any) => row.id,
   onDelete,
+  onPublish,
 }: // isRefetching = false,
 DataTableProps<T>) {
   const [selectedRows, setSelectedRows] = useState<Set<any>>(new Set());

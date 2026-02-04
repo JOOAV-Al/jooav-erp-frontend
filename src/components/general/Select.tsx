@@ -18,7 +18,6 @@ interface SelectProps {
   className?: string;
   marginBottom?: string;
   disableAutoMargin?: boolean;
-
 }
 
 const Select = React.forwardRef<HTMLDivElement, SelectProps>(
@@ -31,8 +30,8 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
       leftIcon,
       searchable = false,
       className,
-      marginBottom="mb-62",
-      disableAutoMargin= false,
+      marginBottom = "mb-62",
+      disableAutoMargin = false,
     },
     ref,
   ) => {
@@ -41,9 +40,9 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
     const containerRef = React.useRef<HTMLDivElement>(null);
 
     const dropdownRef = React.useRef<HTMLDivElement | null>(null);
-    const [measuredMargin, setMeasuredMargin] = React.useState<
-      number | null
-    >(null);
+    const [measuredMargin, setMeasuredMargin] = React.useState<number | null>(
+      null,
+    );
 
     React.useImperativeHandle(ref, () => containerRef.current!);
 
@@ -164,29 +163,31 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
         {isOpen && (
           <div
             ref={dropdownRef}
-            className="absolute p-md z-50 w-full mt-3 bg-white rounded-lg select-dropdown-shadow max-h-60 overflow-hidden"
+            className="absolute p-md z-50 w-full mt-3 bg-white rounded-lg select-dropdown-shadow max-h-60 flex flex-col"
           >
             {/* Search Input */}
             {searchable && (
-              <SearchBox
-                placeholder="Search choice"
-                value={searchQuery}
-                onChange={(val) => setSearchQuery(val)}
-                inputClassName="max-w-full! h-10"
-                className="mb-4"
-                //  onClick={(e) => e.stopPropagation()}
-              />
+              <div className="sticky top-0 bg-white z-20 pb-3">
+                <SearchBox
+                  placeholder="Search choice"
+                  value={searchQuery}
+                  onChange={(val) => setSearchQuery(val)}
+                  inputClassName="max-w-full! h-10"
+                  className="mb-4"
+                  //  onClick={(e) => e.stopPropagation()}
+                />
+              </div>
             )}
 
             {/* Options List */}
-            <div className="overflow-y-auto flex flex-col max-h-64">
+            <div className="overflow-y-auto flex-1">
               {filteredOptions.length > 0 ? (
                 filteredOptions.map((option) => (
                   <div
                     key={option.value}
                     onClick={() => handleSelect(option.value)}
                     className={cn(
-                      "p-sm cursor-pointer transition-colors text-outline] hover:bg-gray-100 text-[15px] ",
+                      "p-sm cursor-pointer transition-colors text-outline hover:bg-gray-100 text-[15px] ",
                       option.value === value && "bg-gray-100 text-outline",
                     )}
                   >

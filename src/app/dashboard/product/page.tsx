@@ -17,17 +17,25 @@ import DataTable from "@/components/general/DataTable";
 import { ProductItem } from "@/features/products/types";
 import FilterContainer from "@/components/filters/FilterContainer";
 import AllFilter from "@/components/filters/AllFilter";
-import SortFilter from "@/components/filters/SortFilter";
+import StatusFilter from "@/components/filters/StatusFilter";
 import SearchBox from "@/components/filters/SearchBox";
 import { useDebounce } from "@/hooks/useDebounce";
 import StatsContainer from "@/components/general/StatsContainer";
 import FormDropdown from "@/components/general/FormDropdown";
+import StatsSkeleton from "@/components/general/StatsSkeleton";
 
 const ProductPage = () => {
   const [page, setPage] = useState<number>(1);
   const [open, setOpen] = useState<boolean>(false);
   const [query, setQuery] = useState<string>("");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [statusFilter, setStatusFilter] = useState<"queue" | "draft" | "live">("queue");
+    const [selectedProduct, setSelectedProduct] = useState<
+      ProductItem | undefined
+    >(undefined);
+    const [selectedProducts, setSelectedProducts] = useState<
+      ProductItem[] | []
+    >([]);
+    const debouncedQuery = useDebounce(query);
 
   const { mutateAsync: updateProduct, isPending: updating } =
     useUpdateProduct();
@@ -40,22 +48,15 @@ const ProductPage = () => {
   } = useDeleteMultipleProducts();
   const { mutateAsync: deleteProduct, isPending: deleting } =
     useDeleteProduct();
-  const [selectedProduct, setSelectedProduct] = useState<
-    ProductItem | undefined
-  >(undefined);
-  const [selectedProducts, setSelectedProducts] = useState<ProductItem[] | []>(
-    [],
-  );
-  const debouncedQuery = useDebounce(query);
 
-  const { data: stats } = useGetProductsStats();
+
+  const { data: stats, isPending: isStatsPending } = useGetProductsStats();
   const {
     data,
     isPending: isProductsPending,
     isRefetching,
-    isInitialLoading,
     refetch,
-  } = useGetProducts({ search: debouncedQuery, sortOrder });
+  } = useGetProducts({ search: debouncedQuery, status: statusFilter });
   const products = data?.data;
 
   const handleCreate = async (values: any) => {
@@ -73,6 +74,11 @@ const ProductPage = () => {
     const idsToDelete = selectedProducts.map((product) => product?.id);
     await deleteMultipleProducts({ productIds: idsToDelete });
   };
+  
+  const handleBulkPublish = async (selectedProducts: ProductItem[]) => {
+    const idsToDelete = selectedProducts.map((product) => product?.id);
+    await deleteMultipleProducts({ productIds: idsToDelete });
+  };
 
   const handleDelete = async () => {
     await deleteProduct({ id: selectedProduct?.id ?? "" });
@@ -81,9 +87,10 @@ const ProductPage = () => {
   };
 
   const displayStats = [
-    { value: stats?.total ? `${stats?.total}` : "0", label: "Total Products" },
-    { value: stats?.total ? `${stats?.total}` : "0", label: "In Draft" },
-    { value: stats?.total ? `${stats?.total}` : "0", label: "Total Published" },
+    { value: stats?.total ? `${stats?.total}` : "0", label: "Products" },
+    { value: stats?.total ? `${stats?.total}` : "0", label: "Variants" },
+    { value: stats?.total ? `${stats?.total}` : "0", label: "Draft" },
+    { value: stats?.total ? `${stats?.total}` : "0", label: "Archived" },
   ];
 
   const tabs: Tab[] = [
@@ -121,15 +128,19 @@ const ProductPage = () => {
 
   return (
     <div className="flex flex-col gap-5">
-      {products?.length != 0 && <StatsContainer stats={displayStats} />}
+      {isStatsPending ? (
+        <StatsSkeleton count={4} />
+      ) : (
+        products?.length != 0 && <StatsContainer stats={displayStats} />
+      )}
 
       <div className="px-xl pt-xl pb-1 flex flex-col gap-7">
         <div className="flex justify-between flex-wrap gap-6">
           <FilterContainer label="Filter">
             <AllFilter />
-            <SortFilter
-              value={sortOrder}
-              onChange={(value) => setSortOrder(value)}
+            <StatusFilter
+              value={statusFilter}
+              onChange={(value) => setStatusFilter(value)}
             />
           </FilterContainer>
           <div className="flex items-center gap-6">
@@ -141,6 +152,11 @@ const ProductPage = () => {
               }}
             />
             <DashboardDrawer
+              isCustomWidth={true}
+              customWidthStyle={
+                "aspect-829/959 max-w-md mdl:max-w-md lg:max-w-[829px]"
+              }
+              customImage={"/dashboard/wide-drawer-top-img.svg"}
               showTrigger
               openDrawer={(isOpen) => {
                 if (isOpen) {
@@ -188,19 +204,23 @@ const ProductPage = () => {
               label: "SKU",
             },
             {
-              key: "packSize",
-              label: "Package Size",
+              key: "packSize.name",
+              label: "Pack Size",
+            },
+            {
+              key: "packType.name",
+              label: "Pack Type",
             },
             {
               key: "price",
               label: "Price",
             },
             {
-              key: "category.parent.name",
+              key: "subcategory.category.name",
               label: "Category",
             },
             {
-              key: "category.name",
+              key: "subcategory.name",
               label: "Sub Category",
             },
             {

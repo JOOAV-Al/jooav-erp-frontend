@@ -16,9 +16,10 @@ import { DiamondPlus, PenLine } from "lucide-react";
 import { DialogFormProps } from "@/interfaces/general";
 import { ManufacturerItem } from "@/features/manufacturers/types";
 import { useEffect } from "react";
+import FieldIcon from "@/components/general/FieldIcon";
 
 const createManufacturerSchema = z.object({
-  name: z.string("Enter a valid name"),
+  name: z.string().min(1, "Enter a valid name"),
 });
 
 export function ManufacturerForm({
@@ -59,7 +60,9 @@ export function ManufacturerForm({
     if (manufacturer?.id) {
       //Build partial payload using dirty fields
       const changes: Partial<ManufacturerData> = {};
-      for (const key of Object.keys(dirtyFields) as Array<keyof ManufacturerData>) {
+      for (const key of Object.keys(dirtyFields) as Array<
+        keyof ManufacturerData
+      >) {
         const val = values[key];
         if (val !== undefined) {
           changes[key] = val;
@@ -104,12 +107,7 @@ export function ManufacturerForm({
                     type="text"
                     placeholder="Enter manufacturer name"
                     aria-invalid={fieldState.invalid}
-                    leftIcon={
-                      <DiamondPlus
-                        strokeWidth={2.5}
-                        className="h-5 w-5 text-outline-passive"
-                      />
-                    }
+                    leftIcon={<FieldIcon Icon={DiamondPlus} />}
                     isEdit={!!manufacturer}
                   />
                 </Field>

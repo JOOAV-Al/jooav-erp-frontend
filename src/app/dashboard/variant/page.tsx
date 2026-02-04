@@ -5,6 +5,8 @@ import DrawerTabs from "@/components/general/DrawerTabs";
 import VariantForm from "@/features/variants/components/VariantForm";
 import {
   useCreateVariant,
+  useDeleteMultipleVariants,
+  useDeleteVariant,
   useGetVariants,
   useGetVariantsStats,
   useUpdateVariant,
@@ -19,6 +21,8 @@ import SortFilter from "@/components/filters/SortFilter";
 import SearchBox from "@/components/filters/SearchBox";
 import { useDebounce } from "@/hooks/useDebounce";
 import StatsContainer from "@/components/general/StatsContainer";
+import FormDropdown from "@/components/general/FormDropdown";
+import StatsSkeleton from "@/components/general/StatsSkeleton";
 
 const VariantPage = () => {
   const [page, setPage] = useState<number>(1);
@@ -26,27 +30,32 @@ const VariantPage = () => {
   const [query, setQuery] = useState<string>("");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const debouncedQuery = useDebounce(query);
-
-  const { mutateAsync: updateVariant, isPending: updating } =
-    useUpdateVariant();
-  const { mutateAsync: createVariant, isPending: creating } =
-    useCreateVariant();
-  const [selectedVariant, setSelectedVariant] = useState<
+    const [selectedVariant, setSelectedVariant] = useState<
     VariantItem | undefined
   >(undefined);
   const [selectedVariants, setSelectedVariants] = useState<VariantItem[] | []>(
     [],
   );
 
-  const { data: stats } = useGetVariantsStats();
+  const { mutateAsync: updateVariant, isPending: updating } =
+    useUpdateVariant();
+  const { mutateAsync: createVariant, isPending: creating } =
+    useCreateVariant();
+    const {
+      mutateAsync: deleteMultipleVariants,
+      isPending: deletingMultiple,
+      status,
+    } = useDeleteMultipleVariants();
+    const { mutateAsync: deleteVariant, isPending: deleting } =
+      useDeleteVariant();
+
+  const { data: stats, isPending: isStatsPending } = useGetVariantsStats();
   const {
     data,
     isPending: isVariantsPending,
     isRefetching,
     refetch,
-    isInitialLoading,
   } = useGetVariants({ search: debouncedQuery, sortOrder });
-
   const variants = data?.data;
 
   const handleCreate = async (values: any) => {
@@ -60,8 +69,19 @@ const VariantPage = () => {
     setSelectedVariant(undefined);
   };
 
-  const handleBulkDelete = async (selectedVariants: VariantItem[]) => {
-    console.log({ selectedVariants });
+  const handleBulkDelete = async (
+    selectedVariants: VariantItem[],
+  ) => {
+    const idsToDelete = selectedVariants.map(
+      (variant) => variant?.id,
+    );
+    await deleteMultipleVariants({ variantIds: idsToDelete });
+  };
+
+  const handleDelete = async () => {
+    await deleteVariant({ id: selectedVariant?.id ?? "" });
+    setOpen(false);
+    setSelectedVariant(undefined);
   };
 
   const displayStats = [
@@ -86,6 +106,9 @@ const VariantPage = () => {
           closeDialog={() => setOpen(false)}
         />
       ),
+      ...(selectedVariant
+        ? { actionDropdown: <FormDropdown deleteAction={handleDelete} /> }
+        : {}),
     },
     {
       value: "bulk",
@@ -105,7 +128,11 @@ const VariantPage = () => {
 
   return (
     <div className="flex flex-col gap-5">
-      {variants?.length != 0 && <StatsContainer stats={displayStats} />}
+      {isStatsPending ? (
+        <StatsSkeleton count={3} />
+      ) : (
+        variants?.length != 0 && <StatsContainer stats={displayStats} />
+      )}
 
       <div className="px-xl pt-xl pb-1 flex flex-col gap-7">
         <div className="flex justify-between flex-wrap gap-6">
@@ -134,7 +161,7 @@ const VariantPage = () => {
               }}
               isOpen={open}
               submitFormId={"variant-form"}
-              submitLoading={updating || creating}
+              submitLoading={updating || creating || deleting}
               submitLabel="Save record"
               children={<DrawerTabs tabs={tabs} />}
               showFooter
@@ -154,10 +181,11 @@ const VariantPage = () => {
           }}
           onDelete={(selectedRows) => {
             console.log("Delete these:", selectedRows);
-            // Call your delete API here
             handleBulkDelete(selectedRows);
           }}
           loading={isVariantsPending || isRefetching}
+          deletingMultiple={deletingMultiple}
+          deletingMultipleStatus={status}
           data={variants ?? []}
           refetch={refetch}
           columns={[
@@ -165,10 +193,6 @@ const VariantPage = () => {
             {
               key: "logo",
               label: "Logo",
-            },
-            {
-              key: "packSize",
-              label: "Pack Size",
             },
             {
               key: "brand.name",

@@ -23,6 +23,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import StatsContainer from "@/components/general/StatsContainer";
 import Image from "next/image";
 import FormDropdown from "@/components/general/FormDropdown";
+import StatsSkeleton from "@/components/general/StatsSkeleton";
 
 const BrandPage = () => {
   const [page, setPage] = useState<number>(1);
@@ -45,13 +46,12 @@ const BrandPage = () => {
   );
   const [selectedBrands, setSelectedBrands] = useState<BrandItem[] | []>([]);
 
-  const { data: stats } = useGetBrandsStats();
+  const { data: stats, isPending: isStatsPending } = useGetBrandsStats();
   const {
     data,
     isPending: isBrandsPending,
     isRefetching,
     refetch,
-    isInitialLoading,
   } = useGetBrands({ search: debouncedQuery, sortOrder });
   const brands = data?.data;
 
@@ -67,12 +67,8 @@ const BrandPage = () => {
     setSelectedBrand(undefined);
   };
 
-  const handleBulkDelete = async (
-    selectedBrands: BrandItem[],
-  ) => {
-    const idsToDelete = selectedBrands.map(
-      (brand) => brand?.id,
-    );
+  const handleBulkDelete = async (selectedBrands: BrandItem[]) => {
+    const idsToDelete = selectedBrands.map((brand) => brand?.id);
     await deleteMultipleBrands({ brandIds: idsToDelete });
   };
 
@@ -83,7 +79,10 @@ const BrandPage = () => {
   };
   const displayStats = [
     { value: stats?.total ? `${stats?.total}` : "0", label: "Brands" },
-    { value: stats?.active ? `${stats?.active}` : "0", label: "Manufacturers" },
+    {
+      value: stats?.totalManufacturers ? `${stats?.totalManufacturers}` : "0",
+      label: "Manufacturers",
+    },
     { value: stats?.inactive ? `${stats?.inactive}` : "0", label: "Archived" },
   ];
 
@@ -101,9 +100,8 @@ const BrandPage = () => {
         />
       ),
       ...(selectedBrand
-              ? { actionDropdown: <FormDropdown deleteAction={handleDelete} /> }
-              : {}),
-          
+        ? { actionDropdown: <FormDropdown deleteAction={handleDelete} /> }
+        : {}),
     },
     {
       value: "bulk",
@@ -123,8 +121,11 @@ const BrandPage = () => {
 
   return (
     <div className="flex flex-col gap-5">
-      {
-        brands?.length != 0 && <StatsContainer stats={displayStats} />}
+      {isStatsPending ? (
+        <StatsSkeleton count={3} />
+      ) : (
+        brands?.length != 0 && <StatsContainer stats={displayStats} />
+      )}
 
       <div className="px-xl pt-xl pb-1 flex flex-col gap-7">
         <div className="flex justify-between flex-wrap gap-6">
@@ -176,14 +177,14 @@ const BrandPage = () => {
             handleBulkDelete(selectedRows);
           }}
           loading={isBrandsPending || isRefetching}
-                    deletingMultiple={deletingMultiple}
+          deletingMultiple={deletingMultiple}
           deletingMultipleStatus={status}
           data={brands ?? []}
           refetch={refetch}
           columns={[
             { key: "name", label: "Brand" },
             {
-              key: "variants",
+              key: "_count.variants",
               label: "No of Var.",
             },
             {
@@ -198,7 +199,9 @@ const BrandPage = () => {
                       width={31.2}
                       height={28}
                     />
-                  ): <span>N/A</span>}
+                  ) : (
+                    <span>N/A</span>
+                  )}
                 </div>
               ),
             },

@@ -26,10 +26,10 @@ const SortFilter: React.FC<SortFilterProps> = ({
         onClick={() => handleToggle("desc")}
         className={`
           
-          ${sortOrder === "desc" ? "bg-storey-foreground text-heading" : ""}
+          ${sortOrder === "desc" ? "bg-storey-foreground text-body" : ""}
         `}
       >
-        <ListEnd className="w-4 h-4 text-outline-passive" />
+        <ListEnd strokeWidth={2.5} className="w-4 h-4 text-outline-passive" />
         Oldest
       </Button>
 
@@ -39,10 +39,10 @@ const SortFilter: React.FC<SortFilterProps> = ({
         variant={"filter"}
         className={`
           
-          ${sortOrder === "asc" ? "bg-storey-foreground text-heading" : ""}
+          ${sortOrder === "asc" ? "bg-storey-foreground text-body" : ""}
         `}
       >
-        <ListStart className="w-4 h-4 text-outline-passive" />
+        <ListStart strokeWidth={2.5} className="w-4 h-4 text-outline-passive" />
         Newest
       </Button>
     </div>

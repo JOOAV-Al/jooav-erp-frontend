@@ -5,8 +5,10 @@ import DrawerTabs from "@/components/general/DrawerTabs";
 import CategoryForm from "@/features/categories/components/CategoryForm";
 import {
   useCreateCategory,
+  useDeleteCategory,
+  useDeleteMultipleCategories,
   useGetCategoriesStats,
-  useGetCategoriesSubcategories,
+  useGetSubcategories,
   useUpdateCategory,
 } from "@/features/categories/services/category.api";
 import { Tab } from "@/interfaces/general";
@@ -20,23 +22,32 @@ import SearchBox from "@/components/filters/SearchBox";
 import { useDebounce } from "@/hooks/useDebounce";
 import StatsContainer from "@/components/general/StatsContainer";
 import StatsSkeleton from "@/components/general/StatsSkeleton";
+import FormDropdown from "@/components/general/FormDropdown";
 
 const CategoryPage = () => {
   const [page, setPage] = useState<number>(1);
   const [open, setOpen] = useState<boolean>(false);
   const [query, setQuery] = useState<string>("");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
-
-  const { mutateAsync: updateCategory, isPending: updating } =
-    useUpdateCategory();
-  const { mutateAsync: createCategory, isPending: creating } =
-    useCreateCategory();
   const [selectedCategory, setSelectedCategory] = useState<
     CategoryItem | undefined
   >(undefined);
   const [selectedCategories, setSelectedCategories] = useState<
     CategoryItem[] | []
   >([]);
+
+  const { mutateAsync: updateCategory, isPending: updating } =
+    useUpdateCategory();
+  const { mutateAsync: createCategory, isPending: creating } =
+    useCreateCategory();
+  const {
+    mutateAsync: deleteMultipleCategories,
+    isPending: deletingMultiple,
+    status,
+  } = useDeleteMultipleCategories();
+  const { mutateAsync: deleteCategory, isPending: deleting } =
+    useDeleteCategory();
+
   const debouncedQuery = useDebounce(query);
 
   const { data: stats, isPending: isStatsPending } = useGetCategoriesStats();
@@ -45,7 +56,7 @@ const CategoryPage = () => {
     isPending: isCategoriesPending,
     isRefetching,
     refetch,
-  } = useGetCategoriesSubcategories({
+  } = useGetSubcategories({
     search: debouncedQuery,
     sortOrder,
   });
@@ -64,16 +75,29 @@ const CategoryPage = () => {
   };
 
   const handleBulkDelete = async (selectedCategories: CategoryItem[]) => {
-    console.log({ selectedCategories });
+    const idsToDelete = selectedCategories.map((category) => category?.id);
+    await deleteMultipleCategories({ categoryIds: idsToDelete });
+  };
+
+  const handleDelete = async () => {
+    await deleteCategory({ id: selectedCategory?.id ?? "" });
+    setOpen(false);
+    setSelectedCategory(undefined);
   };
 
   const displayStats = [
     {
-      value: stats?.total ? `${stats?.total}` : "0",
+      value: stats?.totalCategories ? `${stats?.totalCategories}` : "0",
       label: "categories",
     },
-    { value: stats?.active ? `${stats?.active}` : "0", label: "Brands" },
-    { value: stats?.active ? `${stats?.inactive}` : "0", label: "Archived" },
+    {
+      value: stats?.totalSubcategories ? `${stats?.totalSubcategories}` : "0",
+      label: "Sub-categories",
+    },
+    {
+      value: stats?.inactiveCategories ? `${stats?.inactiveCategories}` : "0",
+      label: "Archived",
+    },
   ];
 
   const formId = `category-form`;
@@ -81,16 +105,19 @@ const CategoryPage = () => {
     {
       value: "manual",
       label: "Manual",
-      heading: "Enter category details",
+      heading: `${selectedCategory ? "Edit" : "Enter"} category details`,
       content: (
         <CategoryForm
-          category={selectedCategory?.parent}
+          category={selectedCategory?.category}
           handleSubmitForm={(values) => handleCreate(values)}
           loading={creating || updating}
           closeDialog={() => setOpen(false)}
           formId={formId}
         />
       ),
+      ...(selectedCategory
+        ? { actionDropdown: <FormDropdown deleteAction={handleDelete} /> }
+        : {}),
     },
     {
       value: "bulk",
@@ -111,7 +138,7 @@ const CategoryPage = () => {
   return (
     <div className="flex flex-col gap-5">
       {isStatsPending ? (
-        <StatsSkeleton count={4} />
+        <StatsSkeleton count={3} />
       ) : (
         categories?.length != 0 && <StatsContainer stats={displayStats} />
       )}
@@ -143,7 +170,7 @@ const CategoryPage = () => {
               }}
               isOpen={open}
               submitFormId={formId}
-              submitLoading={updating || creating}
+              submitLoading={updating || creating || deleting}
               submitLabel="Save record"
               children={<DrawerTabs tabs={tabs} />}
               showFooter
@@ -164,7 +191,6 @@ const CategoryPage = () => {
           }}
           onDelete={(selectedRows) => {
             console.log("Delete these:", selectedRows);
-            // Call your delete API here
             handleBulkDelete(selectedRows);
           }}
           loading={isCategoriesPending || isRefetching}
@@ -172,13 +198,12 @@ const CategoryPage = () => {
           refetch={refetch}
           columns={[
             {
-              key: "parent.name",
+              key: "category.name",
               label: "Category",
             },
             {
               key: "name",
               label: "Sub Category",
-              // render: (category) => <span>{category.parentId ? "Sub" : "Major"}</span>,
             },
             { key: "updatedAt", label: "Modified" },
             { key: "createdAt", label: "Created" },

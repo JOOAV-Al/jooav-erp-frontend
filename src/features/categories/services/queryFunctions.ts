@@ -1,9 +1,9 @@
-import { CategoryItem, CategoryStatsItem } from "@/features/categories/types"
+import { CategoryItem, CategoryStatsItem, ParentCategoryItem } from "@/features/categories/types"
 import { GeneralFetchingParams, PaginatedResponse } from "@/interfaces/general"
 import { api, CustomAxiosRequestConfig } from "@/lib/api/axiosInstance"
 
 const LIMIT = 20
-export async function fetchCategories (params: GeneralFetchingParams): Promise<PaginatedResponse<CategoryItem>> {
+export async function fetchCategories (params: GeneralFetchingParams): Promise<PaginatedResponse<ParentCategoryItem>> {
   const {search, parentId, includeChildren, isActive, sortOrder, page, limit=LIMIT} = params
   const filterParams = new URLSearchParams({})
   if(search) filterParams.append('search', search)
@@ -33,7 +33,7 @@ export async function fetchCategoriesTree (params: GeneralFetchingParams): Promi
   return response.data
 }
 
-export async function fetchCategoriesSubcategories (params: GeneralFetchingParams): Promise<PaginatedResponse<CategoryItem>> {
+export async function fetchSubcategories (params: GeneralFetchingParams): Promise<PaginatedResponse<CategoryItem>> {
   const {search, parentId, includeChildren, isActive, includeProductCount, page, limit=LIMIT} = params
   const filterParams = new URLSearchParams({})
   if(search) filterParams.append('search', search)
@@ -44,7 +44,7 @@ export async function fetchCategoriesSubcategories (params: GeneralFetchingParam
   if(page) filterParams.append('page', page.toString())
   if(limit) filterParams.append('limit', limit.toString())
 
-  const response = await api.get(`/categories/subcategories?${filterParams.toString()}`, { noToast: true } as CustomAxiosRequestConfig)
+  const response = await api.get(`/subcategories?${filterParams.toString()}`, { noToast: true } as CustomAxiosRequestConfig)
   return response.data
 }
 

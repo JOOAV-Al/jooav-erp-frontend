@@ -18,6 +18,7 @@ import { useEffect, useState } from "react";
 import { Select } from "@/components/general/Select";
 import { FileInput } from "@/components/ui/FileInput";
 import { useGetManufacturers } from "@/features/manufacturers/services/manufacturers.api";
+import FieldIcon from "@/components/general/FieldIcon";
 
 const createBrandSchema = z.object({
   logo: z.any().optional(),
@@ -25,26 +26,13 @@ const createBrandSchema = z.object({
   manufacturerId: z.string().min(1, "Manufacturer is required"),
 });
 
-// Mock manufacturer options - replace with your actual data
-const manufacturerOptions = [
-  { value: "nestle", label: "Nestlé" },
-  { value: "unilever", label: "Unilever" },
-  { value: "pz-cussons", label: "PZ Cussons" },
-  { value: "coca-cola", label: "Coca-Cola" },
-  { value: "pepsico", label: "PepsiCo" },
-  { value: "procter-gamble", label: "Procter & Gamble" },
-  { value: "diageo", label: "Diageo" },
-  { value: "tiger-brands", label: "Tiger Brands" },
-  { value: "dangote-group", label: "Dangote Group" },
-];
-
 export function BrandForm({
   handleSubmitForm,
   brand,
 }: DialogFormProps & { brand?: BrandItem }) {
   type BrandData = z.infer<typeof createBrandSchema>;
   const [logoFileName, setLogoFileName] = useState<string>("");
-  const {data: manufacturers} = useGetManufacturers({})
+  const { data: manufacturers } = useGetManufacturers({});
   const form = useForm<BrandData>({
     resolver: zodResolver(createBrandSchema),
     mode: "onChange",
@@ -154,14 +142,9 @@ export function BrandForm({
                   <Input
                     {...field}
                     type="text"
-                    placeholder="Nestlé"
+                    placeholder="Enter brand name"
                     aria-invalid={fieldState.invalid}
-                    leftIcon={
-                      <DiamondPlus
-                        className="h-5 w-5 text-outline-passive"
-                        strokeWidth={2.5}
-                      />
-                    }
+                    leftIcon={<FieldIcon Icon={DiamondPlus} />}
                     isEdit={!!brand}
                   />
                 </Field>
@@ -184,7 +167,7 @@ export function BrandForm({
                   </div>
                   <Select
                     options={
-                      manufacturers?.data?.map((m, i) => ({
+                      manufacturers?.data?.map((m) => ({
                         label: m.name,
                         value: m.id,
                       })) || []
@@ -193,18 +176,12 @@ export function BrandForm({
                     onChange={onChange}
                     placeholder="Select manufacturer"
                     searchable
-                    leftIcon={
-                      <Package
-                        className="h-5 w-5 text-outline-passive"
-                        strokeWidth={2.5}
-                      />
-                    }
+                    leftIcon={<FieldIcon Icon={Package} />}
                   />
                 </Field>
               </div>
             )}
           />
-
         </FieldGroup>
       </FieldSet>
     </form>

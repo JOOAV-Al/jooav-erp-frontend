@@ -5,37 +5,35 @@ import { ManufacturerItem } from "@/features/manufacturers/types";
 export type ProductStatus = "DISCONTINUED" | "ACTIVE" | "INACTIVE"
 export interface CreateProductPayload {
   description?: string;
-  barcode?: number;
-  nafdacNumber?: string;
   brandId?: string;
-  categoryId?: string;
-  variant?: string;
-  packSize?: string;
-  packagingType?: string;
+  subcategoryId?: string;
+  variantId?: string;
+  packSizeId?: string;
+  packTypeId?: string;
   price?: number;
-  expiryDate?: string;
+  discount?: number;
+  thumbnail?: string;
   images?: string[];
-  isActive?: boolean;
 }
 export interface ProductItem {
   id: string;
   name: string;
   description: string;
   sku: string;
-  barcode: number;
-  nafdacNumber: string;
   brandId: string;
   categoryId: string;
+  subcategoryId: string;
   manufacturerId: string;
-  variant: string;
-  packSize: string;
-  packagingType: string;
+  variantId: string;
+  packSizeId: string;
+  packTypeId: string;
   price: number;
-  expiryDate: string;
+  discount: number;
+  thumbnail: string;
   images: string[];
-  isActive: boolean;
+  status: string;
   brand: BrandItem;
-  category: CategoryItem;
+  subcategory: CategoryItem;
   manufacturer: ManufacturerItem
   createdAt: string;
   updatedAt: string;

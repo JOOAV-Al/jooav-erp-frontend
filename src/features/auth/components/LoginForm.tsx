@@ -21,6 +21,8 @@ import { usePathname, useRouter } from "next/navigation";
 import AuthCardHeader from "@/features/auth/components/AuthCardHeader";
 import Cookies from "js-cookie";
 import PasswordInput from "@/features/auth/components/PasswordInput";
+import FieldIcon from "@/components/general/FieldIcon";
+import { EyeIcon, Mail } from "lucide-react";
 
 const loginSchema = z.object({
   email: z.email("Enter a valid email"),
@@ -105,6 +107,7 @@ export function LoginForm({ toggleForm }: { toggleForm: () => void }) {
                       type="email"
                       placeholder="Enter your email"
                       aria-invalid={fieldState.invalid}
+                      leftIcon={<Mail className="h-4 w-4" />}
                     />
                   </Field>
                 </div>

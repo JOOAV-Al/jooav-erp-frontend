@@ -24,6 +24,9 @@ interface DashboardDrawerProps {
   submitLabel?: string;
   // when true, disable footer submit and show loading label
   submitLoading?: boolean;
+  isCustomWidth?: boolean;
+  customWidthStyle?: string;
+  customImage?: string;
 }
 
 const DashboardDrawer = ({
@@ -35,6 +38,9 @@ const DashboardDrawer = ({
   submitFormId,
   submitLabel = "Submit",
   submitLoading = false,
+  customWidthStyle,
+  customImage,
+  isCustomWidth = false,
 }: DashboardDrawerProps) => {
   return (
     <RightDrawer open={isOpen} onOpenChange={openDrawer}>
@@ -48,7 +54,11 @@ const DashboardDrawer = ({
           </Button>
         </RightDrawerTrigger>
       )}
-      <RightDrawerContent>
+      <RightDrawerContent
+        isCustomWidth={isCustomWidth}
+        customWidthStyle={customWidthStyle}
+        customImage={customImage}
+      >
         <RightDrawerHeader className="hidden">
           <RightDrawerTitle>Are you absolutely sure?</RightDrawerTitle>
           <RightDrawerDescription>

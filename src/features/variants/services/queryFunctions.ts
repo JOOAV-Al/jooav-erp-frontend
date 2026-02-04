@@ -4,11 +4,11 @@ import { api, CustomAxiosRequestConfig } from "@/lib/api/axiosInstance"
 
 const LIMIT = 20
 export async function fetchVariants (params: GeneralFetchingParams): Promise<PaginatedResponse<VariantItem>> {
-  const {search, status, manufacturerId, sortBy, sortOrder, page, limit=LIMIT} = params
+  const {search, status, brandId, sortBy, sortOrder, page, limit=LIMIT} = params
   const filterParams = new URLSearchParams({})
   if(search) filterParams.append('search', search)
   if(status) filterParams.append('status', status)
-  if(manufacturerId) filterParams.append('manufacturerId', manufacturerId)
+  if(brandId) filterParams.append('brandId', brandId)
   if(sortBy) filterParams.append('sortBy', sortBy)
   if(sortOrder) filterParams.append('sortOrder', sortOrder)
   if(page) filterParams.append('page', page.toString())

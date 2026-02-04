@@ -11,17 +11,26 @@ import {
   FieldSet,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { DiamondPlus, GitBranchPlus, Workflow } from "lucide-react";
+import { GitBranchPlus, Tag, Tags, Workflow } from "lucide-react";
 import { DialogFormProps } from "@/interfaces/general";
-import { VariantItem } from "@/features/variants/types";
+import {
+  CreateVariantPayload,
+  VariantItem,
+  VariantPackSize,
+  VariantPackType,
+} from "@/features/variants/types";
 import { useEffect, useState } from "react";
 import { Select } from "@/components/general/Select";
 import { useGetBrands } from "@/features/brands/services/brands.api";
+import { TagInput } from "@/components/ui/TagInput";
+import FieldIcon from "@/components/general/FieldIcon";
+import FormGroupName from "@/components/general/FormGroupName";
 
 const createVariantSchema = z.object({
-  // variants: z.array(z.string("Enter a valid name")),
-  name: z.string("Enter a valid name"),
-  brandId: z.string("Enter a valid name"),
+  name: z.string().min(1, "Variant name is required"),
+  brandId: z.string().min(1, "Brand is required"),
+  packSizes: z.array(z.string()).optional(),
+  packTypes: z.array(z.string()).optional(),
 });
 
 export function VariantForm({
@@ -29,7 +38,19 @@ export function VariantForm({
   variant,
 }: DialogFormProps & { variant?: VariantItem }) {
   const { data: brands } = useGetBrands({});
-  const [] = useState<VariantItem[]>([]);
+
+  // Track existing pack sizes and types (from backend)
+  const [existingPackSizes, setExistingPackSizes] = useState<VariantPackSize[]>(
+    variant?.packSizes ?? [],
+  );
+  const [existingPackTypes, setExistingPackTypes] = useState<VariantPackType[]>(
+    variant?.packTypes ?? [],
+  );
+
+  // Track which existing ones to delete
+  const [packSizesToDelete, setPackSizesToDelete] = useState<string[]>([]);
+  const [packTypesToDelete, setPackTypesToDelete] = useState<string[]>([]);
+
   type VariantData = z.infer<typeof createVariantSchema>;
   const form = useForm<VariantData>({
     resolver: zodResolver(createVariantSchema),
@@ -37,6 +58,8 @@ export function VariantForm({
     defaultValues: {
       name: variant?.name ?? "",
       brandId: variant?.brandId ?? "",
+      packSizes: [],
+      packTypes: [],
     },
   });
 
@@ -47,31 +70,94 @@ export function VariantForm({
     reset,
   } = form;
 
-  const onSubmit = async (values: z.infer<typeof createVariantSchema>) => {
-    if (!handleSubmitForm) return;
-    console.log({ variant });
-    console.log({ values });
-    if (variant?.id) {
-      //Build partial payload using dirty fields
-      const changes: Partial<VariantData> = {};
-      for (const key of Object.keys(dirtyFields) as Array<keyof VariantData>) {
-        const val = values[key];
-        if (val !== undefined) {
-          changes[key] = val;
-        }
-      }
-      const payload = Object.keys(changes).length ? changes : values;
-      await handleSubmitForm({ payload, id: variant?.id });
-      return;
-    }
-    await handleSubmitForm(values);
-  };
-
   useEffect(() => {
     reset({
       name: variant?.name ?? "",
+      brandId: variant?.brandId ?? "",
+      packSizes: [],
+      packTypes: [],
     });
+    setExistingPackSizes(variant?.packSizes ?? []);
+    setExistingPackTypes(variant?.packTypes ?? []);
+    setPackSizesToDelete([]);
+    setPackTypesToDelete([]);
   }, [variant?.id, reset]);
+
+  const handleRemoveExistingSize = (name: string) => {
+    const itemToRemove = existingPackSizes.find((item) => item.name === name);
+    if (itemToRemove) {
+      setPackSizesToDelete((prev) => [...prev, itemToRemove.id]);
+      setExistingPackSizes((prev) =>
+        prev.filter((item) => item.id !== itemToRemove.id),
+      );
+    }
+  };
+
+  const handleRemoveExistingType = (name: string) => {
+    const itemToRemove = existingPackTypes.find((item) => item.name === name);
+    if (itemToRemove) {
+      setPackTypesToDelete((prev) => [...prev, itemToRemove.id]);
+      setExistingPackTypes((prev) =>
+        prev.filter((item) => item.id !== itemToRemove.id),
+      );
+    }
+  };
+
+  const onSubmit = async (values: VariantData) => {
+    if (!handleSubmitForm) return;
+
+    const newPackSizes = values.packSizes ?? [];
+    const newPackTypes = values.packTypes ?? [];
+
+    if (variant?.id) {
+      // EDITING MODE
+      const payload: CreateVariantPayload = {};
+
+      // Only include name if it changed
+      if (dirtyFields.name) {
+        payload.name = values.name;
+      }
+
+      // Only include brandId if it changed
+      if (dirtyFields.brandId) {
+        payload.brandId = values.brandId;
+      }
+
+      // Handle pack sizes
+      if (newPackSizes.length > 0) {
+        payload.createPackSizes = newPackSizes.map((name) => ({ name }));
+      }
+      if (packSizesToDelete.length > 0) {
+        payload.deletePackSizeIds = packSizesToDelete;
+      }
+
+      // Handle pack types
+      if (newPackTypes.length > 0) {
+        payload.createPackTypes = newPackTypes.map((name) => ({ name }));
+      }
+      if (packTypesToDelete.length > 0) {
+        payload.deletePackTypeIds = packTypesToDelete;
+      }
+
+      await handleSubmitForm({ payload, id: variant.id });
+    } else {
+      // CREATING MODE
+      const payload: any = {
+        name: values.name,
+        brandId: values.brandId,
+      };
+
+      if (newPackSizes.length > 0) {
+        payload.packSizes = newPackSizes.map((name) => ({ name }));
+      }
+      if (newPackTypes.length > 0) {
+        payload.packTypes = newPackTypes.map((name) => ({ name }));
+      }
+
+      await handleSubmitForm(payload);
+    }
+  };
+
   return (
     <form
       id="variant-form"
@@ -80,41 +166,7 @@ export function VariantForm({
     >
       <FieldSet className="flex flex-1">
         <FieldGroup className="flex flex-col gap-7">
-          <Controller
-            control={control}
-            name="brandId"
-            render={({ field: { onChange, value }, fieldState }) => (
-              <div>
-                <Field data-invalid={fieldState.invalid}>
-                  <div className="flex gap-3 items-center">
-                    <FieldLabel>Brand</FieldLabel>
-                    {fieldState.error && (
-                      <FieldError>: {fieldState.error.message}</FieldError>
-                    )}
-                  </div>
-                  <Select
-                    options={
-                      brands?.data?.map((m, i) => ({
-                        label: m.name,
-                        value: m.id,
-                      })) || []
-                    }
-                    value={value}
-                    onChange={onChange}
-                    placeholder="Select manufacturer"
-                    searchable
-                    leftIcon={
-                      <GitBranchPlus
-                        className="h-5 w-5 text-outline-passive"
-                        strokeWidth={2.5}
-                      />
-                    }
-                  />
-                </Field>
-              </div>
-            )}
-          />
-          {/* NAME */}
+          {/* VARIANT NAME */}
           <Controller
             control={control}
             name="name"
@@ -132,18 +184,101 @@ export function VariantForm({
                     type="text"
                     placeholder="Enter variant name"
                     aria-invalid={fieldState.invalid}
-                    leftIcon={
-                      <Workflow
-                        strokeWidth={2.5}
-                        className="h-5 w-5 text-outline-passive"
-                      />
-                    }
+                    leftIcon={<FieldIcon Icon={Workflow} />}
                     isEdit={!!variant}
                   />
                 </Field>
               </div>
             )}
           />
+
+          {/* BRAND */}
+          <Controller
+            control={control}
+            name="brandId"
+            render={({ field: { onChange, value }, fieldState }) => (
+              <div>
+                <Field data-invalid={fieldState.invalid}>
+                  <div className="flex gap-3 items-center">
+                    <FieldLabel>Brand</FieldLabel>
+                    {fieldState.error && (
+                      <FieldError>: {fieldState.error.message}</FieldError>
+                    )}
+                  </div>
+                  <Select
+                    options={
+                      brands?.data?.map((m) => ({
+                        label: m.name,
+                        value: m.id,
+                      })) || []
+                    }
+                    value={value}
+                    onChange={onChange}
+                    placeholder="Select brand"
+                    searchable
+                    leftIcon={<FieldIcon Icon={GitBranchPlus} />}
+                  />
+                </Field>
+              </div>
+            )}
+          />
+        </FieldGroup>
+
+        <FieldGroup className="flex flex-col gap-sm">
+          <FormGroupName name="PACK CONFIGURATIONS" />
+          <div className="flex flex-col gap-7">
+            {/* PACK SIZES */}
+            <Controller
+              control={control}
+              name="packSizes"
+              render={({ field: { onChange, value }, fieldState }) => (
+                <div>
+                  <Field data-invalid={fieldState.invalid}>
+                    <div className="flex gap-3 items-center">
+                      <FieldLabel>Pack size</FieldLabel>
+                      {fieldState.error && (
+                        <FieldError>: {fieldState.error.message}</FieldError>
+                      )}
+                    </div>
+                    <TagInput
+                      value={value}
+                      onChange={onChange}
+                      placeholder="Add pack size"
+                      leftIcon={<FieldIcon Icon={Tag} />}
+                      existingTags={existingPackSizes.map((item) => item.name)}
+                      onRemoveExisting={handleRemoveExistingSize}
+                    />
+                  </Field>
+                </div>
+              )}
+            />
+
+            {/* PACK TYPES */}
+            <Controller
+              control={control}
+              name="packTypes"
+              render={({ field: { onChange, value }, fieldState }) => (
+                <div>
+                  <Field data-invalid={fieldState.invalid}>
+                    <div className="flex gap-3 items-center">
+                      <FieldLabel>Pack type</FieldLabel>
+                      {fieldState.error && (
+                        <FieldError>: {fieldState.error.message}</FieldError>
+                      )}
+                    </div>
+                    <TagInput
+                      value={value}
+                      onChange={onChange}
+                      placeholder="Add pack type"
+                      leftIcon={<FieldIcon Icon={Tags} />}
+                      existingTags={existingPackTypes.map((item) => item.name)}
+                      onRemoveExisting={handleRemoveExistingType}
+                    />
+                  </Field>
+                </div>
+              )}
+            />
+          </div>
         </FieldGroup>
       </FieldSet>
     </form>
@@ -151,174 +286,3 @@ export function VariantForm({
 }
 
 export default VariantForm;
-
-// "use client";
-
-// import { z } from "zod";
-// import { zodResolver } from "@hookform/resolvers/zod";
-// import { Controller, useForm } from "react-hook-form";
-// import {
-//   Field,
-//   FieldError,
-//   FieldGroup,
-//   FieldLabel,
-//   FieldSet,
-// } from "@/components/ui/field";
-// import { DiamondPlus, GitBranchPlus } from "lucide-react";
-// import { DialogFormProps } from "@/interfaces/general";
-// import { useEffect } from "react";
-// import { Select } from "@/components/general/Select";
-// import { useGetBrands } from "@/features/brands/services/brands.api";
-// import { TagInput } from "@/components/ui/TagInput";
-
-// // Updated schema to match the actual data structure
-// const createVariantSchema = z.object({
-//   variants: z.array(z.string()).min(1, "At least one variant is required"),
-//   brandId: z.string().min(1, "Brand is required"),
-// });
-
-// // Updated interface to reflect that we're working with a brand that has variants
-// interface BrandWithVariants {
-//   id: string;
-//   name: string;
-//   brandId: string;
-//   variants?: string[]; // Array of variant names
-// }
-
-// export function VariantForm({
-//   handleSubmitForm,
-//   variant,
-// }: DialogFormProps & { variant?: BrandWithVariants }) {
-//   const { data: brands } = useGetBrands({});
-
-//   type VariantData = z.infer<typeof createVariantSchema>;
-
-//   const form = useForm<VariantData>({
-//     resolver: zodResolver(createVariantSchema),
-//     mode: "onChange",
-//     defaultValues: {
-//       variants: variant?.variants ?? [],
-//       brandId: variant?.brandId ?? "",
-//     },
-//   });
-
-//   const {
-//     handleSubmit,
-//     control,
-//     formState: { dirtyFields },
-//     reset,
-//   } = form;
-
-//   const onSubmit = async (values: z.infer<typeof createVariantSchema>) => {
-//     if (!handleSubmitForm) return;
-
-//     if (variant?.id) {
-//       // Build partial payload using dirty fields
-//       const changes: Partial<VariantData> = {};
-//       for (const key of Object.keys(dirtyFields) as Array<keyof VariantData>) {
-//         const val = values[key];
-//         if (val !== undefined ) {
-//           if(key === "variants") {
-//             // when key is "variants" we know val must be string[]
-//             changes[key] = val as unknown as string[];
-//           } else {
-//             // brandId is a string
-//             changes[key] = val as unknown as string;
-//           }
-//         }
-//       }
-//       const payload = Object.keys(changes).length ? changes : values;
-//       await handleSubmitForm({ payload, id: variant?.id });
-//       return;
-//     }
-//     await handleSubmitForm(values);
-//   };
-
-//   useEffect(() => {
-//     reset({
-//       variants: variant?.variants ?? [],
-//       brandId: variant?.brandId ?? "",
-//     });
-//   }, [variant?.id, reset, variant?.variants, variant?.brandId]);
-
-//   return (
-//     <form
-//       id="variant-form"
-//       onSubmit={handleSubmit(onSubmit)}
-//       className="flex flex-col flex-1"
-//     >
-//       <FieldSet className="flex flex-1">
-//         <FieldGroup className="flex flex-col pb-12">
-//           {/* BRAND SELECT */}
-//           <Controller
-//             control={control}
-//             name="brandId"
-//             render={({ field: { onChange, value }, fieldState }) => (
-//               <div>
-//                 <Field data-invalid={fieldState.invalid}>
-//                   <div className="flex gap-3 items-center">
-//                     <FieldLabel>Brand name</FieldLabel>
-//                     {fieldState.error && (
-//                       <FieldError>: {fieldState.error.message}</FieldError>
-//                     )}
-//                   </div>
-//                   <Select
-//                     options={
-//                       brands?.data?.map((m) => ({
-//                         label: m.name,
-//                         value: m.id,
-//                       })) || []
-//                     }
-//                     value={value}
-//                     onChange={onChange}
-//                     placeholder="Select brand"
-//                     searchable
-//                     leftIcon={
-//                       <GitBranchPlus
-//                         className="h-5 w-5 text-outline-passive"
-//                         strokeWidth={2.5}
-//                       />
-//                     }
-//                   />
-//                 </Field>
-//               </div>
-//             )}
-//           />
-
-//           {/* VARIANT NAMES - TAG INPUT */}
-//           <Controller
-//             control={control}
-//             name="variants"
-//             render={({ field: { onChange, value }, fieldState }) => (
-//               <div>
-//                 <Field data-invalid={fieldState.invalid}>
-//                   <div className="flex gap-3 items-center">
-//                     <FieldLabel>Variant name</FieldLabel>
-//                     {fieldState.error && (
-//                       <FieldError>: {fieldState.error.message}</FieldError>
-//                     )}
-//                   </div>
-//                   <TagInput
-//                     value={value || []}
-//                     onChange={onChange}
-//                     placeholder={
-//                       variant?.id ? "Add variant" : "Enter variant name"
-//                     }
-//                     leftIcon={
-//                       <DiamondPlus
-//                         strokeWidth={2.5}
-//                         className="h-5 w-5 text-outline-passive"
-//                       />
-//                     }
-//                   />
-//                 </Field>
-//               </div>
-//             )}
-//           />
-//         </FieldGroup>
-//       </FieldSet>
-//     </form>
-//   );
-// }
-
-// export default VariantForm;

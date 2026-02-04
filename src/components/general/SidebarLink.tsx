@@ -53,7 +53,7 @@ export default function SidebarLink({
     >
       <div
         className={`group flex items-center gap-6 px-sm py-5 rounded-main hover:bg-gray-300 hover:text-nominal-input-hover transition-colors cursor-pointer ${
-          isActive ? "bg-gray-300 sidebar-link font-medium" : "font-medium"
+          isActive ? "bg-gray-300 sidebar-link font-semibold" : "font-medium"
         } ${isCollapsed ? "w-fit mx-auto" : ""}`}
       >
         {/* {isTransitioning ? (
@@ -90,7 +90,7 @@ export default function SidebarLink({
           <p
             className={`${
               isActive
-                ? "text-foreground"
+                ? "text-body"
                 : "text-nominal-input-hover group-hover:text-nominal-input-hover w-fit"
             } text-[15px]`}
           >

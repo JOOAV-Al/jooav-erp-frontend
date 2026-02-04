@@ -15,6 +15,10 @@ export interface BrandItem {
   logo: string;
   manufacturerId: string;
   status: BrandStatus;
+  _count: {
+    products: number;
+    variants: number;
+  }
   createdAt: string;
   updatedAt: string;
   createdBy: string;
@@ -44,4 +48,5 @@ export interface BrandStatsItem {
   active: number;
   inactive: number;
   recentlyAdded: number;
+  totalManufacturers: number;
 }

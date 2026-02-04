@@ -30,39 +30,56 @@ RightDrawerOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
 const RightDrawerContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
-  <RightDrawerPortal>
-    <RightDrawerOverlay />
-    <DialogPrimitive.Content
-      ref={ref}
-      className={cn(
-        "fixed z-50 flex flex-col bg-white shadow-lg transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-300",
-        // Position from right with spacing
-        "top-3 right-3 bottom-3 w-[calc(100%-2rem)] aspect-508/958 max-w-sm md:max-w-md lg:max-w-[508px] rounded-2xl border",
-        // Slide animations from right
-        "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right",
-        className
-      )}
-      {...props}
-    >
-      <div
-        style={{ background: `url("/dashboard/drawer-top-img.svg")` }}
-        className="h-30 rounded-t-2xl p-main"
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
+    isCustomWidth?: boolean;
+    customWidthStyle?: string;
+    customImage?: string;
+    aspectRatio?: string;
+  }
+>(
+  (
+    {
+      className,
+      children,
+      isCustomWidth = false,
+      customWidthStyle,
+      customImage,
+      ...props
+    },
+    ref,
+  ) => (
+    <RightDrawerPortal>
+      <RightDrawerOverlay />
+      <DialogPrimitive.Content
+        ref={ref}
+        className={cn(
+          "fixed z-50 flex flex-col bg-white shadow-lg transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-300",
+          // Position from right with spacing
+          `top-3 right-3 bottom-3 w-[calc(100%-2rem)] ${isCustomWidth ? `${customWidthStyle}` : "aspect-508/958 xl:aspect-auto max-w-sm md:max-w-md lg:max-w-[508px]"} w-[calc(100%-2rem)] rounded-2xl border`,
+          // Slide animations from right
+          "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right",
+          className,
+        )}
+        {...props}
       >
-        <div className="flex justify-between items-center">
-          <div></div>
-          <RightDrawerClose>
-            <div className="size-9 rounded-full p-sm sidebar-link bg-white hover:bg-storey-foreground flex justify-center items-center text-outline cursor-pointer">
-              <X size={20} />
-            </div>
-          </RightDrawerClose>
+        <div
+          style={{ background: customImage ? `url(${customImage})` : `url("/dashboard/drawer-top-img.svg")` }}
+          className="h-24 rounded-t-2xl p-main"
+        >
+          <div className="flex justify-between items-center">
+            <div></div>
+            <RightDrawerClose>
+              <div className="size-9 rounded-full p-sm sidebar-link bg-white hover:bg-storey-foreground flex justify-center items-center text-outline cursor-pointer">
+                <X size={20} />
+              </div>
+            </RightDrawerClose>
+          </div>
         </div>
-      </div>
-      {children}
-    </DialogPrimitive.Content>
-  </RightDrawerPortal>
-));
+        {children}
+      </DialogPrimitive.Content>
+    </RightDrawerPortal>
+  ),
+);
 RightDrawerContent.displayName = DialogPrimitive.Content.displayName;
 
 const RightDrawerHeader = ({

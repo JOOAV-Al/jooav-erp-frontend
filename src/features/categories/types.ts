@@ -6,6 +6,19 @@ export interface CreateCategoryPayload {
   description?: string;
   parentId?: string;
   sortOrder?: number;
+  subcategories?: {
+    name: string;
+  }[];
+
+  //Editing
+  createSubcategories?: {
+    name: string;
+  }[];
+  updateSubcategories?: {
+    id: string;
+    name: string;
+  }[];
+  deleteSubcategoryIds?: string[];
 }
 export interface UpdateBulkCategoryPayload {
   categoryIds?: string[];
@@ -17,7 +30,7 @@ export interface CategoryItem {
   description: string;
   parentId: string | null;
   sortOrder: number;
-  parent: ParentCategoryItem;
+  category: ParentCategoryItem;
   productCount: number;
   isActive: boolean;
   createdAt: string;
@@ -31,10 +44,9 @@ export interface ParentCategoryItem {
   name: string;
   slug: string;
   description: string;
-  parentId: string | null;
   sortOrder: number;
   productCount: number;
-  children: CategoryItem[];
+  subcategories: CategoryItem[];
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -44,8 +56,8 @@ export interface ParentCategoryItem {
 }
 
 export interface CategoryStatsItem {
-  total: number;
-  active: number;
-  inactive: number;
-  recentlyAdded: number;
+  totalCategories: number;
+  activeCategories: number;
+  inactiveCategories: number;
+  totalSubcategories: number;
 }

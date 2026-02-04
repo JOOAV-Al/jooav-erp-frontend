@@ -22,6 +22,7 @@ import SearchBox from "@/components/filters/SearchBox";
 import { useDebounce } from "@/hooks/useDebounce";
 import StatsContainer from "@/components/general/StatsContainer";
 import FormDropdown from "@/components/general/FormDropdown";
+import StatsSkeleton from "@/components/general/StatsSkeleton";
 
 const ManufacturerPage = () => {
   const [page, setPage] = useState<number>(1);
@@ -29,7 +30,13 @@ const ManufacturerPage = () => {
   const [query, setQuery] = useState<string>("");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const debouncedQuery = useDebounce(query);
-
+  const [selectedManufacturer, setSelectedManufacturer] = useState<
+    ManufacturerItem | undefined
+  >(undefined);
+  const [selectedManufacturers, setSelectedManufacturers] = useState<
+    ManufacturerItem[] | []
+  >([]);
+  
   const { mutateAsync: updateManufacturer, isPending: updating } =
     useUpdateManufacturer();
   // lift mutation here so drawer footer can show loading and we can close on success
@@ -42,20 +49,14 @@ const ManufacturerPage = () => {
   } = useDeleteMultipleManufacturers();
   const { mutateAsync: deleteManufacturer, isPending: deleting } =
     useDeleteManufacturer();
-  const [selectedManufacturer, setSelectedManufacturer] = useState<
-    ManufacturerItem | undefined
-  >(undefined);
-  const [selectedManufacturers, setSelectedManufacturers] = useState<
-    ManufacturerItem[] | []
-  >([]);
 
-  const { data: stats } = useGetManufacturersStats();
+  const { data: stats, isPending: isStatsPending } = useGetManufacturersStats();
   const {
     data,
     isPending: isManufacturersPending,
     isRefetching,
     refetch,
-  } = useGetManufacturers({ search: debouncedQuery, sortOrder });
+  } = useGetManufacturers({ search: debouncedQuery });
   const manufacturers = data?.data;
 
   const handleCreate = async (values: any) => {
@@ -127,7 +128,11 @@ const ManufacturerPage = () => {
 
   return (
     <div className="flex flex-col gap-5">
-      {manufacturers?.length != 0 && <StatsContainer stats={displayStats} />}
+      {isStatsPending ? (
+        <StatsSkeleton count={3} />
+      ) : (
+        manufacturers?.length != 0 && <StatsContainer stats={displayStats} />
+      )}
 
       <div className="px-xl pt-xl pb-1 flex flex-col gap-7">
         <div className="flex justify-between flex-wrap gap-6">

@@ -47,6 +47,8 @@
   --outline-passive: hsla(50, 7%, 64%);
   --outline: hsla(0, 0%, 48%);
   --spinner-color: hsla(0, 0%, 48%);
+  --body-passive: hsla(0, 0%, 48%, 1);
+  --body: hsla(0, 0%, 20%, 1);
 
   --orange-100: hsl(21 100% 93%);
   --orange-200: hsl(21 100% 87%);
@@ -213,6 +215,9 @@
   --text-tag-base: var(--gray-600);
   --text-tag-primary: var(--blue-500);
   --text-tag-secondary: var(--cosmic-latte-500);
+  --text-outline-passive: var(--outline-passive);
+  --text-body-passive: var(--body-passive);
+  --text-body: var(--body);
 }
 
 /* Semantic Typography Tokens */
@@ -229,6 +234,7 @@
   --size-tag: var(--0-875rem);
   --size-button-label: var(--0-875rem);
   --size-card-body: var(--0-875rem);
+  --size-link: var(--0-9375rem);
   --size-toast-body: var(--1rem);
   --size-body: var(--1-125rem);
   --size-h3: var(--1-25rem);
@@ -344,41 +350,43 @@
 /* Shadow Tokens */
 :root {
   /* Input/Card elevation effect */
-  --shadow-input: 0px 0px 0px 2px rgba(0, 0, 0, 0.05),
-    0px 3px 2px 0px rgba(6, 16, 30, 0.08);
+  --shadow-input:
+    0px 0px 0px 2px rgba(0, 0, 0, 0.05), 0px 3px 2px 0px rgba(6, 16, 30, 0.08);
 
-  --shadow-card: 0px 0px 0px 3px rgba(6, 16, 30, 0.02),
-    0px 6px 3px 0px rgba(6, 16, 30, 0.04);
-
-  /* Sidebar links elevation effect */
-  --sidebar-link: 0px 0px 0px 2px rgba(0, 0, 0, 0.05),
-    0px 3px 2px 0px rgba(6, 16, 30, 0.08);
+  --shadow-card:
+    0px 0px 0px 3px rgba(6, 16, 30, 0.02), 0px 6px 3px 0px rgba(6, 16, 30, 0.04);
 
   /* Sidebar links elevation effect */
-  --table-selected: 0px 0px 0px 1px rgba(0, 0, 0, 0.1),
+  --sidebar-link:
+    0px 0px 0px 2px rgba(0, 0, 0, 0.05), 0px 3px 2px 0px rgba(6, 16, 30, 0.08);
+
+  /* Sidebar links elevation effect */
+  --table-selected:
+    0px 0px 0px 1px rgba(0, 0, 0, 0.1),
     0px 1.5px 0.25px 0px rgba(6, 16, 30, 0.08);
 
-  --table-shadow: 0px 0px 0px 3px rgba(6, 16, 30, 0.02),
-    0px 6px 3px 0px rgba(6, 16, 30, 0.04);
+  --table-shadow:
+    0px 0px 0px 3px rgba(6, 16, 30, 0.02), 0px 6px 3px 0px rgba(6, 16, 30, 0.04);
 
-  --select-dropdown-shadow: 0px 0px 0px 3px rgba(6, 16, 30, 0.03),
-    0px 6px 3px 0px rgba(6, 16, 30, 0.07);
+  --select-dropdown-shadow:
+    0px 0px 0px 3px rgba(6, 16, 30, 0.03), 0px 6px 3px 0px rgba(6, 16, 30, 0.07);
 
   /* Additional common shadows (for future use) */
   --shadow-sm: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0px 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0px 2px 4px -2px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0px 10px 15px -3px rgba(0, 0, 0, 0.1),
-    0px 4px 6px -4px rgba(0, 0, 0, 0.1);
-  --shadow-xl: 0px 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0px 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --shadow-md:
+    0px 4px 6px -1px rgba(0, 0, 0, 0.1), 0px 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg:
+    0px 10px 15px -3px rgba(0, 0, 0, 0.1), 0px 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --shadow-xl:
+    0px 20px 25px -5px rgba(0, 0, 0, 0.1), 0px 8px 10px -6px rgba(0, 0, 0, 0.1);
 
-    
-    /* Button shadows (if needed) */
-    /* Modified */
-  --shadow-button: 0px 2px 1px 0px rgba(0, 0, 0, 0.15),
+  /* Button shadows (if needed) */
+  /* Modified */
+  --shadow-button:
+    0px 2px 1px 0px rgba(0, 0, 0, 0.15),
     0px 0px 2px 2px rgba(43, 111, 212, 0.25);
-  --shadow-button-hover: 0px 2px 1px 0px rgba(0, 0, 0, 0.1),
+  --shadow-button-hover:
+    0px 2px 1px 0px rgba(0, 0, 0, 0.1),
     0px 0px 2px 2px rgba(246, 249, 254, 0.25);
 
   /* Actual */
@@ -393,16 +401,17 @@
   --shadow-button-hover: 0px 4px 8px 0px rgba(0, 0, 0, 0.1),
     0px 3px 2px 0px rgba(6, 16, 30, 0.08); */
 
-  --shadow-button-neutral: 0px 0px 0px 2px rgba(0, 0, 0, 0.15),
-    0px 3px 2px 0px rgba(6, 16, 30, 0.08);
-  --shadow-button-neutral-hover: 0px 2px 1px 0px rgba(0, 0, 0, 0.1),
+  --shadow-button-neutral:
+    0px 0px 0px 2px rgba(0, 0, 0, 0.15), 0px 3px 2px 0px rgba(6, 16, 30, 0.08);
+  --shadow-button-neutral-hover:
+    0px 2px 1px 0px rgba(0, 0, 0, 0.1),
     0px 0px 2px 2px rgba(246, 249, 254, 0.25);
 
-
-    /* Text shadow */
-    --btn-text-shadow: text-shadow: 0px 0.5px 1px 4px rgba(16, 40, 76, 0.4),
-      0px 8px 10px -6px rgba(0, 0, 0, 0.1);
-  }
+  /* Text shadow */
+  --btn-text-shadow:
+    text-shadow: 0px 0.5px 1px 4px rgba(16, 40, 76, 0.4),
+    0px 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
 
 /* ============================================
    TAILWIND THEME MAPPING
@@ -450,7 +459,9 @@
   --color-gray-400: var(--gray-400);
   --color-body-passive: var(--gray-400);
   --color-outline-passive: var(--outline-passive);
+  --color-body-passive: var(--body-passive);
   --color-outline: var(--outline);
+  --color-body: var(--body);
   --color-gray-500: var(--gray-500);
   --color-gray-600: var(--gray-600);
   --color-gray-700: var(--gray-700);
@@ -550,6 +561,7 @@
 
   /* Semantic font sizes (alternative names) */
   --font-size-tag: var(--size-tag);
+  --font-size-link: var(--size-tag);
   --font-size-button: var(--size-button-label);
   --font-size-card-body: var(--size-card-body);
   --font-size-toast: var(--size-toast-body);
@@ -683,11 +695,18 @@
   .auth-card {
     @apply p-xl rounded-3xl mx-auto w-full max-w-[clamp(270px,80vw,370px)] mdl:max-w-[clamp(370px,60vw,420px)] 2xxl:max-w-[clamp(420px,45vw,560px)] bg-card;
   }
+  html {
+    text-rendering: optimizeLegibility;
+  }
 
   html {
     font-size: 100%;
   }
 
+  /* Kill extra font line-gap where possible */
+  * {
+    line-height: inherit;
+  }
   @media (min-width: 1440px) {
     html {
       font-size: 108%;
@@ -757,7 +776,9 @@
   }
 
   .shadow-input-focus {
-    box-shadow: var(--shadow-input), 0 0 0 2px hsl(var(--ring) / 0.5);
+    box-shadow:
+      var(--shadow-input),
+      0 0 0 2px hsl(var(--ring) / 0.5);
   }
 
   .shadow-card {
@@ -792,9 +813,8 @@
     box-shadow: var(--shadow-button-neutral);
   }
 
-
   /* Text shadows */
-    .btn-text-shadow {
+  .btn-text-shadow {
     box-shadow: var(--btn-text-shadow);
   }
 }
@@ -812,8 +832,9 @@
   height: 25px;
   border-radius: 50%;
   padding: 3px;
-  background: conic-gradient(from 135deg at top, var(--spinner-color) 90deg, #0000 0)
-      0 calc(50% - 2px) / 8.5px 4.25px,
+  background:
+    conic-gradient(from 135deg at top, var(--spinner-color) 90deg, #0000 0) 0
+      calc(50% - 2px) / 8.5px 4.25px,
     radial-gradient(
         farthest-side at bottom left,
         #0000 calc(100% - 3px),
@@ -836,4 +857,12 @@
   100% {
     transform: rotate(1turn);
   }
+}
+
+.text-trim {
+  line-height: 1;
+  text-box-edge: ex alphabetic;
+  text-box-trim: trim-both;
+  /* border-top: 5px solid magenta;
+  border-bottom: 5px solid magenta; */
 }

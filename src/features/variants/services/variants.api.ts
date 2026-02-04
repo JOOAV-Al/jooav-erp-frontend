@@ -7,9 +7,9 @@ import { useQuery } from "@tanstack/react-query";
 
 
 export const useGetVariants = (params: GeneralFetchingParams) => {
-  const {search, status, manufacturerId, sortBy, sortOrder, page, limit} = params
+  const {search, status, brandId, sortBy, sortOrder, page, limit} = params
   return useQuery({
-    queryKey: ["all-variants", search, status, manufacturerId, sortBy, sortOrder, page, limit],
+    queryKey: ["all-variants", search, status, brandId, sortBy, sortOrder, page, limit],
     queryFn: () => fetchVariants(params),
     retry: 2,
   });
@@ -60,6 +60,14 @@ export const useDeleteVariant = () => {
     mutationFn: ({id}: {id: string}) =>
       api.delete(`/variants/${id}`), 
     invalidateQueries: [["all-variants"], ["variant-details"], ["variants-stats"]]
+  });
+};
+
+export const useDeleteMultipleVariants = () => {
+  return useInvalidatingMutation({
+    mutationFn: ({variantIds}: {variantIds: string[]}) =>
+      api.post(`/variants/bulk-delete`, {variantIds}), 
+    invalidateQueries: [["all-variants"], ["variants-stats"]]
   });
 };
 

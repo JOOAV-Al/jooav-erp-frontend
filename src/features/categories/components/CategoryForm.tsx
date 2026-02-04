@@ -12,10 +12,16 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { TagInput } from "@/components/ui/TagInput";
-import { FolderTree, Tag } from "lucide-react";
+import { Folders, FolderTree } from "lucide-react";
 import { DialogFormProps } from "@/interfaces/general";
-import { ParentCategoryItem } from "@/features/categories/types";
+import {
+  CategoryItem,
+  CreateCategoryPayload,
+  ParentCategoryItem,
+} from "@/features/categories/types";
 import { useEffect, useState } from "react";
+import FieldIcon from "@/components/general/FieldIcon";
+import FormGroupName from "@/components/general/FormGroupName";
 
 const createCategorySchema = z.object({
   name: z.string().min(1, "Category name is required"),
@@ -29,17 +35,13 @@ export function CategoryForm({
 }: DialogFormProps & { category?: ParentCategoryItem; formId?: string }) {
   type CategoryData = z.infer<typeof createCategorySchema>;
 
-  // State for managing existing subcategories (when editing)
-  // Extract names from children array
-  const [existingSubcategories, setExistingSubcategories] = useState<string[]>(
-    category?.children?.map((child) => child.name) ?? [],
+  const [existingSubcategories, setExistingSubcategories] = useState<
+    CategoryItem[]
+  >(category?.subcategories ?? []);
+
+  const [subcategoriesToDelete, setSubcategoriesToDelete] = useState<string[]>(
+    [],
   );
-
-  // Keep track of the original IDs for submission
-  const [existingSubcategoryIds, setExistingSubcategoryIds] = useState<
-    string[]
-  >(category?.children?.map((child) => child.id) ?? []);
-
   const form = useForm<CategoryData>({
     resolver: zodResolver(createCategorySchema),
     mode: "onChange",
@@ -61,81 +63,60 @@ export function CategoryForm({
       name: category?.name ?? "",
       subcategories: [],
     });
-    setExistingSubcategories(
-      category?.children?.map((child) => child.name) ?? [],
-    );
-    setExistingSubcategoryIds(
-      category?.children?.map((child) => child.id) ?? [],
-    );
-  }, [category?.id, category?.children, reset]);
+    setExistingSubcategories(category?.subcategories ?? []);
+    setSubcategoriesToDelete([]);
+  }, [category?.id, reset]);
 
-  const handleRemoveExisting = (tagToRemove: string) => {
-    // Find the index of the tag to remove
-    const indexToRemove = existingSubcategories.findIndex(
-      (name) => name === tagToRemove,
+  const handleRemoveExistingCategory = (name: string) => {
+    const itemToRemove = existingSubcategories.find(
+      (item) => item.name === name,
     );
-
-    if (indexToRemove !== -1) {
-      // Remove from both arrays (names and IDs)
+    if (itemToRemove) {
+      setSubcategoriesToDelete((prev) => [...prev, itemToRemove.id]);
       setExistingSubcategories((prev) =>
-        prev.filter((_, index) => index !== indexToRemove),
-      );
-      setExistingSubcategoryIds((prev) =>
-        prev.filter((_, index) => index !== indexToRemove),
+        prev.filter((item) => item.id !== itemToRemove.id),
       );
     }
   };
-
   const onSubmit = async (values: CategoryData) => {
     if (!handleSubmitForm) return;
-
-    // For new subcategories (just names), we'll send them as names
-    // For existing ones that weren't removed, we keep their IDs
     const newSubcategoryNames = values.subcategories ?? [];
 
-    // Build the payload
-    const payload = {
-      name: values.name,
-      // Include both existing IDs and new names
-      // Your backend should handle this appropriately
-      existingSubcategoryIds: existingSubcategoryIds,
-      newSubcategories: newSubcategoryNames,
-    };
-
-    console.log({ category });
-    console.log({ payload });
-
     if (category?.id) {
-      // Build partial payload using dirty fields
-      const changes: any = {};
+      // EDITING MODE
+      const payload: CreateCategoryPayload = {};
 
-      // Check if name changed
+      // Only include name if it changed
       if (dirtyFields.name) {
-        changes.name = values.name;
+        payload.name = values.name;
       }
 
-      // Check if subcategories were modified
-      const subcategoriesModified =
-        newSubcategoryNames.length > 0 ||
-        existingSubcategoryIds.length !== (category?.children?.length ?? 0);
-
-      if (subcategoriesModified) {
-        changes.existingSubcategoryIds = existingSubcategoryIds;
-        changes.newSubcategories = newSubcategoryNames;
+      // Handle pack categories
+      if (newSubcategoryNames.length > 0) {
+        payload.createSubcategories = newSubcategoryNames.map((name) => ({
+          name,
+        }));
+      }
+      if (subcategoriesToDelete.length > 0) {
+        payload.deleteSubcategoryIds = subcategoriesToDelete;
       }
 
-      const finalPayload = Object.keys(changes).length > 0 ? changes : payload;
-      await handleSubmitForm({ payload: finalPayload, id: category?.id });
-      return;
+      await handleSubmitForm({ payload, id: category.id });
+    } else {
+      // CREATING MODE
+      const payload: any = {
+        name: values.name,
+      };
+
+      if (newSubcategoryNames.length > 0) {
+        payload.subcategories = newSubcategoryNames.map((name) => ({ name }));
+      }
+
+      await handleSubmitForm(payload);
     }
-
-    // For creating new category, we only have names
-    await handleSubmitForm({
-      name: values.name,
-      subcategories: newSubcategoryNames,
-    });
   };
 
+  console.log(form?.getValues());
   return (
     <form
       id={formId}
@@ -162,12 +143,7 @@ export function CategoryForm({
                     type="text"
                     placeholder="Enter category name"
                     aria-invalid={fieldState.invalid}
-                    leftIcon={
-                      <FolderTree
-                        strokeWidth={2.5}
-                        className="h-5 w-5 text-outline-passive"
-                      />
-                    }
+                    leftIcon={<FieldIcon Icon={FolderTree} />}
                     isEdit={!!category}
                   />
                 </Field>
@@ -192,14 +168,11 @@ export function CategoryForm({
                     value={value}
                     onChange={onChange}
                     placeholder="Add sub-category"
-                    leftIcon={
-                      <Tag
-                        strokeWidth={2.5}
-                        className="h-5 w-5 text-outline-passive"
-                      />
-                    }
-                    existingTags={existingSubcategories}
-                    onRemoveExisting={handleRemoveExisting}
+                    leftIcon={<FieldIcon Icon={Folders} />}
+                    existingTags={existingSubcategories.map(
+                      (item) => item.name,
+                    )}
+                    onRemoveExisting={handleRemoveExistingCategory}
                   />
                 </Field>
               </div>

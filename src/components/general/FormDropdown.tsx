@@ -26,6 +26,7 @@ function FormDropdown({
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent
+        align="end"
         className={
           "flex flex-col gap-5 p-sm! rounded-lg! max-h-90 select-dropdown-shadow"
         }
@@ -45,7 +46,7 @@ function FormDropdown({
         )}
         {deleteAction && (
           <DropdownMenuItem
-            className="text-red"
+            className="text-destructive!"
             onClick={() => deleteAction?.()}
           >
             Delete

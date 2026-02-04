@@ -1,6 +1,6 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
-import { PenLine } from "lucide-react";
+// import { PenLine } from "lucide-react";
 
 interface InputProps extends React.ComponentProps<"input"> {
   leftIcon?: React.ReactNode;
@@ -31,8 +31,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           className={cn(
             // Base styles
             "w-full min-w-0 h-12 rounded-md bg-white border border-transparent",
-            "py-md text-base outline-none leading-20",
-            "placeholder:text-card-body placeholder:text-body",
+            "py-md text-base outline-none leading-none",
+            "placeholder:text-card-body placeholder:text-body-passive",
             "border border-transparent",
 
             // Dynamic padding based on icons
@@ -54,7 +54,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             "focus-visible:bg-background",
 
             // Disabled state
-            "disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none",
+            "disabled:bg-gray-300 disabled:text-body-passive/50 disabled:cursor-not-allowed disabled:pointer-events-none",
 
             // File input styles
             "file:inline-flex file:h-7 file:border-0 file:bg-transparent",
@@ -69,14 +69,14 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         />
 
         {/* Right Icon Wrapper - 4px padding */}
-        {hasRightIcon && (
+        {/* {hasRightIcon && (
           <div className="absolute inset-y-0 right-3 flex items-center pointer-events-auto">
             <div className="p-1 flex items-center justify-center">
               {isEdit && <PenLine strokeWidth={2.5} className="h-5 w-5 text-outline-passive" />}
               {rightIcon}
             </div>
           </div>
-        )}
+        )} */}
       </div>
     );
   }

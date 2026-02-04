@@ -1,10 +1,35 @@
+import { BrandItem } from "@/features/brands/types";
+
 export type VariantStatus = "DISCONTINUED" | "ACTIVE" | "INACTIVE"
 export interface CreateVariantPayload {
   name?: string;
   description?: string;
-  manufacturerId?: string;
-  logo?: string;
-  status?: string;
+  brandId?: string;
+  //Creation
+  packSizes?: {
+    name: string;
+  }[];
+  packTypes?: {
+    name: string;
+  }[];
+
+  //Editing
+  createPackSizes?: {
+    name: string;
+  }[];
+  updatePackSizes?: {
+    id: string;
+    name: string;
+  }[];
+  deletePackSizeIds?: string[];
+  createPackTypes?: {
+    name: string;
+  }[];
+  updatePackTypes?: {
+    id: string;
+    name: string;
+  }[];
+  deletePackTypeIds?: string[];
 }
 export interface VariantItem {
   id: string;
@@ -13,6 +38,9 @@ export interface VariantItem {
   logo: string;
   brandId: string;
   status: VariantStatus;
+  packSizes?: VariantPackSize[];
+  packTypes?: VariantPackType[];
+  brand: BrandItem;
   createdAt: string;
   updatedAt: string;
   createdBy: string;
@@ -20,6 +48,16 @@ export interface VariantItem {
   updatedBy: string;
 }
 
+export interface VariantPackType {
+  id: string;
+  name: string;
+  status: string;
+}
+export interface VariantPackSize {
+  id: string;
+  name: string;
+  status: string;
+}
 export interface VariantProductItem {
   id: string;
   name: string;

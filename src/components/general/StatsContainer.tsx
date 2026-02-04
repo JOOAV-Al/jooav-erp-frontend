@@ -7,7 +7,7 @@ interface StatsContainerProps {
 }
 const StatsContainer = ({ stats }: {stats: StatsContainerProps[]}) => {
   return (
-    <div className="flex flex-col mdx:flex-row py-main gap-6 border-y border-[#EDEDED]">
+    <div className="flex flex-col mdx:flex-row py-main gap-6 border-b border-[#EDEDED]">
       {stats.map((stat, i) => (
         <DashboardCard
           className={`${
