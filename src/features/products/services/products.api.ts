@@ -4,12 +4,13 @@ import { GeneralFetchingParams } from "@/interfaces/general";
 import { api } from "@/lib/api/axiosInstance";
 import { useInvalidatingMutation } from "@/lib/api/useInvalidatingMutations";
 import { useQuery } from "@tanstack/react-query";
+import { AxiosRequestHeaders } from "axios";
 
 
 export const useGetProducts = (params: GeneralFetchingParams) => {
-  const {search, status, manufacturerId, sortBy, sortOrder, page, limit} = params
+  const {search, status, brandId, page, limit} = params
   return useQuery({
-    queryKey: ["all-products", search, status, manufacturerId, sortBy, sortOrder, page, limit],
+    queryKey: ["all-products", search, status, brandId, page, limit],
     queryFn: () => fetchProducts(params),
     retry: 2,
   });
@@ -42,7 +43,9 @@ export const useGetProductDetails = ({id}: {id: string}) => {
 export const useCreateProduct = () => {
   return useInvalidatingMutation({
     mutationFn: (payload: CreateProductPayload) =>
-      api.post<ProductItem>("/products", payload), 
+      api.post<ProductItem>("/products", payload, {headers: {
+          "Content-Type": "multipart/form-data",
+        } as AxiosRequestHeaders}), 
     invalidateQueries: [["all-products"], ["products-stats"]]
   });
 };
@@ -50,7 +53,9 @@ export const useCreateProduct = () => {
 export const useUpdateProduct = () => {
   return useInvalidatingMutation({
     mutationFn: ({payload, id}: {payload: CreateProductPayload, id: string}) =>
-      api.patch<ProductItem>(`/products/${id}`, payload), 
+      api.patch<ProductItem>(`/products/${id}`, payload, {headers: {
+          "Content-Type": "multipart/form-data",
+        } as AxiosRequestHeaders}), 
     invalidateQueries: [["all-products"], ["product-details"]]
   });
 };
@@ -67,6 +72,14 @@ export const useDeleteMultipleProducts = () => {
   return useInvalidatingMutation({
     mutationFn: ({productIds}: {productIds: string[]}) =>
       api.post(`/products/bulk-delete`, {productIds}), 
+    invalidateQueries: [["all-products"], ["product-details"], ["products-stats"]]
+  });
+};
+
+export const usePublishMultipleProducts = () => {
+  return useInvalidatingMutation({
+    mutationFn: ({productIds}: {productIds: string[]}) =>
+      api.post(`/products/bulk-publish`, {productIds}), 
     invalidateQueries: [["all-products"], ["product-details"], ["products-stats"]]
   });
 };

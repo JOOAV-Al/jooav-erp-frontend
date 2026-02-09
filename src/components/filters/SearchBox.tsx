@@ -26,13 +26,15 @@ const SearchBox: React.FC<SearchBoxProps> = ({
 
   return (
     <div className={`relative ${className}`}>
-      <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-outline-passive" />
+      <div className="absolute left-2 top-1/2 -translate-y-1/2 flex justify-center items-center p-3">
+        <Search strokeWidth={2} className=" w-5 h-5 text-outline-passive" />
+      </div>
       <input
         type="text"
         placeholder={placeholder}
         value={searchValue}
         onChange={handleChange}
-        className={`pl-7 pr-4 py-4 border border-border-main table-selected rounded-lg text-sm focus:outline-none max-w-42.5 w-full h-10 ${inputClassName}`}
+        className={`pl-9 pr-4 py-4 border border-border-main table-selected rounded-lg text-sm focus:outline-none w-62.5 h-[34px] placeholder:text-body-passive placeholder:text-sm ${inputClassName}`}
       />
     </div>
   );

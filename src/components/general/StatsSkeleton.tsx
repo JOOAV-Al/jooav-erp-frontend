@@ -7,7 +7,7 @@ interface StatsSkeletonProps {
 
 export function StatsSkeleton({ count = 4 }: StatsSkeletonProps) {
   return (
-    <div className="flex flex-col mdx:flex-row py-main gap-6 border-y border-[#EDEDED]">
+    <div className="flex flex-col mdx:flex-row py-main gap-6 border-b border-[#EDEDED]">
       {Array.from({ length: count }).map((_, i) => (
         <div
           key={i}

@@ -15,10 +15,17 @@ const DrawerTabs = ({ tabs }: DrawerTabsProps) => {
           </TabsList>
         </div>
         {tabs?.map((tab, i) => (
-          <TabsContent key={i} value={tab.value} className="px-xl py-main flex flex-col gap-main">
+          <TabsContent
+            key={i}
+            value={tab.value}
+            className="px-xl py-main flex flex-col gap-main"
+          >
             <div className="flex justify-between items-center gap-5">
-            <h3>{tab?.heading ?? ""}</h3>
-            {tab?.actionDropdown && <div>{tab?.actionDropdown}</div>}
+              <div className="flex gap-[8px] items-center">
+                <h4 className="leading-[1.2] tracking-[0.01]">{tab?.heading ?? ""}</h4>
+                {tab?.statusTag && <div>{tab?.statusTag}</div>}
+              </div>
+              {tab?.actionDropdown && <div>{tab?.actionDropdown}</div>}
             </div>
             {tab?.content}
           </TabsContent>

@@ -1,25 +1,33 @@
 import React, { useState } from "react";
-import { ListEnd, ListStart } from "lucide-react";
+import { List, ListEnd, ListStart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface SortFilterProps {
-  value?: "desc" | "asc";
-  onChange?: (value: "desc" | "asc") => void;
+  value?: "desc" | "asc" | "";
+  onChange?: (value: "desc" | "asc" | "") => void;
 }
 
-const SortFilter: React.FC<SortFilterProps> = ({
-  value = "asc",
-  onChange,
-}) => {
-  const [sortOrder, setSortOrder] = useState<"desc" | "asc">(value);
+const SortFilter: React.FC<SortFilterProps> = ({ value = "asc", onChange }) => {
+  const [sortOrder, setSortOrder] = useState<"desc" | "asc" | "">(value);
 
-  const handleToggle = (newValue: "desc" | "asc") => {
+  const handleToggle = (newValue: "desc" | "asc" | "") => {
     setSortOrder(newValue);
     onChange?.(newValue);
   };
 
   return (
-    <div className="flex items-center gap-6">
+    <div className="flex items-center flex-wrap gap-6">
+      <Button
+        size={"filter"}
+        variant={"filter"}
+        onClick={() => handleToggle("")}
+        className={`
+                ${status === "" ? "bg-storey-foreground text-body" : ""}
+              `}
+      >
+        <List strokeWidth={2.5} className="w-3.5 h-3.5 text-outline-passive" />
+        All
+      </Button>
       <Button
         size={"filter"}
         variant={"filter"}
@@ -29,7 +37,7 @@ const SortFilter: React.FC<SortFilterProps> = ({
           ${sortOrder === "desc" ? "bg-storey-foreground text-body" : ""}
         `}
       >
-        <ListEnd strokeWidth={2.5} className="w-4 h-4 text-outline-passive" />
+        <ListEnd strokeWidth={2.5} className="w-3.5 h-3.5 text-outline-passive" />
         Oldest
       </Button>
 
@@ -42,7 +50,7 @@ const SortFilter: React.FC<SortFilterProps> = ({
           ${sortOrder === "asc" ? "bg-storey-foreground text-body" : ""}
         `}
       >
-        <ListStart strokeWidth={2.5} className="w-4 h-4 text-outline-passive" />
+        <ListStart strokeWidth={2.5} className="w-3.5 h-3.5 text-outline-passive" />
         Newest
       </Button>
     </div>

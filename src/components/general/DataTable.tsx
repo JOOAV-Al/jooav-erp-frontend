@@ -11,7 +11,7 @@ import EmptyState from "@/components/general/EmptyState";
 import Spinner from "@/components/general/Spinner";
 import { format } from "date-fns";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Trash2, X } from "lucide-react";
+import { CloudUpload, Trash2, X } from "lucide-react";
 import { TableSkeleton } from "@/components/general/TableSkeleton";
 // import Pagination from "./Pagination";
 // import CustomLoader from "@/components/layouts/landing-page/CustomLoader";
@@ -20,7 +20,8 @@ import { TableSkeleton } from "@/components/general/TableSkeleton";
 
 type Column<T> = {
   key: keyof T | string;
-  label: string;
+  activeColor?: boolean;
+  label: React.ReactNode;
   render?: (row: T) => React.ReactNode;
 };
 
@@ -31,6 +32,8 @@ interface DataTableProps<T> {
   loading?: boolean;
   deletingMultiple?: boolean;
   deletingMultipleStatus?: string;
+  publishingMultiple?: boolean;
+  publishingMultipleStatus?: string;
   page?: number;
   pageSize?: number;
   totalCount?: number;
@@ -72,6 +75,8 @@ function DataTable<T>({
   loading = false,
   deletingMultiple = false,
   deletingMultipleStatus,
+  publishingMultiple = false,
+  publishingMultipleStatus,
   withPagination = true,
   page,
   pageSize,
@@ -143,6 +148,11 @@ DataTableProps<T>) {
     handleClearSelection();
   }, [deletingMultipleStatus]);
 
+  useEffect(() => {
+    if (publishingMultipleStatus !== "success") return;
+    handleClearSelection();
+  }, [publishingMultipleStatus]);
+
   const isAllSelected = data.length > 0 && selectedRows.size === data.length;
   const isSomeSelected =
     selectedRows.size > 0 && selectedRows.size < data.length;
@@ -163,7 +173,7 @@ DataTableProps<T>) {
   return (
     <div className="flex flex-col gap-4 relative">
       <Table>
-        <TableHeader className="bg-[#F7F7F7] h-10.5 gap-8">
+        <TableHeader className="bg-[#F7F7F7] gap-8">
           <TableRow>
             {withCheckbox && (
               <TableHead className="w-12">
@@ -171,7 +181,7 @@ DataTableProps<T>) {
                   checked={isAllSelected}
                   onCheckedChange={handleSelectAll}
                   aria-label="Select all"
-                  className={` border-[#D4D0C4]!
+                  className={`border-border-accent!
                     ${
                       isSomeSelected
                         ? "data-[state=checked]:bg-brand-primary"
@@ -182,7 +192,12 @@ DataTableProps<T>) {
               </TableHead>
             )}
             {columns.map((col, i) => (
-              <TableHead key={i}>{col.label}</TableHead>
+              <TableHead
+                key={i}
+                title={typeof col.label === "string" ? col.label : undefined}
+              >
+                {col.label}
+              </TableHead>
             ))}
           </TableRow>
         </TableHeader>
@@ -249,7 +264,7 @@ DataTableProps<T>) {
                     </TableCell>
                   )}
                   {columns?.map((col, j) => (
-                    <TableCell key={j}>
+                    <TableCell className={`${col?.activeColor ? "text-body" : "text-body-passive"}`} key={j}>
                       {(() => {
                         if (!col.key) return "nil";
                         if (col.render) return col.render(row);
@@ -301,12 +316,12 @@ DataTableProps<T>) {
         )} */}
       {/* Floating Selection Actions - Shows when items are selected */}
       {withCheckbox && selectedRows.size > 0 && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-6">
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center justify-center max-w-97.5 w-full gap-6">
           {/* Selection count card */}
-          <div className="bg-storey-foreground rounded-lg shadow-input flex items-center">
+          <div className="bg-storey-foreground rounded-lg shadow-input flex items-center h-11">
             <span
               className=" 
-            text-[#333] px-md py-sm border-r-2 border-border-main"
+            text-body px-md py-sm border-r-2 border-border-main"
             >
               {selectedRows.size} Selected
             </span>
@@ -319,11 +334,25 @@ DataTableProps<T>) {
             </button>
           </div>
 
+          {onPublish && (
+            <div className="bg-storey-foreground rounded-lg shadow-input flex items-center group h-11">
+              <div
+                onClick={handleClearSelection}
+                className="flex items-center justify-center pl-md py-3 cursor-pointer"
+              >
+                <CloudUpload className="w-5 h-5 text-outline" />
+              </div>
+              <span className="text-body pr-md pl-3 py-sm cursor-pointer">
+                Publish
+              </span>
+            </div>
+          )}
+
           {/* Delete button */}
           {onDelete && (
             <button
               onClick={handleDelete}
-              className="bg-storey-foreground rounded-lg shadow-input px-main py-md flex items-center gap-5 group cursor-pointer"
+              className="bg-storey-foreground rounded-lg shadow-input px-main py-md flex items-center gap-5 group cursor-pointer h-11"
               aria-label="Delete selected"
             >
               {deletingMultiple ? (

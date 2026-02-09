@@ -2,7 +2,7 @@ import { BrandItem } from "@/features/brands/types";
 import { CategoryItem } from "@/features/categories/types";
 import { ManufacturerItem } from "@/features/manufacturers/types";
 
-export type ProductStatus = "DISCONTINUED" | "ACTIVE" | "INACTIVE"
+export type ProductStatus = "DRAFT" | "QUEUE" | "LIVE"
 export interface CreateProductPayload {
   description?: string;
   brandId?: string;
@@ -10,10 +10,14 @@ export interface CreateProductPayload {
   variantId?: string;
   packSizeId?: string;
   packTypeId?: string;
+  status?: string;
   price?: number;
   discount?: number;
-  thumbnail?: string;
-  images?: string[];
+  thumbnail?: File | null;
+  images?: File[] | null;
+  deleteImages?: string[];
+  createImages?: string[];
+  deleteThumbnail?: string;
 }
 export interface ProductItem {
   id: string;
@@ -27,7 +31,7 @@ export interface ProductItem {
   variantId: string;
   packSizeId: string;
   packTypeId: string;
-  price: number;
+  price: string;
   discount: number;
   thumbnail: string;
   images: string[];

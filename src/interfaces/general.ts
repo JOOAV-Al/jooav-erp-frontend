@@ -1,8 +1,11 @@
+// import { Role } from "@/lib/rbac/roles";
+
 export interface GeneralFetchingParams {
   page?: number;
   limit?: number;
   search?: string;
   status?: string;
+  role?: string;
   country?: string;
   state?: string;
   id?: string;
@@ -60,6 +63,7 @@ export interface Tab {
   heading?: string;
   content: React.ReactNode;
   actionDropdown?: React.ReactNode;
+  statusTag?: React.ReactNode;
 }
 export interface DrawerTabsProps {
   tabs: Tab[];
@@ -71,4 +75,5 @@ export interface DialogFormProps {
   // loading state (e.g. mutation in parent) so UI can show spinner/disable buttons
   loading?: boolean;
   closeDialog?: () => void;
+  submitAction?: 'primary' | 'secondary';
 }

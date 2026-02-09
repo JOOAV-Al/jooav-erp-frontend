@@ -14,7 +14,8 @@ interface TableSkeletonProps {
   columns: number;
   rows?: number;
   withCheckbox?: boolean;
-  columnLabels?: string[];
+  // columnLabels?: string[];
+  columnLabels?: React.ReactNode[];
 }
 
 export function TableSkeleton({

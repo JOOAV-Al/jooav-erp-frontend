@@ -53,8 +53,8 @@ export function ImageUploadBox({
     <div
       onClick={() => inputRef.current?.click()}
       className={cn(
-        "relative flex items-center justify-center rounded-lg border border-dashed",
-        "cursor-pointer bg-muted hover:bg-muted/70 transition",
+        "relative flex items-center justify-center rounded-2xl",
+        "cursor-pointer bg-storey-foreground hover:bg-muted/60 transition",
         className,
       )}
       style={{ width, height }}
@@ -73,7 +73,7 @@ export function ImageUploadBox({
             src={preview}
             alt="Preview"
             fill
-            className="object-cover rounded-lg"
+            className="object-contain rounded-lg"
           />
           <button
             type="button"
@@ -84,7 +84,9 @@ export function ImageUploadBox({
           </button>
         </>
       ) : (
-        <Plus className="w-6 h-6 text-muted-foreground" />
+          <div className="p-2">
+            <Plus className="w-[17px] h-[17px] text-outline-passive" />
+          </div>
       )}
     </div>
   );

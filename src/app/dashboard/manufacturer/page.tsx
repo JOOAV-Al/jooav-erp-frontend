@@ -16,7 +16,6 @@ import React, { useState } from "react";
 import DataTable from "@/components/general/DataTable";
 import { ManufacturerItem } from "@/features/manufacturers/types";
 import FilterContainer from "@/components/filters/FilterContainer";
-import AllFilter from "@/components/filters/AllFilter";
 import SortFilter from "@/components/filters/SortFilter";
 import SearchBox from "@/components/filters/SearchBox";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -28,7 +27,7 @@ const ManufacturerPage = () => {
   const [page, setPage] = useState<number>(1);
   const [open, setOpen] = useState<boolean>(false);
   const [query, setQuery] = useState<string>("");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [sortOrder, setSortOrder] = useState<"desc" | "asc" | "">("");
   const debouncedQuery = useDebounce(query);
   const [selectedManufacturer, setSelectedManufacturer] = useState<
     ManufacturerItem | undefined
@@ -137,13 +136,12 @@ const ManufacturerPage = () => {
       <div className="px-xl pt-xl pb-1 flex flex-col gap-7">
         <div className="flex justify-between flex-wrap gap-6">
           <FilterContainer label="Filter">
-            <AllFilter />
             <SortFilter
               value={sortOrder}
               onChange={(value) => setSortOrder(value)}
             />
           </FilterContainer>
-          <div className="flex items-center gap-6">
+          <div className="flex items-center flex-wrap gap-6">
             <SearchBox
               value={query}
               onChange={(value) => {
@@ -190,7 +188,7 @@ const ManufacturerPage = () => {
           data={manufacturers ?? []}
           refetch={refetch}
           columns={[
-            { key: "name", label: "Manufacturer" },
+            { key: "name", label: "Manufacturer", activeColor: true },
             { key: "updatedAt", label: "Modified" },
             { key: "createdAt", label: "Created" },
           ]}

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { EyeClosedIcon, EyeIcon, EyeOffIcon, LockIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import FieldIcon from "@/components/general/FieldIcon";
 
 interface PasswordInputProps {
   field: any;
@@ -30,9 +31,9 @@ export default function PasswordInput({
       aria-label={showPassword ? "Hide password" : "Show password"}
     >
       {showPassword ? (
-        <EyeIcon className="h-4 w-4" />
+        <FieldIcon Icon={EyeIcon} />
       ) : (
-        <EyeClosedIcon className="h-4 w-4" />
+        <FieldIcon Icon={EyeClosedIcon} />
       )}
     </button>
   );

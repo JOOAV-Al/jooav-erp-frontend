@@ -107,7 +107,7 @@ export function LoginForm({ toggleForm }: { toggleForm: () => void }) {
                       type="email"
                       placeholder="Enter your email"
                       aria-invalid={fieldState.invalid}
-                      leftIcon={<Mail className="h-4 w-4" />}
+                      leftIcon={<FieldIcon Icon={Mail} />}
                     />
                   </Field>
                 </div>

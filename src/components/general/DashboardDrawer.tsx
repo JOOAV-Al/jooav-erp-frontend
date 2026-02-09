@@ -27,6 +27,13 @@ interface DashboardDrawerProps {
   isCustomWidth?: boolean;
   customWidthStyle?: string;
   customImage?: string;
+  // New props for dual actions
+  secondarySubmitLabel?: string;
+  secondarySubmitLoading?: boolean;
+  submitAction?: "primary" | "secondary";
+  onSubmitActionChange?: (action: "primary" | "secondary") => void;
+  primaryBtnIcon?: React.ReactNode;
+  secondaryBtnIcon?: React.ReactNode;
 }
 
 const DashboardDrawer = ({
@@ -41,6 +48,12 @@ const DashboardDrawer = ({
   customWidthStyle,
   customImage,
   isCustomWidth = false,
+  secondarySubmitLabel,
+  secondarySubmitLoading = false,
+  submitAction,
+  onSubmitActionChange,
+  primaryBtnIcon,
+  secondaryBtnIcon,
 }: DashboardDrawerProps) => {
   return (
     <RightDrawer open={isOpen} onOpenChange={openDrawer}>
@@ -70,21 +83,48 @@ const DashboardDrawer = ({
 
         {showFooter && (
           <RightDrawerFooter>
-            <RightDrawerClose asChild>
-              <Button size={"neutral"} variant="neutral">
-                Cancel
+            {/* Secondary action button (e.g., "Publish") */}
+            {secondarySubmitLabel ? (
+              <Button
+                type={submitFormId ? "submit" : "button"}
+                form={submitFormId}
+                size={"neutral"}
+                variant="neutral"
+                disabled={secondarySubmitLoading || submitLoading}
+                onClick={() => onSubmitActionChange?.("secondary")}
+              >
+                <span className="px-2">
+                  {secondaryBtnIcon && secondaryBtnIcon}
+                </span>
+                <span className="px-2 py-4">
+                  {secondarySubmitLoading && submitAction === "secondary"
+                    ? "Loading..."
+                    : secondarySubmitLabel}
+                </span>
               </Button>
-            </RightDrawerClose>
+            ) : (
+              <RightDrawerClose asChild>
+                <Button size={"neutral"} variant="neutral">
+                  Cancel
+                </Button>
+              </RightDrawerClose>
+            )}
+
             {/* Submit button targets the inner form using the form attribute */}
+            {/* Primary action button (e.g., "Queue" or "Save") */}
             <Button
               type={submitFormId ? "submit" : "button"}
               form={submitFormId}
               size={"neutral"}
               className="mr-2"
-              disabled={submitLoading}
+              disabled={submitLoading || secondarySubmitLoading}
+              onClick={() => onSubmitActionChange?.("primary")}
             >
-              <span className="">
-                {submitLoading ? "Loading..." : submitLabel}
+              <span className="px-2">{primaryBtnIcon && primaryBtnIcon}</span>
+              <span className="px-2 py-4">
+                {submitLoading && submitAction === "primary"
+                  ? "Loading..."
+                  : submitLabel}
               </span>
             </Button>
           </RightDrawerFooter>

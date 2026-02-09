@@ -12,7 +12,7 @@ const FilterContainer: React.FC<FilterContainerProps> = ({
   return (
     <div className="flex items-center gap-6 flex-wrap">
       {label && (
-        <span className="text-sm text-heading font-medium">{label}:</span>
+        <span className="text-[13px] text-body font-semibold">{label}:</span>
       )}
       {children}
     </div>

@@ -1,66 +1,85 @@
 import React, { useState } from "react";
-import {
-  CloudUpload,
-  ListPlus,
-  PenLine,
-} from "lucide-react";
+import { CloudUpload, List, ListPlus, PenLine } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface StatusFilterProps {
-  value?: "draft" | "queue" | "live";
-  onChange?: (value: "draft" | "queue" | "live") => void;
+  value?: string;
+  onChange?: (value: string) => void;
+  isProducts?: boolean;
 }
 
 const StatusFilter: React.FC<StatusFilterProps> = ({
-  value = "queue",
+  value = "",
   onChange,
+  isProducts,
 }) => {
-  const [status, setStatus] = useState<"draft" | "queue" | "live">(value);
+  const [status, setStatus] = useState<string>(value);
 
-  const handleToggle = (newValue: "draft" | "queue" | "live") => {
+  const handleToggle = (newValue: string) => {
     setStatus(newValue);
     onChange?.(newValue);
   };
 
   return (
-    <div className="flex items-center gap-6">
+    <div className="flex items-center flex-wrap gap-6">
       <Button
         size={"filter"}
         variant={"filter"}
-        onClick={() => handleToggle("draft")}
+        onClick={() => handleToggle("")}
         className={`
-          ${status === "draft" ? "bg-storey-foreground text-body" : ""}
+          ${status === "" ? "bg-storey-foreground text-body" : ""}
         `}
       >
-        <PenLine strokeWidth={2.5} className="w-4 h-4 text-outline-passive" />
-        Draft
+        <List strokeWidth={2.5} className="w-3.5 h-3.5 text-outline-passive" />
+        All
       </Button>
+      {isProducts && (
+        <>
+          <Button
+            size={"filter"}
+            variant={"filter"}
+            onClick={() => handleToggle("DRAFT")}
+            className={`
+          ${status === "DRAFT" ? "bg-storey-foreground text-body" : ""}
+        `}
+          >
+            <PenLine
+              strokeWidth={2.5}
+              className="w-3.5 h-3.5 text-outline-passive"
+            />
+            Draft
+          </Button>
 
-      <Button
-        onClick={() => handleToggle("queue")}
-        size={"filter"}
-        variant={"filter"}
-        className={`
-          ${status === "queue" ? "bg-storey-foreground text-body" : ""}
+          <Button
+            onClick={() => handleToggle("QUEUE")}
+            size={"filter"}
+            variant={"filter"}
+            className={`
+          ${status === "QUEUE" ? "bg-storey-foreground text-body" : ""}
         `}
-      >
-        <ListPlus strokeWidth={2.5} className="w-4 h-4 text-outline-passive" />
-        Queue
-      </Button>
-      <Button
-        onClick={() => handleToggle("live")}
-        size={"filter"}
-        variant={"filter"}
-        className={`
-          ${status === "live" ? "bg-storey-foreground text-body hover:bg-storey-foreground" : ""}
+          >
+            <ListPlus
+              strokeWidth={2.5}
+              className="w-3.5 h-3.5 text-outline-passive"
+            />
+            Queue
+          </Button>
+          <Button
+            onClick={() => handleToggle("LIVE")}
+            size={"filter"}
+            variant={"filter"}
+            className={`
+          ${status === "LIVE" ? "bg-storey-foreground text-body hover:bg-storey-foreground" : ""}
         `}
-      >
-        <CloudUpload
-          strokeWidth={2.5}
-          className="w-4 h-4 text-outline-passive"
-        />
-        Live
-      </Button>
+          >
+            <CloudUpload
+              strokeWidth={2.5}
+              className="w-3.5 h-3.5 text-outline-passive"
+            />
+            Live
+          </Button>
+        </>
+      )}
     </div>
   );
 };

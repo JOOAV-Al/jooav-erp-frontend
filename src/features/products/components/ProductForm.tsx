@@ -12,26 +12,21 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
-  DollarSign,
   GitBranch,
   GitBranchPlus,
   GitFork,
   Package,
   PackageOpen,
-  PackagePlus,
   PackageSearch,
   Workflow,
 } from "lucide-react";
 import { DialogFormProps } from "@/interfaces/general";
-import { ProductItem } from "@/features/products/types";
+import { CreateProductPayload, ProductItem } from "@/features/products/types";
 import { useEffect, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { useGetBrands } from "@/features/brands/services/brands.api";
 import { useGetVariants } from "@/features/variants/services/variants.api";
-import {
-  useGetCategories,
-  useGetCategoriesTree,
-} from "@/features/categories/services/category.api";
+import { useGetCategories } from "@/features/categories/services/category.api";
 import { Select } from "@/components/general/Select";
 import FormGroupName from "@/components/general/FormGroupName";
 import FieldIcon from "@/components/general/FieldIcon";
@@ -41,9 +36,26 @@ import { ImageUploadBox } from "@/components/general/ImageUploadBox";
 import { VariantItem } from "@/features/variants/types";
 import { ParentCategoryItem } from "@/features/categories/types";
 
+const createProductSchema = z.object({
+  name: z.string().optional(),
+  description: z.string().min(1, "description is required"),
+  brandId: z.string().min(1, "brand is required"),
+  variantId: z.string().min(1, "variant is required"),
+  sku: z.string().optional(),
+  categoryId: z.string().min(1, "category is required"),
+  subcategoryId: z.string().min(1, "subcategory is required"),
+  packTypeId: z.string().min(1, "pack type is required"),
+  packSizeId: z.string().min(1, "pack size is required"),
+  price: z.number().min(0, "Enter Price"),
+  // discount: z.number().min(0, "Enter discount"),
+  thumbnail: z.any().optional(),
+  images: z.array(z.any()).optional(),
+});
+
 export function ProductForm({
   handleSubmitForm,
   product,
+  submitAction="primary"
 }: DialogFormProps & { product?: ProductItem }) {
   const [selectedVariant, setSelectedVariant] = useState<
     VariantItem | undefined
@@ -51,24 +63,15 @@ export function ProductForm({
   const [selectedCategory, setSelectedCategory] = useState<
     ParentCategoryItem | undefined
   >();
+  //Track existing images and deletions
+  const [existingImages, setExistingImages] = useState<string[]>(
+    product?.images ?? [],
+  );
+  const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
+  const [shouldDeleteThumbnail, setShouldDeleteThumbnail] = useState(false);
+
   const { data: brands } = useGetBrands({});
   const { data: categories } = useGetCategories({});
-
-  const createProductSchema = z.object({
-    name: z.string().optional(),
-    description: z.string().min(1, "description is required"),
-    brandId: z.string().min(1, "brand is required"),
-    variantId: z.string().min(1, "variant is required"),
-    categoryId: z.string().min(1, "category is required"),
-    sku: z.string().optional(),
-    subcategoryId: z.string().min(1, "subcategory is required"),
-    packTypeId: z.string().min(1, "pack type is required"),
-    packSizeId: z.string().min(1, "pack size is required"),
-    price: z.number().min(0, "Enter Price"),
-    // discount: z.number().min(0, "Enter discount"),
-    thumbnail: z.any().optional(),
-    images: z.any().optional(),
-  });
 
   type ProductData = z.infer<typeof createProductSchema>;
   const form = useForm<ProductData>({
@@ -82,11 +85,11 @@ export function ProductForm({
       packSizeId: product?.packSizeId ?? "",
       packTypeId: product?.packTypeId ?? "",
       sku: product?.sku ?? "",
-      categoryId: product?.categoryId ?? "",
+      categoryId: product?.subcategory?.category?.id ?? "",
       subcategoryId: product?.subcategoryId ?? "",
-      price: (product?.price && product?.price) || undefined,
+      price: Number(product?.price && product?.price) || undefined,
       thumbnail: (product?.thumbnail && product?.thumbnail) || undefined,
-      images: product?.images ?? [],
+      images: [],
     },
   });
 
@@ -117,30 +120,75 @@ export function ProductForm({
     setSelectedCategory(category);
   }, [watchedCategory, categories]);
 
+  const handleRemoveExistingImage = (imageUrl: string) => {
+    setImagesToDelete((prev) => [...prev, imageUrl]);
+    setExistingImages((prev) => prev.filter((url) => url !== imageUrl));
+  };
   const onSubmit = async (values: z.infer<typeof createProductSchema>) => {
     if (!handleSubmitForm) return;
-    console.log({ product });
-    console.log({ values });
+    console.log(values);
+    // Determine status based on which button was clicked
+    const status = submitAction === "secondary" ? "LIVE" : "QUEUE";
+    // Build FormData
+    const formData = new FormData();
+
+    // Add text fields
+    formData.append("description", values.description);
+    formData.append("brandId", values.brandId);
+    formData.append("variantId", values.variantId);
+    formData.append("subcategoryId", values.subcategoryId);
+    formData.append("packTypeId", values.packTypeId);
+    formData.append("packSizeId", values.packSizeId);
+    formData.append("status", status);
+    formData.append("price", values.price.toString());
+
     if (product?.id) {
-      //Build partial payload using dirty fields
-      const changes: Partial<ProductData> = {};
-      for (const key of Object.keys(dirtyFields) as Array<keyof ProductData>) {
-        const val = values[key];
-        if (val !== undefined) {
-          if (typeof val === "number") {
-            if (key === "price") changes.price = val;
-          } else if (typeof val === "string" && key !== "price") {
-            changes[key] = val;
-          }
-        }
+      // EDITING MODE
+
+      // Handle thumbnail
+      if (values.thumbnail instanceof File) {
+        formData.append("thumbnail", values.thumbnail);
       }
-      const payload = Object.keys(changes).length ? changes : values;
-      await handleSubmitForm({ payload, id: product?.id });
-      return;
+      if (shouldDeleteThumbnail) {
+        formData.append("deleteThumbnail", "true");
+      }
+
+      // Handle images - append each file individually
+      const newImages = (values.images ?? []).filter(
+        (img): img is File => img instanceof File,
+      );
+      newImages.forEach((file) => {
+        formData.append("createImages", file);
+      });
+
+      // Track deleted images
+      if (imagesToDelete.length > 0) {
+        imagesToDelete.forEach((url) => {
+          formData.append("deleteImages", url);
+        });
+        // formData.append("deleteImages", JSON.stringify(imagesToDelete));
+      }
+
+      await handleSubmitForm({ payload: formData, id: product.id });
+    } else {
+      // CREATING MODE
+
+      // Handle thumbnail
+      if (values.thumbnail instanceof File) {
+        formData.append("thumbnail", values.thumbnail);
+      }
+
+      // Handle images - append each file individually
+      const imageFiles = (values.images ?? []).filter(
+        (img): img is File => img instanceof File,
+      );
+      imageFiles.forEach((file) => {
+        formData.append("images", file);
+      });
+
+      await handleSubmitForm(formData);
     }
-    const { thumbnail, images, name, sku, categoryId, ...rest } = values;
-    await handleSubmitForm(rest);
-  };
+  };;
 
   useEffect(() => {
     reset({
@@ -151,12 +199,16 @@ export function ProductForm({
       packSizeId: product?.packSizeId ?? "",
       packTypeId: product?.packTypeId ?? "",
       sku: product?.sku ?? "",
-      categoryId: product?.categoryId ?? "",
+      categoryId: product?.subcategory?.category?.id ?? "",
       subcategoryId: product?.subcategoryId ?? "",
-      price: (product?.price && product?.price) || undefined,
-      // thumbnail: product?.thumbnail ?? "",
-      images: product?.images ?? [],
+      price: Number(product?.price && product?.price) || undefined,
+      images: [],
     });
+
+    // Reset image tracking
+    setExistingImages(product?.images ?? []);
+    setImagesToDelete([]);
+    setShouldDeleteThumbnail(false);
   }, [product?.id, reset]);
 
   return (
@@ -488,17 +540,26 @@ export function ProductForm({
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <div className="flex gap-3 items-center">
-                    <FieldLabel>Product thumbnail</FieldLabel>
+                    <FieldLabel>Upload product thumbnail</FieldLabel>
                     {fieldState.error && (
                       <FieldError>: {fieldState.error.message}</FieldError>
                     )}
                   </div>
 
                   <ImageUploadBox
-                    value={field.value ?? product?.thumbnail}
-                    onChange={field.onChange}
-                    width={96}
-                    height={96}
+                    value={field.value}
+                    onChange={(file) => {
+                      field.onChange(file);
+                      // If there was an existing thumbnail on the product,
+                      // mark it for deletion whenever the thumbnail value changes
+                      // (either removed or replaced with a new file).
+                      if (product?.thumbnail) {
+                        setShouldDeleteThumbnail(true);
+                      }
+                    }}
+                    width={100}
+                    height={83.34}
+                    className=""
                   />
                 </Field>
               )}
@@ -509,34 +570,56 @@ export function ProductForm({
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <div className="flex gap-3 items-center">
-                    <FieldLabel>Product Images</FieldLabel>
+                    <FieldLabel>Upload product images</FieldLabel>
                     {fieldState.error && (
                       <FieldError>: {fieldState.error.message}</FieldError>
                     )}
                   </div>
 
-                  <div className="grid grid-cols-3 gap-3">
-                    {field.value?.map((img: File | string, index: number) => (
+                  <div className="flex flex-col gap-6">
+                    {/* Existing images (URLs from backend) */}
+                    {existingImages?.map((imageUrl, index) => (
                       <ImageUploadBox
-                        key={index}
-                        value={img}
+                        key={`existing-${index}`}
+                        value={imageUrl}
                         onChange={(file) => {
-                          const copy = [...field.value];
-                          if (file) copy[index] = file;
-                          field.onChange(copy);
+                          if (!file) {
+                            // User clicked X to remove
+                            handleRemoveExistingImage(imageUrl);
+                          }
                         }}
-                        width={160}
-                        height={160}
+                        width={376.5}
+                        height={376.5}
                       />
                     ))}
 
+                    {/* New images (Files being uploaded) */}
+                    {(field.value ?? []).map((img: File, index: number) => (
+                      <ImageUploadBox
+                        key={`new-${index}`}
+                        value={img}
+                        onChange={(file) => {
+                          const copy = [...(field.value ?? [])];
+                          if (file) {
+                            copy[index] = file;
+                          } else {
+                            copy.splice(index, 1);
+                          }
+                          field.onChange(copy);
+                        }}
+                        width={376.5}
+                        height={376.5}
+                        // className="max-w-[376.5px] w-full max-h-[376.5px] h-full"
+                      />
+                    ))}
+                    {/* Add new image box */}
                     <ImageUploadBox
                       onChange={(file) => {
                         if (!file) return;
                         field.onChange([...(field.value || []), file]);
                       }}
-                      width={160}
-                      height={160}
+                      width={376.5}
+                      height={376.5}
                     />
                   </div>
                 </Field>

@@ -16,7 +16,6 @@ import React, { useState } from "react";
 import DataTable from "@/components/general/DataTable";
 import { BrandItem } from "@/features/brands/types";
 import FilterContainer from "@/components/filters/FilterContainer";
-import AllFilter from "@/components/filters/AllFilter";
 import SortFilter from "@/components/filters/SortFilter";
 import SearchBox from "@/components/filters/SearchBox";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -24,12 +23,12 @@ import StatsContainer from "@/components/general/StatsContainer";
 import Image from "next/image";
 import FormDropdown from "@/components/general/FormDropdown";
 import StatsSkeleton from "@/components/general/StatsSkeleton";
-
+import { ImageIcon } from "lucide-react";
 const BrandPage = () => {
   const [page, setPage] = useState<number>(1);
   const [open, setOpen] = useState<boolean>(false);
   const [query, setQuery] = useState<string>("");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [sortOrder, setSortOrder] = useState<"desc" | "asc" | "">("");
   const debouncedQuery = useDebounce(query);
 
   const { mutateAsync: updateBrand, isPending: updating } = useUpdateBrand();
@@ -130,13 +129,12 @@ const BrandPage = () => {
       <div className="px-xl pt-xl pb-1 flex flex-col gap-7">
         <div className="flex justify-between flex-wrap gap-6">
           <FilterContainer label="Filter">
-            <AllFilter />
             <SortFilter
               value={sortOrder}
               onChange={(value) => setSortOrder(value)}
             />
           </FilterContainer>
-          <div className="flex items-center gap-6">
+          <div className="flex items-center flex-wrap gap-6">
             <SearchBox
               value={query}
               onChange={(value) => {
@@ -182,16 +180,24 @@ const BrandPage = () => {
           data={brands ?? []}
           refetch={refetch}
           columns={[
-            { key: "name", label: "Brand" },
+            { key: "name", label: "Brand", activeColor: true },
             {
               key: "_count.variants",
               label: "No of Var.",
+              activeColor: true,
             },
             {
               key: "logo",
-              label: "Logo",
+              label: (
+                <div className="flex justify-center">
+                  <ImageIcon
+                    strokeWidth={2.5}
+                    className="w-5 h-5 text-border-accent"
+                  />
+                </div>
+              ),
               render: (item) => (
-                <div className="w-[31.2px] h-7 flex items-center justify-center">
+                <div className="w-[31.2px] h-7 flex items-center justify-center mx-auto">
                   {item?.logo ? (
                     <Image
                       src={item?.logo ?? ""}
@@ -200,7 +206,7 @@ const BrandPage = () => {
                       height={28}
                     />
                   ) : (
-                    <span>N/A</span>
+                    <span className="text-body">N/A</span>
                   )}
                 </div>
               ),
@@ -208,6 +214,7 @@ const BrandPage = () => {
             {
               key: "manufacturer.name",
               label: "Manufacturer",
+              activeColor: true,
             },
             { key: "updatedAt", label: "Modified" },
             { key: "createdAt", label: "Created" },

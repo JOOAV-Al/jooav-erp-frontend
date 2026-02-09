@@ -56,7 +56,7 @@ const TagInput = React.forwardRef<HTMLDivElement, TagInputProps>(
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === "Enter") {
+      if (e.key === ",") {
         e.preventDefault();
         if (inputValue.trim()) {
           addTag(inputValue);
@@ -68,6 +68,9 @@ const TagInput = React.forwardRef<HTMLDivElement, TagInputProps>(
       ) {
         // Remove last tag when backspacing with empty input
         removeTag(internalTags[internalTags.length - 1]);
+      } else if (e.key === "Enter"){
+        e.preventDefault();
+        console.log("enter")
       }
     };
 

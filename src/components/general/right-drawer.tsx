@@ -99,8 +99,8 @@ const RightDrawerFooter = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-3 px-lg pt-sm pb-lg mt-auto gap-6",
-      className
+      "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-3 px-lg pt-md pb-lg mt-auto gap-3",
+      className,
     )}
     {...props}
   />

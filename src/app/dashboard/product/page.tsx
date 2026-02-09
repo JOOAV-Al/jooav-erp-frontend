@@ -10,32 +10,37 @@ import {
   useGetProducts,
   useUpdateProduct,
   useGetProductsStats,
+  usePublishMultipleProducts,
 } from "@/features/products/services/products.api";
 import { Tab } from "@/interfaces/general";
 import React, { useState } from "react";
 import DataTable from "@/components/general/DataTable";
 import { ProductItem } from "@/features/products/types";
 import FilterContainer from "@/components/filters/FilterContainer";
-import AllFilter from "@/components/filters/AllFilter";
 import StatusFilter from "@/components/filters/StatusFilter";
 import SearchBox from "@/components/filters/SearchBox";
 import { useDebounce } from "@/hooks/useDebounce";
 import StatsContainer from "@/components/general/StatsContainer";
 import FormDropdown from "@/components/general/FormDropdown";
 import StatsSkeleton from "@/components/general/StatsSkeleton";
+import TableTag from "@/components/general/TableTag";
+import { CloudUpload, SquareStack } from "lucide-react";
 
 const ProductPage = () => {
+  const [submitAction, setSubmitAction] = useState<"primary" | "secondary">(
+    "primary",
+  );
   const [page, setPage] = useState<number>(1);
   const [open, setOpen] = useState<boolean>(false);
   const [query, setQuery] = useState<string>("");
-  const [statusFilter, setStatusFilter] = useState<"queue" | "draft" | "live">("queue");
-    const [selectedProduct, setSelectedProduct] = useState<
-      ProductItem | undefined
-    >(undefined);
-    const [selectedProducts, setSelectedProducts] = useState<
-      ProductItem[] | []
-    >([]);
-    const debouncedQuery = useDebounce(query);
+  const [statusFilter, setStatusFilter] = useState<string>("");
+  const [selectedProduct, setSelectedProduct] = useState<
+    ProductItem | undefined
+  >(undefined);
+  const [selectedProducts, setSelectedProducts] = useState<ProductItem[] | []>(
+    [],
+  );
+  const debouncedQuery = useDebounce(query);
 
   const { mutateAsync: updateProduct, isPending: updating } =
     useUpdateProduct();
@@ -46,9 +51,13 @@ const ProductPage = () => {
     isPending: deletingMultiple,
     status,
   } = useDeleteMultipleProducts();
+  const {
+    mutateAsync: publishMultipleProducts,
+    isPending: publishingMultiple,
+    // status: publishingStatus,
+  } = usePublishMultipleProducts();
   const { mutateAsync: deleteProduct, isPending: deleting } =
     useDeleteProduct();
-
 
   const { data: stats, isPending: isStatsPending } = useGetProductsStats();
   const {
@@ -60,24 +69,26 @@ const ProductPage = () => {
   const products = data?.data;
 
   const handleCreate = async (values: any) => {
+    console.log(values)
     if (selectedProduct) {
       await updateProduct(values);
     } else {
       await createProduct(values);
     }
-    // close drawer on success
+    // close drawer on success and reset state
+    setSubmitAction("primary");
     setOpen(false);
     setSelectedProduct(undefined);
-  };
+  };;
 
   const handleBulkDelete = async (selectedProducts: ProductItem[]) => {
     const idsToDelete = selectedProducts.map((product) => product?.id);
     await deleteMultipleProducts({ productIds: idsToDelete });
   };
-  
+
   const handleBulkPublish = async (selectedProducts: ProductItem[]) => {
-    const idsToDelete = selectedProducts.map((product) => product?.id);
-    await deleteMultipleProducts({ productIds: idsToDelete });
+    const idsToPublish = selectedProducts.map((product) => product?.id);
+    await publishMultipleProducts({ productIds: idsToPublish });
   };
 
   const handleDelete = async () => {
@@ -92,6 +103,31 @@ const ProductPage = () => {
     { value: stats?.total ? `${stats?.total}` : "0", label: "Draft" },
     { value: stats?.total ? `${stats?.total}` : "0", label: "Archived" },
   ];
+  const getTagStyles = (value: string = "DRAFT") => {
+    if (value === "QUEUE") {
+      return {
+        styles: `border-border-brand-stroke bg-tag-added text-brand-primary`,
+        text: `Queue`,
+      };
+    }
+    // else if (value === "PROCUREMENT_OFFICER") {
+    //   return {
+    //     styles: `border-border-accent bg-tag-queue text-brand-signal`,
+    //     text: `Procurement`,
+    //   };
+    // }
+    else if (value === "LIVE") {
+      return {
+        styles: `border-border-main bg-tag-active text-success-500`,
+        text: `Live`,
+      };
+    } else {
+      return {
+        styles: `border-border-main bg-tag-draft text-body-passive`,
+        text: `Draft`,
+      };
+    }
+  };
 
   const tabs: Tab[] = [
     {
@@ -104,11 +140,18 @@ const ProductPage = () => {
           handleSubmitForm={handleCreate}
           loading={creating || updating}
           closeDialog={() => setOpen(false)}
+          submitAction={submitAction}
         />
       ),
       ...(selectedProduct
         ? { actionDropdown: <FormDropdown deleteAction={handleDelete} /> }
         : {}),
+      statusTag: (
+        <TableTag
+          className={`${getTagStyles(selectedProduct?.status)?.styles}`}
+          text={getTagStyles(selectedProduct?.status)?.text}
+        />
+      ),
     },
     {
       value: "bulk",
@@ -137,13 +180,13 @@ const ProductPage = () => {
       <div className="px-xl pt-xl pb-1 flex flex-col gap-7">
         <div className="flex justify-between flex-wrap gap-6">
           <FilterContainer label="Filter">
-            <AllFilter />
             <StatusFilter
+              isProducts
               value={statusFilter}
               onChange={(value) => setStatusFilter(value)}
             />
           </FilterContainer>
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-6 flex-wrap">
             <SearchBox
               value={query}
               onChange={(value) => {
@@ -161,16 +204,36 @@ const ProductPage = () => {
               openDrawer={(isOpen) => {
                 if (isOpen) {
                   setSelectedProduct(undefined);
+                  setSubmitAction("primary"); // Reset on open
                 }
                 setOpen(isOpen);
               }}
               isOpen={open}
               submitFormId={"product-form"}
               submitLoading={updating || creating || deleting}
-              submitLabel="Save record"
-              children={<DrawerTabs tabs={tabs} />}
+              submitLabel="Queue"
+              secondarySubmitLabel="Publish"
+              secondarySubmitLoading={updating || creating || deleting}
+              submitAction={submitAction}
+              onSubmitActionChange={setSubmitAction}
+              primaryBtnIcon={
+                <SquareStack
+                  className="text-secondary"
+                  size={17}
+                  strokeWidth={2.5}
+                />
+              }
+              secondaryBtnIcon={
+                <CloudUpload
+                  className="text-outline"
+                  size={17}
+                  strokeWidth={2.5}
+                />
+              }
               showFooter
-            />
+            >
+              <DrawerTabs tabs={tabs} />
+            </DashboardDrawer>
           </div>
         </div>
         <DataTable
@@ -181,27 +244,34 @@ const ProductPage = () => {
           withCheckbox
           getRowId={(row) => row.id}
           onSelectionChange={(selectedRows) => {
-            console.log("Selected rows:", selectedRows);
             setSelectedProducts(selectedRows);
           }}
           onDelete={(selectedRows) => {
-            console.log("Delete these:", selectedRows);
             handleBulkDelete(selectedRows);
           }}
-          loading={isProductsPending || isRefetching}
           deletingMultiple={deletingMultiple}
           deletingMultipleStatus={status}
+          onPublish={(selectedRows) => {
+            handleBulkPublish(selectedRows);
+          }}
+          loading={isProductsPending || isRefetching}
+          publishingMultiple={publishingMultiple}
+          publishingMultipleStatus={status}
           data={products ?? []}
           refetch={refetch}
           columns={[
-            { key: "name", label: "Product" },
+            { key: "name", label: "Name", activeColor: true },
             {
-              key: "brand.name",
-              label: "Brand Name",
+              key: "subcategory.category.name",
+              label: "Category",
             },
             {
-              key: "sku",
-              label: "SKU",
+              key: "subcategory.name",
+              label: "Sub Category",
+            },
+            {
+              key: "brand.name",
+              label: "Brand",
             },
             {
               key: "packSize.name",
@@ -212,23 +282,25 @@ const ProductPage = () => {
               label: "Pack Type",
             },
             {
+              key: "sku",
+              label: "SKU",
+              activeColor: true,
+            },
+            {
               key: "price",
-              label: "Price",
-            },
-            {
-              key: "subcategory.category.name",
-              label: "Category",
-            },
-            {
-              key: "subcategory.name",
-              label: "Sub Category",
+              label: "Price(N)",
+              activeColor: true,
             },
             {
               key: "status",
               label: "Status",
+              render: (item) => (
+                <TableTag
+                  className={`${getTagStyles(item?.status)?.styles}`}
+                  text={getTagStyles(item?.status)?.text}
+                />
+              ),
             },
-            { key: "updatedAt", label: "Modified" },
-            { key: "createdAt", label: "Created" },
           ]}
           page={page}
           pageSize={20}

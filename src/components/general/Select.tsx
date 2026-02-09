@@ -2,6 +2,7 @@ import * as React from "react";
 import { ChevronDown, ChevronUp, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import SearchBox from "@/components/filters/SearchBox";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface SelectOption {
   value: string;
@@ -30,8 +31,8 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
       leftIcon,
       searchable = false,
       className,
-      marginBottom = "mb-62",
-      disableAutoMargin = false,
+      // marginBottom = "mb-62",
+      // disableAutoMargin = false,
     },
     ref,
   ) => {
@@ -103,20 +104,21 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
     return (
       <div
         ref={containerRef}
-        style={
-          !disableAutoMargin && measuredMargin
-            ? { marginBottom: `${measuredMargin}px` }
-            : undefined
-        }
-        className={`relative w-full ${isOpen && disableAutoMargin ? marginBottom : ""}`}
+        className={`relative w-full`}
+        // style={
+        //   !disableAutoMargin && measuredMargin
+        //     ? { marginBottom: `${measuredMargin}px` }
+        //     : undefined
+        // }
+        // className={`relative w-full ${isOpen && disableAutoMargin ? marginBottom : ""}`}
       >
         {/* Select Trigger */}
         <div
           onClick={() => setIsOpen(!isOpen)}
           className={cn(
             // Base styles
-            "w-full min-w-0 h-12 rounded-md bg-white border border-transparent",
-            "py-md text-base outline-none leading-20",
+            `w-full min-w-0 h-12 rounded-md ${isOpen ? "bg-background" : "bg-white"} border border-transparent`,
+            "py-md text-base outline-none",
             "shadow-input focus-within:shadow-input",
             "transition-[color,box-shadow]",
             "cursor-pointer",
@@ -163,43 +165,50 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
         {isOpen && (
           <div
             ref={dropdownRef}
-            className="absolute p-md z-50 w-full mt-3 bg-white rounded-lg select-dropdown-shadow max-h-60 flex flex-col"
+            className="absolute pt-md z-50 w-full mt-3 bg-white rounded-lg select-dropdown-shadow max-h-60 flex flex-col"
           >
             {/* Search Input */}
             {searchable && (
-              <div className="sticky top-0 bg-white z-20 pb-3">
+              <div className="sticky top-0 bg-white z-20 px-md">
                 <SearchBox
                   placeholder="Search choice"
                   value={searchQuery}
                   onChange={(val) => setSearchQuery(val)}
-                  inputClassName="max-w-full! h-10"
-                  className="mb-4"
+                  inputClassName="max-w-full! w-full h-10"
+                  // className="mb-4"
                   //  onClick={(e) => e.stopPropagation()}
                 />
               </div>
             )}
 
             {/* Options List */}
-            <div className="overflow-y-auto flex-1">
-              {filteredOptions.length > 0 ? (
-                filteredOptions.map((option) => (
-                  <div
-                    key={option.value}
-                    onClick={() => handleSelect(option.value)}
-                    className={cn(
-                      "p-sm cursor-pointer transition-colors text-outline hover:bg-gray-100 text-[15px] ",
-                      option.value === value && "bg-gray-100 text-outline",
-                    )}
-                  >
-                    {option.label}
+            {/* TODO: Implement a dynamic logic to calculate and adjust height of dropdown based on content */}
+            <ScrollArea isSidebar className="h-30 overflow-y-auto">
+              {/* <div className="overflow-y-auto flex-1 flex flex-col gap-5 pt-sm"> */}
+              <div className="flex-1 flex flex-col gap-5 py-sm">
+                {filteredOptions.length > 0 ? (
+                  filteredOptions.map((option) => (
+                      <div
+                        key={option.value}
+                        onClick={() => handleSelect(option.value)}
+                        className={cn(
+                          "mx-3 px-sm rounded-main h-6.5 cursor-pointer transition-colors text-body-passive hover:bg-storey-foreground select-option",
+                          option.value === value &&
+                            "bg-storey-foreground text-body table-selected",
+                        )}
+                      >
+                        <span className="leading-[1.2] tracking-[0.04] text-[15px] font-medium">
+                          {option.label}
+                        </span>
+                      </div>
+                  ))
+                ) : (
+                  <div className="px-4 py-3 text-body text-center text-[15px] mt-6">
+                    <span>No options found</span>
                   </div>
-                ))
-              ) : (
-                <div className="px-4 py-3 text-outline] text-center text-[15px]">
-                  No options found
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            </ScrollArea>
           </div>
         )}
       </div>
