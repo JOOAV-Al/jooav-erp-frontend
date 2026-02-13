@@ -6,12 +6,14 @@ interface StatusFilterProps {
   value?: string;
   onChange?: (value: string) => void;
   isProducts?: boolean;
+  isManufacturers?: boolean;
 }
 
 const StatusFilter: React.FC<StatusFilterProps> = ({
   value = "",
   onChange,
   isProducts,
+  isManufacturers,
 }) => {
   const [status, setStatus] = useState<string>(value);
 
@@ -77,6 +79,68 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
               className="w-3.5 h-3.5 text-outline-passive"
             />
             Live
+          </Button>
+        </>
+      )}
+      
+      {isManufacturers && (
+        <>
+          <Button
+            size={"filter"}
+            variant={"filter"}
+            onClick={() => handleToggle("PENDING_APPROVAL")}
+            className={`
+          ${status === "PENDING_APPROVAL" ? "bg-storey-foreground text-body" : ""}
+        `}
+          >
+            <PenLine
+              strokeWidth={2.5}
+              className="w-3.5 h-3.5 text-outline-passive"
+            />
+            Pending
+          </Button>
+
+          <Button
+            onClick={() => handleToggle("ACTIVE")}
+            size={"filter"}
+            variant={"filter"}
+            className={`
+          ${status === "ACTIVE" ? "bg-storey-foreground text-body" : ""}
+        `}
+          >
+            <ListPlus
+              strokeWidth={2.5}
+              className="w-3.5 h-3.5 text-outline-passive"
+            />
+            Active
+          </Button>
+          <Button
+            onClick={() => handleToggle("SUSPENDED")}
+            size={"filter"}
+            variant={"filter"}
+            className={`
+          ${status === "SUSPENDED" ? "bg-storey-foreground text-body hover:bg-storey-foreground" : ""}
+        `}
+          >
+            <CloudUpload
+              strokeWidth={2.5}
+              className="w-3.5 h-3.5 text-outline-passive"
+            />
+            Suspended
+          </Button>
+          <Button
+            onClick={() => handleToggle("INACTIVE")}
+            size={"filter"}
+            variant={"filter"}
+            className={`
+          ${status === "INACTIVE" ? "bg-storey-foreground text-body hover:bg-storey-foreground" : ""}
+        `}
+          >
+            <CloudUpload
+              strokeWidth={2.5}
+              className="w-3.5 h-3.5 text-outline-passive"
+            />
+            Inactive
           </Button>
         </>
       )}

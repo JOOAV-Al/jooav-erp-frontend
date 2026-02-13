@@ -37,7 +37,7 @@ import { VariantItem } from "@/features/variants/types";
 import { ParentCategoryItem } from "@/features/categories/types";
 
 const createProductSchema = z.object({
-  name: z.string().optional(),
+  name: z.string().min(1, "Name is required"),
   description: z.string().min(1, "description is required"),
   brandId: z.string().min(1, "brand is required"),
   variantId: z.string().min(1, "variant is required"),
@@ -55,7 +55,7 @@ const createProductSchema = z.object({
 export function ProductForm({
   handleSubmitForm,
   product,
-  submitAction="primary"
+  submitAction = "primary",
 }: DialogFormProps & { product?: ProductItem }) {
   const [selectedVariant, setSelectedVariant] = useState<
     VariantItem | undefined
@@ -133,6 +133,7 @@ export function ProductForm({
     const formData = new FormData();
 
     // Add text fields
+    formData.append("name", values.name);
     formData.append("description", values.description);
     formData.append("brandId", values.brandId);
     formData.append("variantId", values.variantId);
@@ -188,7 +189,7 @@ export function ProductForm({
 
       await handleSubmitForm(formData);
     }
-  };;
+  };
 
   useEffect(() => {
     reset({
@@ -223,35 +224,30 @@ export function ProductForm({
             <FormGroupName name="OVERVIEW" />
             <div className="flex flex-col gap-7">
               {/* NAME */}
-              {!!product && (
-                <Controller
-                  control={control}
-                  name="name"
-                  render={({ field, fieldState }) => (
-                    <div>
-                      <Field data-invalid={fieldState.invalid}>
-                        <div className="flex gap-3 items-center">
-                          <FieldLabel>Product name</FieldLabel>
-                          {fieldState.error && (
-                            <FieldError>
-                              : {fieldState.error.message}
-                            </FieldError>
-                          )}
-                        </div>
-                        <Input
-                          disabled
-                          {...field}
-                          type="text"
-                          placeholder="Enter product name"
-                          aria-invalid={fieldState.invalid}
-                          leftIcon={<FieldIcon Icon={Package} />}
-                          isEdit={!!product}
-                        />
-                      </Field>
-                    </div>
-                  )}
-                />
-              )}
+              <Controller
+                control={control}
+                name="name"
+                render={({ field, fieldState }) => (
+                  <div>
+                    <Field data-invalid={fieldState.invalid}>
+                      <div className="flex gap-3 items-center">
+                        <FieldLabel>Product name</FieldLabel>
+                        {fieldState.error && (
+                          <FieldError>: {fieldState.error.message}</FieldError>
+                        )}
+                      </div>
+                      <Input
+                        {...field}
+                        type="text"
+                        placeholder="Enter product name"
+                        aria-invalid={fieldState.invalid}
+                        leftIcon={<FieldIcon Icon={Package} />}
+                        isEdit={!!product}
+                      />
+                    </Field>
+                  </div>
+                )}
+              />
 
               <Controller
                 control={control}

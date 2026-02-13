@@ -1,7 +1,5 @@
 "use client";
-import CSVUpload from "@/features/uploads/components/CSVUpload";
 import DashboardDrawer from "@/components/general/DashboardDrawer";
-import DrawerTabs from "@/components/general/DrawerTabs";
 import UserForm from "@/features/users/components/UserForm";
 import {
   useCreateUser,
@@ -11,12 +9,10 @@ import {
   useGetUsersStats,
   useUpdateUser,
 } from "@/features/users/services/users.api";
-import { Tab } from "@/interfaces/general";
 import React, { useState } from "react";
 import DataTable from "@/components/general/DataTable";
 import { UserItem } from "@/features/users/types";
 import FilterContainer from "@/components/filters/FilterContainer";
-import SortFilter from "@/components/filters/SortFilter";
 import SearchBox from "@/components/filters/SearchBox";
 import { useDebounce } from "@/hooks/useDebounce";
 import StatsContainer from "@/components/general/StatsContainer";
@@ -24,13 +20,18 @@ import FormDropdown from "@/components/general/FormDropdown";
 import StatsSkeleton from "@/components/general/StatsSkeleton";
 import TableTag from "@/components/general/TableTag";
 import RoleFilter from "@/components/filters/RoleFilter";
-import { Image } from "lucide-react";
+import { ImageIcon, Wheat } from "lucide-react";
+import DrawerBoxContent from "@/components/general/DrawerBoxContent";
+import CopyLinkBox from "@/components/general/CopyLinkBox";
+import Image from "next/image";
 
 const UserPage = () => {
   const [page, setPage] = useState<number>(1);
   const [open, setOpen] = useState<boolean>(false);
   const [query, setQuery] = useState<string>("");
   const [role, setRole] = useState<string>("");
+  const [loginLink, setLoginLink] = useState<string>("");
+  const [showLink, setShowLink] = useState<boolean>(false);
   const debouncedQuery = useDebounce(query);
 
   const { mutateAsync: updateUser, isPending: updating } = useUpdateUser();
@@ -60,11 +61,15 @@ const UserPage = () => {
     console.log({ finalValues: values });
     if (selectedUser) {
       await updateUser(values);
+
+      setOpen(false);
     } else {
-      await createUser(values);
+      const res = await createUser(values);
+      console.log(res);
+      // setLoginLink(res?.data?.)
+      setShowLink(true);
     }
-    // close drawer on success
-    setOpen(false);
+    // show link on success
     setSelectedUser(undefined);
   };
 
@@ -81,41 +86,8 @@ const UserPage = () => {
   const displayStats = [
     { value: stats?.totalUsers ? `${stats?.totalUsers}` : "0", label: "Users" },
     {
-      value: stats?.deactivatedUsers ? `${stats?.deactivatedUsers}` : "0",
+      value: stats?.archived ? `${stats?.archived}` : "0",
       label: "Archived",
-    },
-  ];
-
-  const tabs: Tab[] = [
-    {
-      value: "manual",
-      label: "Manual",
-      heading: `${selectedUser ? "Edit" : "Enter"} user details`,
-      content: (
-        <UserForm
-          user={selectedUser}
-          handleSubmitForm={handleCreate}
-          loading={creating || updating}
-          closeDialog={() => setOpen(false)}
-        />
-      ),
-      ...(selectedUser
-        ? { actionDropdown: <FormDropdown deleteAction={handleDelete} /> }
-        : {}),
-    },
-    {
-      value: "bulk",
-      label: "Bulk Import",
-      // heading: "Upload user details",
-      content: (
-        <CSVUpload
-          catalog={"user"}
-          onCTAClick={() => setOpen(!open)}
-          onDownload={() => {
-            console.log("download");
-          }}
-        />
-      ),
     },
   ];
 
@@ -148,7 +120,7 @@ const UserPage = () => {
       {isStatsPending ? (
         <StatsSkeleton count={3} />
       ) : (
-        users?.length != 0 && <StatsContainer stats={displayStats} />
+        <StatsContainer stats={displayStats} />
       )}
 
       <div className="px-xl pt-xl pb-1 flex flex-col gap-7">
@@ -169,8 +141,13 @@ const UserPage = () => {
               }}
             />
             <DashboardDrawer
+              isCustomWidth={true}
+              customWidthStyle={
+                "aspect-460/958 max-w-md mdl:max-w-md lg:max-w-[460px]"
+              }
               showTrigger
               openDrawer={(isOpen) => {
+                setShowLink(false);
                 if (isOpen) {
                   setSelectedUser(undefined);
                 }
@@ -179,10 +156,53 @@ const UserPage = () => {
               isOpen={open}
               submitFormId={"user-form"}
               submitLoading={updating || creating || deleting}
-              submitLabel="Save record"
-              children={<DrawerTabs tabs={tabs} />}
-              showFooter
-            />
+              submitLabel="Save user"
+              showFooter={!showLink}
+            >
+              {showLink ? (
+                <DrawerBoxContent
+                  // useScrollable={false}
+                  heading={`Share link with user`}
+                  description={`Send link to user. They can login to their dashboard using link.`}
+                  content={
+                    <CopyLinkBox
+                      onShare={() => {
+                        console.log("share");
+                      }}
+                      link="https://google.com"
+                      shareBtnIcon={
+                        <Image
+                          src={"/dashboard/whatsApp.svg"}
+                          width={16}
+                          height={16}
+                          alt="Naira"
+                        />
+                      }
+                    />
+                  }
+                />
+              ) : (
+                <DrawerBoxContent
+                  heading={`${selectedUser ? "Edit" : "Enter"} user details`}
+                  content={
+                    <UserForm
+                      user={selectedUser}
+                      handleSubmitForm={handleCreate}
+                      loading={creating || updating}
+                      closeDialog={() => {
+                        setOpen(false);
+                        setShowLink(false);
+                      }}
+                    />
+                  }
+                  actionDropdown={
+                    selectedUser ? (
+                      <FormDropdown deleteAction={handleDelete} />
+                    ) : undefined
+                  }
+                />
+              )}
+            </DashboardDrawer>
           </div>
         </div>
         <DataTable
@@ -210,7 +230,7 @@ const UserPage = () => {
               key: "avatar",
               label: (
                 <div className="flex justify-center">
-                  <Image
+                  <ImageIcon
                     strokeWidth={2.5}
                     className="w-5 h-5 text-border-accent"
                   />

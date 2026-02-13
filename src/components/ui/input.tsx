@@ -11,7 +11,7 @@ interface InputProps extends React.ComponentProps<"input"> {
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, leftIcon, rightIcon, isEdit=false, ...props }, ref) => {
     const hasLeftIcon = Boolean(leftIcon);
-    const hasRightIcon = Boolean(rightIcon) || isEdit;
+    const hasRightIcon = Boolean(rightIcon);
 
     return (
       <div className="relative w-full">
@@ -39,7 +39,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             // Logic: Base padding is 16px (px-main)
             // With left icon: 12px (pl-3) + 4px wrapper padding + icon width = total left space
             // The pl-12 (48px) gives us: 12px + 4px padding + ~20px icon + 12px text offset = flush at 16px from wrapper edge
-            hasLeftIcon && !hasRightIcon && "pl-11 pr-main",
+            hasLeftIcon && !hasRightIcon && "pl-12 pr-main",
             !hasLeftIcon && hasRightIcon && "pl-main pr-12",
             hasLeftIcon && hasRightIcon && "pl-10 pr-10",
             !hasLeftIcon && !hasRightIcon && "px-main",
@@ -54,7 +54,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             "focus-visible:bg-background",
 
             // Disabled state
-            "disabled:bg-gray-300 disabled:text-body-passive/50 disabled:cursor-not-allowed disabled:pointer-events-none",
+            "disabled:bg-background disabled:text-body-passive/50 disabled:cursor-not-allowed disabled:pointer-events-none",
 
             // File input styles
             "file:inline-flex file:h-7 file:border-0 file:bg-transparent",

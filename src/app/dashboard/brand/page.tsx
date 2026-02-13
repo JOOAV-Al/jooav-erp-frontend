@@ -123,7 +123,7 @@ const BrandPage = () => {
       {isStatsPending ? (
         <StatsSkeleton count={3} />
       ) : (
-        brands?.length != 0 && <StatsContainer stats={displayStats} />
+        <StatsContainer stats={displayStats} />
       )}
 
       <div className="px-xl pt-xl pb-1 flex flex-col gap-7">

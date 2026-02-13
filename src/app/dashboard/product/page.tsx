@@ -10,7 +10,7 @@ import {
   useGetProducts,
   useUpdateProduct,
   useGetProductsStats,
-  usePublishMultipleProducts,
+  useUpdateMultipleProductStatus,
 } from "@/features/products/services/products.api";
 import { Tab } from "@/interfaces/general";
 import React, { useState } from "react";
@@ -54,8 +54,8 @@ const ProductPage = () => {
   const {
     mutateAsync: publishMultipleProducts,
     isPending: publishingMultiple,
-    // status: publishingStatus,
-  } = usePublishMultipleProducts();
+    status: publishingStatus,
+  } = useUpdateMultipleProductStatus();
   const { mutateAsync: deleteProduct, isPending: deleting } =
     useDeleteProduct();
 
@@ -69,7 +69,7 @@ const ProductPage = () => {
   const products = data?.data;
 
   const handleCreate = async (values: any) => {
-    console.log(values)
+    console.log(values);
     if (selectedProduct) {
       await updateProduct(values);
     } else {
@@ -79,7 +79,7 @@ const ProductPage = () => {
     setSubmitAction("primary");
     setOpen(false);
     setSelectedProduct(undefined);
-  };;
+  };
 
   const handleBulkDelete = async (selectedProducts: ProductItem[]) => {
     const idsToDelete = selectedProducts.map((product) => product?.id);
@@ -88,7 +88,11 @@ const ProductPage = () => {
 
   const handleBulkPublish = async (selectedProducts: ProductItem[]) => {
     const idsToPublish = selectedProducts.map((product) => product?.id);
-    await publishMultipleProducts({ productIds: idsToPublish });
+    const payload = {
+      productIds: idsToPublish,
+      status: "LIVE"
+    };
+    await publishMultipleProducts({payload});
   };
 
   const handleDelete = async () => {
@@ -98,10 +102,16 @@ const ProductPage = () => {
   };
 
   const displayStats = [
-    { value: stats?.total ? `${stats?.total}` : "0", label: "Products" },
-    { value: stats?.total ? `${stats?.total}` : "0", label: "Variants" },
-    { value: stats?.total ? `${stats?.total}` : "0", label: "Draft" },
-    { value: stats?.total ? `${stats?.total}` : "0", label: "Archived" },
+    {
+      value: stats?.totalProducts ? `${stats?.totalProducts}` : "0",
+      label: "Products",
+    },
+    {
+      value: stats?.totalVariants ? `${stats?.totalVariants}` : "0",
+      label: "Variants",
+    },
+    { value: stats?.drafts ? `${stats?.drafts}` : "0", label: "Draft" },
+    { value: stats?.archived ? `${stats?.archived}` : "0", label: "Archived" },
   ];
   const getTagStyles = (value: string = "DRAFT") => {
     if (value === "QUEUE") {
@@ -174,7 +184,7 @@ const ProductPage = () => {
       {isStatsPending ? (
         <StatsSkeleton count={4} />
       ) : (
-        products?.length != 0 && <StatsContainer stats={displayStats} />
+        <StatsContainer stats={displayStats} />
       )}
 
       <div className="px-xl pt-xl pb-1 flex flex-col gap-7">
@@ -256,7 +266,7 @@ const ProductPage = () => {
           }}
           loading={isProductsPending || isRefetching}
           publishingMultiple={publishingMultiple}
-          publishingMultipleStatus={status}
+          publishingMultipleStatus={publishingStatus}
           data={products ?? []}
           refetch={refetch}
           columns={[

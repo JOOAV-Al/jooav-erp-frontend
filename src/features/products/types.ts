@@ -47,8 +47,8 @@ export interface ProductItem {
 }
 
 export interface ProductStatsItem {
-  total: number;
-  active: number;
-  inactive: number;
-  recentlyAdded: number;
+  totalProducts: number;
+  totalVariants: number;
+  drafts: number;
+  archived: number;
 }

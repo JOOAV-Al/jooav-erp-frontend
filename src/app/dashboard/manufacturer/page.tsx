@@ -22,12 +22,14 @@ import { useDebounce } from "@/hooks/useDebounce";
 import StatsContainer from "@/components/general/StatsContainer";
 import FormDropdown from "@/components/general/FormDropdown";
 import StatsSkeleton from "@/components/general/StatsSkeleton";
+import StatusFilter from "@/components/filters/StatusFilter";
 
 const ManufacturerPage = () => {
   const [page, setPage] = useState<number>(1);
   const [open, setOpen] = useState<boolean>(false);
   const [query, setQuery] = useState<string>("");
-  const [sortOrder, setSortOrder] = useState<"desc" | "asc" | "">("");
+  // const [sortOrder, setSortOrder] = useState<"desc" | "asc" | "">("");
+  const [statusFilter, setStatusFilter] = useState<string>("");
   const debouncedQuery = useDebounce(query);
   const [selectedManufacturer, setSelectedManufacturer] = useState<
     ManufacturerItem | undefined
@@ -55,7 +57,7 @@ const ManufacturerPage = () => {
     isPending: isManufacturersPending,
     isRefetching,
     refetch,
-  } = useGetManufacturers({ search: debouncedQuery });
+  } = useGetManufacturers({ search: debouncedQuery, status: statusFilter });
   const manufacturers = data?.data;
 
   const handleCreate = async (values: any) => {
@@ -130,16 +132,23 @@ const ManufacturerPage = () => {
       {isStatsPending ? (
         <StatsSkeleton count={3} />
       ) : (
-        manufacturers?.length != 0 && <StatsContainer stats={displayStats} />
+        <StatsContainer stats={displayStats} />
       )}
 
       <div className="px-xl pt-xl pb-1 flex flex-col gap-7">
         <div className="flex justify-between flex-wrap gap-6">
           <FilterContainer label="Filter">
-            <SortFilter
+            <>
+            </>
+            {/* <StatusFilter
+              isManufacturers
+              value={statusFilter}
+              onChange={(value) => setStatusFilter(value)}
+            /> */}
+            {/* <SortFilter
               value={sortOrder}
               onChange={(value) => setSortOrder(value)}
-            />
+            /> */}
           </FilterContainer>
           <div className="flex items-center flex-wrap gap-6">
             <SearchBox

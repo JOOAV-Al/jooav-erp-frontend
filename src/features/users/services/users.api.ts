@@ -51,9 +51,7 @@ export const useCreateUser = () => {
 export const useUpdateUser = () => {
   return useInvalidatingMutation({
     mutationFn: ({payload, id}: {payload: CreateUserPayload, id: string}) =>
-      api.patch<UserItem>(`/users/${id}`, payload, {headers: {
-          "Content-Type": "multipart/form-data",
-        } as AxiosRequestHeaders}), 
+      api.patch<UserItem>(`/users/${id}`, payload), 
     invalidateQueries: [["all-users"], ["user-details"]]
   });
 };

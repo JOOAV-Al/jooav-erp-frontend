@@ -79,7 +79,13 @@ const DashboardDrawer = ({
           </RightDrawerDescription>
         </RightDrawerHeader>
 
-        <RightDrawerBody className="">{children}</RightDrawerBody>
+        {/*
+          RightDrawerBody fills the remaining height between the top image band
+          and the footer. It is itself a flex column so that:
+          - DrawerTabs (which manages its own internal scroll) can stretch to fill it
+          - A plain component passed as children will also scroll naturally
+        */}
+        <RightDrawerBody className="flex flex-col">{children}</RightDrawerBody>
 
         {showFooter && (
           <RightDrawerFooter>

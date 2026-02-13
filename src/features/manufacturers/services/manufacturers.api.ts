@@ -7,9 +7,9 @@ import { useQuery } from "@tanstack/react-query";
 
 
 export const useGetManufacturers = (params: GeneralFetchingParams) => {
-  const {search, status, country, sortOrder, state, page, limit} = params
+  const {search, status, sortOrder, page, limit} = params
   return useQuery({
-    queryKey: ["all-manufacturers", search, status, country, state, sortOrder, page, limit],
+    queryKey: ["all-manufacturers", search, status, sortOrder, page, limit],
     queryFn: () => fetchManufacturers(params),
     retry: 2,
   });

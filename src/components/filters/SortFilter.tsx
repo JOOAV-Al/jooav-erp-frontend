@@ -22,7 +22,7 @@ const SortFilter: React.FC<SortFilterProps> = ({ value = "asc", onChange }) => {
         variant={"filter"}
         onClick={() => handleToggle("")}
         className={`
-                ${status === "" ? "bg-storey-foreground text-body" : ""}
+                ${sortOrder === "" ? "bg-storey-foreground text-body" : ""}
               `}
       >
         <List strokeWidth={2.5} className="w-3.5 h-3.5 text-outline-passive" />
@@ -31,26 +31,32 @@ const SortFilter: React.FC<SortFilterProps> = ({ value = "asc", onChange }) => {
       <Button
         size={"filter"}
         variant={"filter"}
-        onClick={() => handleToggle("desc")}
-        className={`
-          
-          ${sortOrder === "desc" ? "bg-storey-foreground text-body" : ""}
-        `}
-      >
-        <ListEnd strokeWidth={2.5} className="w-3.5 h-3.5 text-outline-passive" />
-        Oldest
-      </Button>
-
-      <Button
         onClick={() => handleToggle("asc")}
-        size={"filter"}
-        variant={"filter"}
         className={`
           
           ${sortOrder === "asc" ? "bg-storey-foreground text-body" : ""}
         `}
       >
-        <ListStart strokeWidth={2.5} className="w-3.5 h-3.5 text-outline-passive" />
+        <ListEnd
+          strokeWidth={2.5}
+          className="w-3.5 h-3.5 text-outline-passive"
+        />
+        Oldest
+      </Button>
+
+      <Button
+        onClick={() => handleToggle("desc")}
+        size={"filter"}
+        variant={"filter"}
+        className={`
+          
+          ${sortOrder === "desc" ? "bg-storey-foreground text-body" : ""}
+        `}
+      >
+        <ListStart
+          strokeWidth={2.5}
+          className="w-3.5 h-3.5 text-outline-passive"
+        />
         Newest
       </Button>
     </div>

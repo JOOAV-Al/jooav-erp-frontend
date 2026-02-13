@@ -12,6 +12,7 @@ const buttonVariants = cva(
         default:
           "bg-primary text-primary-foreground hover:bg-primary/90 shadow-button text-shadow-xs text-shadow-[#10284C66] font-medium tracking-[0.02]",
         neutral: "bg-white hover:bg-white/90 shadow-button-neutral",
+        input: "bg-white hover:bg-white/90 shadow-input",
         filter:
           "bg-white hover:bg-storey-foreground table-selected text-body-passive font-semibold",
         destructive:

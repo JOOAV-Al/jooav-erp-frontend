@@ -44,6 +44,7 @@ export interface UserStatsItem {
   deactivatedUsers: number;
   adminUsers: number;
   totalManufacturers: number;
+  archived: number;
   usersByRole: {
     role: string;
     count: number;

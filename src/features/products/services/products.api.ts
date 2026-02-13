@@ -1,5 +1,5 @@
 import { fetchDeactivatedProducts, fetchProductDetails, fetchProducts, fetchProductsStats, fetchProductsByManufacturer } from "@/features/products/services/queryFunctions";
-import { CreateProductPayload, ProductItem } from "@/features/products/types";
+import { CreateProductPayload, ProductItem, ProductStatus } from "@/features/products/types";
 import { GeneralFetchingParams } from "@/interfaces/general";
 import { api } from "@/lib/api/axiosInstance";
 import { useInvalidatingMutation } from "@/lib/api/useInvalidatingMutations";
@@ -71,7 +71,7 @@ export const useDeleteProduct = () => {
 export const useDeleteMultipleProducts = () => {
   return useInvalidatingMutation({
     mutationFn: ({productIds}: {productIds: string[]}) =>
-      api.post(`/products/bulk-delete`, {productIds}), 
+      api.post(`/products/bulk`, {productIds}), 
     invalidateQueries: [["all-products"], ["product-details"], ["products-stats"]]
   });
 };
@@ -80,6 +80,14 @@ export const usePublishMultipleProducts = () => {
   return useInvalidatingMutation({
     mutationFn: ({productIds}: {productIds: string[]}) =>
       api.post(`/products/bulk-publish`, {productIds}), 
+    invalidateQueries: [["all-products"], ["product-details"], ["products-stats"]]
+  });
+};
+
+export const useUpdateMultipleProductStatus = () => {
+  return useInvalidatingMutation({
+    mutationFn: ({payload}: {payload: {productIds: string[], status: string}}) =>
+      api.patch(`/products/bulk/status`, payload), 
     invalidateQueries: [["all-products"], ["product-details"], ["products-stats"]]
   });
 };

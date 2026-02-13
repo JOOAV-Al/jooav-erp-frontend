@@ -143,6 +143,14 @@ DataTableProps<T>) {
     onDelete?.(selectedRowObjects);
   };
 
+  // Handle publish action
+  const handlePublish = async () => {
+    const selectedRowObjects = data.filter((r) =>
+      selectedRows.has(getRowId(r)),
+    );
+    onPublish?.(selectedRowObjects);
+  };
+
   useEffect(() => {
     if (deletingMultipleStatus !== "success") return;
     handleClearSelection();
@@ -264,7 +272,10 @@ DataTableProps<T>) {
                     </TableCell>
                   )}
                   {columns?.map((col, j) => (
-                    <TableCell className={`${col?.activeColor ? "text-body" : "text-body-passive"}`} key={j}>
+                    <TableCell
+                      className={`${col?.activeColor ? "text-body" : "text-body-passive"}`}
+                      key={j}
+                    >
                       {(() => {
                         if (!col.key) return "nil";
                         if (col.render) return col.render(row);
@@ -335,12 +346,19 @@ DataTableProps<T>) {
           </div>
 
           {onPublish && (
-            <div className="bg-storey-foreground rounded-lg shadow-input flex items-center group h-11">
+            <div
+              onClick={handlePublish}
+              className="bg-storey-foreground rounded-lg shadow-input flex items-center group h-11"
+            >
               <div
-                onClick={handleClearSelection}
+                // onClick={handleClearSelection}
                 className="flex items-center justify-center pl-md py-3 cursor-pointer"
               >
-                <CloudUpload className="w-5 h-5 text-outline" />
+                {publishingMultiple ? (
+                  <Spinner className="w-5 h-5" />
+                ) : (
+                  <CloudUpload className="w-5 h-5 text-outline" />
+                )}
               </div>
               <span className="text-body pr-md pl-3 py-sm cursor-pointer">
                 Publish
@@ -356,7 +374,7 @@ DataTableProps<T>) {
               aria-label="Delete selected"
             >
               {deletingMultiple ? (
-                <Spinner color="red" />
+                <Spinner color="red" className="w-5 h-5" />
               ) : (
                 <Trash2 className="w-5 h-5 text-outline group-hover:text-red-500 group-hover:scale-105" />
               )}

@@ -4,13 +4,11 @@ import { api, CustomAxiosRequestConfig } from "@/lib/api/axiosInstance"
 
 const LIMIT = 20
 export async function fetchCategories (params: GeneralFetchingParams): Promise<PaginatedResponse<ParentCategoryItem>> {
-  const {search, parentId, includeChildren, isActive, sortOrder, page, limit=LIMIT} = params
+  const {search, status, sortOrder, page, limit=LIMIT} = params
   const filterParams = new URLSearchParams({})
   if(search) filterParams.append('search', search)
-  if(parentId) filterParams.append('parentId', parentId)
-  if(isActive) filterParams.append('isActive', String(isActive))
+  if(status) filterParams.append('status', status)
   if(sortOrder) filterParams.append('sortOrder', String(sortOrder))
-  if(includeChildren) filterParams.append('includeChildren', String(includeChildren))
   if(page) filterParams.append('page', page.toString())
   if(limit) filterParams.append('limit', limit.toString())
 
@@ -19,13 +17,11 @@ export async function fetchCategories (params: GeneralFetchingParams): Promise<P
 }
 
 export async function fetchCategoriesTree (params: GeneralFetchingParams): Promise<PaginatedResponse<CategoryItem>> {
-  const {search, parentId, includeChildren, isActive, includeProductCount, page, limit=LIMIT} = params
+  const {search, status, sortOrder, page, limit=LIMIT} = params
   const filterParams = new URLSearchParams({})
   if(search) filterParams.append('search', search)
-  if(parentId) filterParams.append('parentId', parentId)
-  if(isActive) filterParams.append('isActive', String(isActive))
-  if(includeProductCount) filterParams.append('includeProductCount', String(includeProductCount))
-  if(includeChildren) filterParams.append('includeChildren', String(includeChildren))
+  if(status) filterParams.append('status', status)
+  if(sortOrder) filterParams.append('sortOrder', String(sortOrder))
   if(page) filterParams.append('page', page.toString())
   if(limit) filterParams.append('limit', limit.toString())
 
@@ -34,13 +30,11 @@ export async function fetchCategoriesTree (params: GeneralFetchingParams): Promi
 }
 
 export async function fetchSubcategories (params: GeneralFetchingParams): Promise<PaginatedResponse<CategoryItem>> {
-  const {search, parentId, includeChildren, isActive, includeProductCount, page, limit=LIMIT} = params
+  const {search, status, sortOrder, page, limit=LIMIT} = params
   const filterParams = new URLSearchParams({})
   if(search) filterParams.append('search', search)
-  if(parentId) filterParams.append('parentId', parentId)
-  if(isActive) filterParams.append('isActive', String(isActive))
-  if(includeProductCount) filterParams.append('includeProductCount', String(includeProductCount))
-  if(includeChildren) filterParams.append('includeChildren', String(includeChildren))
+  if(status) filterParams.append('status', status)
+  if(sortOrder) filterParams.append('sortOrder', String(sortOrder))
   if(page) filterParams.append('page', page.toString())
   if(limit) filterParams.append('limit', limit.toString())
 

@@ -20,11 +20,14 @@ import {
 } from "lucide-react";
 import { DialogFormProps } from "@/interfaces/general";
 import { UserItem } from "@/features/users/types";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Select } from "@/components/general/Select";
 import FieldIcon from "@/components/general/FieldIcon";
 import { userRoles } from "@/lib/rbac/roles";
 import { isValidPhoneNumber } from "libphonenumber-js";
+import { Button } from "@/components/ui/button";
+import CopyLinkBox from "@/components/general/CopyLinkBox";
+import Image from "next/image";
 
 const createUserSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -41,6 +44,8 @@ export function UserForm({
   handleSubmitForm,
   user,
 }: DialogFormProps & { user?: UserItem }) {
+  const [linkGenerated, setLinkGenerated] = useState<boolean>(false);
+  const [link, setLink] = useState<string>("");
   type UserData = z.infer<typeof createUserSchema>;
   const form = useForm<UserData>({
     resolver: zodResolver(createUserSchema),
@@ -62,10 +67,13 @@ export function UserForm({
     setValue,
   } = form;
 
+  const handleLinkRequest = () => {
+    setLink("https://google.com")
+    setLinkGenerated(true)
+  }
+
   const onSubmit = async (values: z.infer<typeof createUserSchema>) => {
     if (!handleSubmitForm) return;
-    console.log({ user });
-    console.log({ values });
 
     if (user?.id) {
       // Build partial payload using dirty fields
@@ -78,6 +86,7 @@ export function UserForm({
       }
       const payload = Object.keys(changes).length ? changes : values;
       await handleSubmitForm({ payload, id: user?.id });
+      setLinkGenerated(false)
       return;
     }
     await handleSubmitForm(values);
@@ -233,6 +242,50 @@ export function UserForm({
               </div>
             )}
           />
+
+          {user && (
+            <>
+              {linkGenerated && link ? (
+                <CopyLinkBox
+                  onShare={() => {
+                    console.log("share");
+                  }}
+                  link={link}
+                  shareBtnIcon={
+                    <Image
+                      src={"/dashboard/whatsApp.svg"}
+                      width={16}
+                      height={16}
+                      alt="Naira"
+                    />
+                  }
+                />
+              ) : (
+                <div className="py-sm gap-main flex flex-col">
+                  <div className={`flex flex-col gap-5 ${`py-sm`}`}>
+                    <h4 className="leading-[1.2] tracking-[0.01]">
+                      Reset user credentials
+                    </h4>
+                    <p className="text-body-passive text-[15px] font-medium leading-normal tracking-[0.03]">
+                      {"Click the button to generate a link to"}
+                    </p>
+                  </div>
+                  <Button
+                    type={"button"}
+                    size={"neutral"}
+                    variant="input"
+                    onClick={handleLinkRequest}
+                    className="shadow-input! font-semibold w-fit"
+                  >
+                    {/* <span className="px-2">{shareBtnIcon && shareBtnIcon}</span> */}
+                    <span className="px-2 py-4 text-[#FF803F]">
+                      Generate login link
+                    </span>
+                  </Button>
+                </div>
+              )}
+            </>
+          )}
         </FieldGroup>
       </FieldSet>
     </form>
