@@ -36,6 +36,7 @@ export function ResetPasswordForm() {
   const dispatch = useDispatch();
   const params = useSearchParams();
   const otp = params.get("otp");
+  const token = params.get("token");
 
   const form = useForm<z.infer<typeof useResetPasswordSchema>>({
     resolver: zodResolver(useResetPasswordSchema),
@@ -56,7 +57,7 @@ export function ResetPasswordForm() {
 
   const onSubmit = async (values: z.infer<typeof useResetPasswordSchema>) => {
     const response = await resetPassword({
-      token: otp ?? "",
+      token: otp ?? token ?? "",
       password: values.password,
     });
     dispatch(

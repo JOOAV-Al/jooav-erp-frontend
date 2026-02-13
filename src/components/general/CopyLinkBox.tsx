@@ -24,17 +24,17 @@ const CopyLinkBox = ({ link, onShare, shareBtnIcon }: CopyLinkBoxProps) => {
           COPY LOGIN LINK
         </h6>
         <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-[8px]">
+          <div className="flex items-center gap-[8px] min-w-0">
             <div className="p-3 w-5.5 h-5.5">
               <Link2 strokeWidth={2} className="text-brand-primary w-5 h-5" />
             </div>
-            <p className="truncate text-clip text-brand-primary text-sm mt-[3px]">
+            <p className="flex-1 min-w-0 truncate overflow-hidden whitespace-nowrap text-clip text-brand-primary text-sm mt-[3px]">
               {link}
             </p>
           </div>
           <div
             onClick={() => handleCopy(link ?? "")}
-            className="p-3 w-6.5 h-6.5 bg-tag-added rounded-main table-selected flex justify-center items-center cursor-pointer"
+            className="shrink-0 p-3 w-6.5 h-6.5 bg-tag-added rounded-main table-selected flex justify-center items-center cursor-pointer"
           >
             {showCopied ? (
               <CheckCheck
@@ -60,7 +60,7 @@ const CopyLinkBox = ({ link, onShare, shareBtnIcon }: CopyLinkBoxProps) => {
           className="shadow-input! font-semibold"
         >
           <span className="px-2">{shareBtnIcon && shareBtnIcon}</span>
-          <span className="px-2 py-4">Share link</span>
+          <span className="px-2 py-4 text-[15px]">Share link</span>
         </Button>
       )}
     </div>

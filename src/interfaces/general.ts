@@ -51,10 +51,13 @@ export interface PaginatedObjectResponse<T> {
     hasNextPage: boolean;
     hasPreviousPage: boolean;
   }
-  // result: T;
-  // count: number;
-  // next: boolean;
-  // prev: boolean;
+}
+
+export interface MutationResponse<T> {
+  message: string;
+  status: string;
+  success: boolean;
+  data: T;
 }
 
 export interface Tab {
@@ -64,6 +67,7 @@ export interface Tab {
   content: React.ReactNode;
   actionDropdown?: React.ReactNode;
   statusTag?: React.ReactNode;
+  loading?: boolean
 }
 export interface DrawerTabsProps {
   tabs: Tab[];

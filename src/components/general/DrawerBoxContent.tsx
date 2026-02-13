@@ -1,3 +1,4 @@
+import Spinner from "@/components/general/Spinner";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import React from "react";
 
@@ -7,6 +8,7 @@ export interface DrawerBoxContentProps {
   content: React.ReactNode;
   actionDropdown?: React.ReactNode;
   statusTag?: React.ReactNode;
+  loading?: boolean;
 }
 const DrawerBoxContent = ({
   heading,
@@ -14,6 +16,7 @@ const DrawerBoxContent = ({
   content,
   actionDropdown,
   statusTag,
+  loading,
 }: DrawerBoxContentProps) => {
   return (
     <div className="flex flex-col flex-1 min-h-0 mt-0">
@@ -24,7 +27,12 @@ const DrawerBoxContent = ({
             <h4 className="leading-[1.2] tracking-[0.01]">{heading ?? ""}</h4>
             {statusTag && <div>{statusTag}</div>}
           </div>
-          {description && <p className="text-body-passive text-[15px] font-medium leading-normal tracking-[0.03]">{description}</p>}
+          {description && (
+            <p className="text-body-passive text-[15px] font-medium leading-normal tracking-[0.03]">
+              {description}
+            </p>
+          )}
+          {loading && <Spinner className="w-4 h-4" />}
         </div>
         {actionDropdown && <div>{actionDropdown}</div>}
       </div>

@@ -8,6 +8,7 @@ import {
   useGetUsers,
   useGetUsersStats,
   useUpdateUser,
+  useRegenerateResetToken,
 } from "@/features/users/services/users.api";
 import React, { useState } from "react";
 import DataTable from "@/components/general/DataTable";
@@ -30,7 +31,7 @@ const UserPage = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [query, setQuery] = useState<string>("");
   const [role, setRole] = useState<string>("");
-  const [loginLink, setLoginLink] = useState<string>("");
+  const [resetLink, setResetLink] = useState<string>("");
   const [showLink, setShowLink] = useState<boolean>(false);
   const debouncedQuery = useDebounce(query);
 
@@ -66,7 +67,7 @@ const UserPage = () => {
     } else {
       const res = await createUser(values);
       console.log(res);
-      // setLoginLink(res?.data?.)
+      setResetLink(res?.data?.data?.resetUrl)
       setShowLink(true);
     }
     // show link on success
@@ -169,7 +170,7 @@ const UserPage = () => {
                       onShare={() => {
                         console.log("share");
                       }}
-                      link="https://google.com"
+                      link={resetLink}
                       shareBtnIcon={
                         <Image
                           src={"/dashboard/whatsApp.svg"}

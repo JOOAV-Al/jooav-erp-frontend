@@ -28,6 +28,7 @@ import { isValidPhoneNumber } from "libphonenumber-js";
 import { Button } from "@/components/ui/button";
 import CopyLinkBox from "@/components/general/CopyLinkBox";
 import Image from "next/image";
+import { useRegenerateResetToken } from "@/features/users/services/users.api";
 
 const createUserSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -46,6 +47,9 @@ export function UserForm({
 }: DialogFormProps & { user?: UserItem }) {
   const [linkGenerated, setLinkGenerated] = useState<boolean>(false);
   const [link, setLink] = useState<string>("");
+
+  const { mutateAsync: resetToken, isPending: resetting } = useRegenerateResetToken();
+
   type UserData = z.infer<typeof createUserSchema>;
   const form = useForm<UserData>({
     resolver: zodResolver(createUserSchema),
@@ -67,11 +71,14 @@ export function UserForm({
     setValue,
   } = form;
 
-  const handleLinkRequest = () => {
-    setLink("https://google.com")
-    setLinkGenerated(true)
-  }
+  const handleLinkRequest = async () => {
+    const response = await resetToken({id: user?.id ?? ""})
+    console.log(response)
+    setLink(response?.data?.data?.resetUrl);
+    setLinkGenerated(true);
+  };
 
+  console.log({link, linkGenerated})
   const onSubmit = async (values: z.infer<typeof createUserSchema>) => {
     if (!handleSubmitForm) return;
 
@@ -86,7 +93,7 @@ export function UserForm({
       }
       const payload = Object.keys(changes).length ? changes : values;
       await handleSubmitForm({ payload, id: user?.id });
-      setLinkGenerated(false)
+      setLinkGenerated(false);
       return;
     }
     await handleSubmitForm(values);
@@ -278,7 +285,7 @@ export function UserForm({
                     className="shadow-input! font-semibold w-fit"
                   >
                     {/* <span className="px-2">{shareBtnIcon && shareBtnIcon}</span> */}
-                    <span className="px-2 py-4 text-[#FF803F]">
+                    <span className="px-2 py-4 text-[#FF803F] text-[15px]">
                       Generate login link
                     </span>
                   </Button>

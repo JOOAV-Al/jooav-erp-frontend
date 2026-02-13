@@ -1,6 +1,6 @@
 import { fetchDeletedUsers, fetchUserDetails, fetchUsers, fetchUsersStats, fetchUsersByManufacturer } from "@/features/users/services/queryFunctions";
 import { UserItem, CreateUserPayload } from "@/features/users/types";
-import { GeneralFetchingParams } from "@/interfaces/general";
+import { GeneralFetchingParams, MutationResponse } from "@/interfaces/general";
 import { api } from "@/lib/api/axiosInstance";
 import { useInvalidatingMutation } from "@/lib/api/useInvalidatingMutations";
 import { useQuery } from "@tanstack/react-query";
@@ -43,7 +43,7 @@ export const useGetUserDetails = ({id}: {id: string}) => {
 export const useCreateUser = () => {
   return useInvalidatingMutation({
     mutationFn: (payload: CreateUserPayload) =>
-      api.post<UserItem>("/users", payload,), 
+      api.post<MutationResponse<UserItem>>("/users", payload,), 
     invalidateQueries: [["all-users"], ["users-stats"]]
   });
 };
@@ -51,7 +51,7 @@ export const useCreateUser = () => {
 export const useUpdateUser = () => {
   return useInvalidatingMutation({
     mutationFn: ({payload, id}: {payload: CreateUserPayload, id: string}) =>
-      api.patch<UserItem>(`/users/${id}`, payload), 
+      api.patch<MutationResponse<UserItem>>(`/users/${id}`, payload), 
     invalidateQueries: [["all-users"], ["user-details"]]
   });
 };
@@ -61,6 +61,14 @@ export const useDeleteUser = () => {
     mutationFn: ({id}: {id: string}) =>
       api.delete(`/users/${id}`), 
     invalidateQueries: [["all-users"], ["user-details"], ["users-stats"]]
+  });
+};
+
+export const useRegenerateResetToken = () => {
+  return useInvalidatingMutation({
+    mutationFn: ({id}: {id: string}) =>
+      api.post<MutationResponse<UserItem>>(`/users/${id}/regenerate-reset-token`), 
+    // invalidateQueries: [["all-users"], ["user-details"], ["users-stats"]]
   });
 };
 

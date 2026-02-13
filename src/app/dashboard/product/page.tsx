@@ -90,13 +90,23 @@ const ProductPage = () => {
     const idsToPublish = selectedProducts.map((product) => product?.id);
     const payload = {
       productIds: idsToPublish,
-      status: "LIVE"
+      status: "LIVE",
     };
-    await publishMultipleProducts({payload});
+    await publishMultipleProducts({ payload });
   };
 
   const handleDelete = async () => {
     await deleteProduct({ id: selectedProduct?.id ?? "" });
+    setOpen(false);
+    setSelectedProduct(undefined);
+  };
+
+  const handleStatusChange = async (status: string = "QUEUE") => {
+    const payload = {
+      productIds: [selectedProduct?.id ?? ""],
+      status,
+    };
+    await publishMultipleProducts({ payload });
     setOpen(false);
     setSelectedProduct(undefined);
   };
@@ -154,7 +164,23 @@ const ProductPage = () => {
         />
       ),
       ...(selectedProduct
-        ? { actionDropdown: <FormDropdown deleteAction={handleDelete} /> }
+        ? {
+            actionDropdown: (
+              <FormDropdown
+                deleteAction={handleDelete}
+                publish={
+                  selectedProduct?.status !== "LIVE"
+                    ? () => handleStatusChange("LIVE")
+                    : undefined
+                }
+                unpublish={
+                  selectedProduct?.status !== "QUEUE"
+                    ? () => handleStatusChange("QUEUE")
+                    : undefined
+                }
+              />
+            ),
+          }
         : {}),
       statusTag: (
         <TableTag
@@ -162,6 +188,7 @@ const ProductPage = () => {
           text={getTagStyles(selectedProduct?.status)?.text}
         />
       ),
+      loading: publishingMultiple || deleting,
     },
     {
       value: "bulk",

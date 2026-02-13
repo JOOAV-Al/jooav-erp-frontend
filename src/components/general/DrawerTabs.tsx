@@ -37,6 +37,7 @@
 
 // export default DrawerTabs;
 
+import Spinner from "@/components/general/Spinner";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DrawerTabsProps } from "@/interfaces/general";
@@ -71,6 +72,7 @@ const DrawerTabs = ({ tabs }: DrawerTabsProps) => {
                 {tab?.heading ?? ""}
               </h4>
               {tab?.statusTag && <div>{tab?.statusTag}</div>}
+              {tab?.loading && <Spinner className="w-4 h-4" />}
             </div>
             {tab?.actionDropdown && <div>{tab?.actionDropdown}</div>}
           </div>

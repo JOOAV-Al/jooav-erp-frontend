@@ -30,6 +30,8 @@ export interface UserItem {
     state: string;
     country: string | null;
   }
+  resetUrl: string;
+  resetTokenExpiry: string;
   createdAt: string;
   updatedAt: string;
   createdBy: string;

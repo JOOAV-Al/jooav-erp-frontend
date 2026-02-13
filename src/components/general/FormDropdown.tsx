@@ -46,7 +46,7 @@ function FormDropdown({
         )}
         {deleteAction && (
           <DropdownMenuItem
-            className="text-destructive!"
+            className="text-destructive! hover:text-destructive!"
             onClick={() => deleteAction?.()}
           >
             Delete
