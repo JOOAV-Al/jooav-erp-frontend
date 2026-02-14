@@ -71,7 +71,7 @@ export const useDeleteBrand = () => {
 export const useDeleteMultipleBrands = () => {
   return useInvalidatingMutation({
     mutationFn: ({brandIds}: {brandIds: string[]}) =>
-      api.post(`/brands/bulk-delete`, {brandIds}), 
+      api.post(`/brands/bulk/delete`, {brandIds}), 
     invalidateQueries: [["all-brands"], ["brand-details"], ["brands-stats"]]
   });
 };

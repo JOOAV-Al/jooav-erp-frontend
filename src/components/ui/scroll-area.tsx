@@ -9,9 +9,11 @@ function ScrollArea({
   className,
   children,
   isSidebar,
+  orientation="vertical",
   ...props
 }: React.ComponentProps<typeof ScrollAreaPrimitive.Root> & {
   isSidebar?: boolean;
+  orientation?: "vertical" | "horizontal";
 }) {
   return (
     <ScrollAreaPrimitive.Root
@@ -25,7 +27,7 @@ function ScrollArea({
       >
         {children}
       </ScrollAreaPrimitive.Viewport>
-      <ScrollBar isSidebar={isSidebar} />
+      <ScrollBar isSidebar={isSidebar} orientation={orientation} />
       <ScrollAreaPrimitive.Corner />
     </ScrollAreaPrimitive.Root>
   );
@@ -48,8 +50,8 @@ function ScrollBar({
         orientation === "vertical" &&
           `h-full ${isSidebar ? "w-0" : "w-2.5"} border-l border-l-transparent`,
         orientation === "horizontal" &&
-          "h-2.5 flex-col border-t border-t-transparent",
-        className
+          `${isSidebar ? "h-0" : "h-2.5"} flex-col border-t border-t-transparent`,
+        className,
       )}
       {...props}
     >

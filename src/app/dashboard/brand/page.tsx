@@ -24,6 +24,7 @@ import Image from "next/image";
 import FormDropdown from "@/components/general/FormDropdown";
 import StatsSkeleton from "@/components/general/StatsSkeleton";
 import { ImageIcon } from "lucide-react";
+import { useGetManufacturers } from "@/features/manufacturers/services/manufacturers.api";
 const BrandPage = () => {
   const [page, setPage] = useState<number>(1);
   const [open, setOpen] = useState<boolean>(false);
@@ -53,6 +54,7 @@ const BrandPage = () => {
     refetch,
   } = useGetBrands({ search: debouncedQuery, sortOrder });
   const brands = data?.data;
+  const { data: manufacturers } = useGetManufacturers({});
 
   const handleCreate = async (values: any) => {
     console.log({ finalValues: values });
@@ -93,6 +95,7 @@ const BrandPage = () => {
       content: (
         <BrandForm
           brand={selectedBrand}
+          manufacturers={manufacturers?.data}
           handleSubmitForm={handleCreate}
           loading={creating || updating}
           closeDialog={() => setOpen(false)}

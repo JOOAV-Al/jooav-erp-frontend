@@ -25,6 +25,8 @@ import FormDropdown from "@/components/general/FormDropdown";
 import StatsSkeleton from "@/components/general/StatsSkeleton";
 import TableTag from "@/components/general/TableTag";
 import { CloudUpload, SquareStack } from "lucide-react";
+import { useGetBrands } from "@/features/brands/services/brands.api";
+import { useGetCategories } from "@/features/categories/services/category.api";
 
 const ProductPage = () => {
   const [submitAction, setSubmitAction] = useState<"primary" | "secondary">(
@@ -67,6 +69,8 @@ const ProductPage = () => {
     refetch,
   } = useGetProducts({ search: debouncedQuery, status: statusFilter });
   const products = data?.data;
+  const { data: brands } = useGetBrands({});
+  const { data: categories } = useGetCategories({});
 
   const handleCreate = async (values: any) => {
     console.log(values);
@@ -124,19 +128,18 @@ const ProductPage = () => {
     { value: stats?.archived ? `${stats?.archived}` : "0", label: "Archived" },
   ];
   const getTagStyles = (value: string = "DRAFT") => {
-    if (value === "QUEUE") {
-      return {
-        styles: `border-border-brand-stroke bg-tag-added text-brand-primary`,
-        text: `Queue`,
-      };
-    }
-    // else if (value === "PROCUREMENT_OFFICER") {
+    // if (value === "QUEUE") {
     //   return {
-    //     styles: `border-border-accent bg-tag-queue text-brand-signal`,
-    //     text: `Procurement`,
+    //     styles: `border-border-brand-stroke bg-tag-added text-brand-primary`,
+    //     text: `Queue`,
     //   };
     // }
-    else if (value === "LIVE") {
+    if (value === "QUEUE") {
+      return {
+        styles: `border-border-accent bg-tag-queue text-brand-signal`,
+        text: `Queue`,
+      };
+    } else if (value === "LIVE") {
       return {
         styles: `border-border-main bg-tag-active text-success-500`,
         text: `Live`,
@@ -161,6 +164,8 @@ const ProductPage = () => {
           loading={creating || updating}
           closeDialog={() => setOpen(false)}
           submitAction={submitAction}
+          brands={brands?.data}
+          categories={categories?.data}
         />
       ),
       ...(selectedProduct

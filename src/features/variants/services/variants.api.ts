@@ -66,7 +66,7 @@ export const useDeleteVariant = () => {
 export const useDeleteMultipleVariants = () => {
   return useInvalidatingMutation({
     mutationFn: ({variantIds}: {variantIds: string[]}) =>
-      api.post(`/variants/bulk-delete`, {variantIds}), 
+      api.post(`/variants/bulk/delete`, {variantIds}), 
     invalidateQueries: [["all-variants"], ["variants-stats"]]
   });
 };

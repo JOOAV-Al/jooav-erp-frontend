@@ -21,10 +21,11 @@ import {
 } from "@/features/variants/types";
 import { useEffect, useState } from "react";
 import { Select } from "@/components/general/Select";
-import { useGetBrands } from "@/features/brands/services/brands.api";
+// import { useGetBrands } from "@/features/brands/services/brands.api";
 import { TagInput } from "@/components/ui/TagInput";
 import FieldIcon from "@/components/general/FieldIcon";
 import FormGroupName from "@/components/general/FormGroupName";
+import { BrandItem } from "@/features/brands/types";
 
 const createVariantSchema = z.object({
   name: z.string().min(1, "Variant name is required"),
@@ -36,8 +37,9 @@ const createVariantSchema = z.object({
 export function VariantForm({
   handleSubmitForm,
   variant,
-}: DialogFormProps & { variant?: VariantItem }) {
-  const { data: brands } = useGetBrands({});
+  brands,
+}: DialogFormProps & { variant?: VariantItem, brands?: BrandItem[] }) {
+  // const { data: brands } = useGetBrands({});
 
   // Track existing pack sizes and types (from backend)
   const [existingPackSizes, setExistingPackSizes] = useState<VariantPackSize[]>(
@@ -46,6 +48,8 @@ export function VariantForm({
   const [existingPackTypes, setExistingPackTypes] = useState<VariantPackType[]>(
     variant?.packTypes ?? [],
   );
+  const [pendingPackSizes, setPendingPackSizes] = useState<string[]>([]);
+  const [pendingPackTypes, setPendingPackTypes] = useState<string[]>([]);
 
   // Track which existing ones to delete
   const [packSizesToDelete, setPackSizesToDelete] = useState<string[]>([]);
@@ -81,6 +85,8 @@ export function VariantForm({
     setExistingPackTypes(variant?.packTypes ?? []);
     setPackSizesToDelete([]);
     setPackTypesToDelete([]);
+    setPendingPackSizes([]);
+    setPendingPackTypes([]);
   }, [variant?.id, reset]);
 
   const handleRemoveExistingSize = (name: string) => {
@@ -101,6 +107,34 @@ export function VariantForm({
         prev.filter((item) => item.id !== itemToRemove.id),
       );
     }
+  };
+
+const handleConfirmSizes = (tags: string[]) => {
+  setPendingPackSizes((prev) => {
+    const merged = [...prev, ...tags.filter((t) => !prev.includes(t))];
+    form.setValue("packSizes", merged); // ✅ uses the same merged array
+    return merged;
+  });
+};
+
+const handleConfirmTypes = (tags: string[]) => {
+  setPendingPackTypes((prev) => {
+    const merged = [...prev, ...tags.filter((t) => !prev.includes(t))];
+    form.setValue("packTypes", merged); // ✅ uses the same merged array
+    return merged;
+  });
+};
+
+  const handleRemovePendingSize = (tag: string) => {
+    const updated = pendingPackSizes.filter((t) => t !== tag);
+    setPendingPackSizes(updated);
+    form.setValue("packSizes", updated);
+  };
+
+  const handleRemovePendingType = (tag: string) => {
+    const updated = pendingPackTypes.filter((t) => t !== tag);
+    setPendingPackTypes(updated);
+    form.setValue("packTypes", updated);
   };
 
   const onSubmit = async (values: VariantData) => {
@@ -164,7 +198,7 @@ export function VariantForm({
       onSubmit={handleSubmit(onSubmit)}
       className="flex flex-col flex-1"
     >
-      <FieldSet className="flex flex-1">
+      <FieldSet className="flex flex-1 flex-col gap-lg pb-6">
         <FieldGroup className="flex flex-col gap-7">
           {/* VARIANT NAME */}
           <Controller
@@ -207,7 +241,7 @@ export function VariantForm({
                   </div>
                   <Select
                     options={
-                      brands?.data?.map((m) => ({
+                      brands?.map((m) => ({
                         label: m.name,
                         value: m.id,
                       })) || []
@@ -242,11 +276,25 @@ export function VariantForm({
                     </div>
                     <TagInput
                       value={value}
-                      onChange={onChange}
+                      // onChange={onChange}
+                      onChange={() => {}}
+                      onConfirm={handleConfirmSizes}
                       placeholder="Add pack size"
                       leftIcon={<FieldIcon Icon={Tag} />}
-                      existingTags={existingPackSizes.map((item) => item.name)}
-                      onRemoveExisting={handleRemoveExistingSize}
+                      // existingTags={existingPackSizes.map((item) => item.name)}
+                      existingTags={[
+                        ...existingPackSizes.map((item) => item.name),
+                        ...pendingPackSizes,
+                      ]}
+                      // onRemoveExisting={handleRemoveExistingSize}
+                      onRemoveExisting={(tag) => {
+                        // Check if it's a pending (new) one or a real existing one
+                        if (pendingPackSizes.includes(tag)) {
+                          handleRemovePendingSize(tag);
+                        } else {
+                          handleRemoveExistingSize(tag);
+                        }
+                      }}
                     />
                   </Field>
                 </div>
@@ -268,11 +316,22 @@ export function VariantForm({
                     </div>
                     <TagInput
                       value={value}
-                      onChange={onChange}
+                      // onChange={onChange}
+                      onChange={() => {}}
+                      onConfirm={handleConfirmTypes}
                       placeholder="Add pack type"
                       leftIcon={<FieldIcon Icon={Tags} />}
-                      existingTags={existingPackTypes.map((item) => item.name)}
-                      onRemoveExisting={handleRemoveExistingType}
+                      existingTags={[
+                        ...existingPackTypes.map((item) => item.name),
+                        ...pendingPackTypes,
+                      ]}
+                      onRemoveExisting={(tag) => {
+                        if (pendingPackTypes.includes(tag)) {
+                          handleRemovePendingType(tag);
+                        } else {
+                          handleRemoveExistingType(tag);
+                        }
+                      }}
                     />
                   </Field>
                 </div>

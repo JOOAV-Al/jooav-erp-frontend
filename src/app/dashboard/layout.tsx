@@ -44,6 +44,10 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       ? "Manage category"
       : pathname.startsWith("/dashboard/product")
       ? "Manage product"
+      : pathname.startsWith("/dashboard/users")
+      ? "Manage user"
+      : pathname.startsWith("/dashboard/roles-and-permissions")
+      ? "Permission categories"
       : "Home";
   };
   return (

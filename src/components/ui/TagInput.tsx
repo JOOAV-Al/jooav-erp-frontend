@@ -5,6 +5,7 @@ import { X } from "lucide-react";
 interface TagInputProps {
   value?: string[];
   onChange?: (tags: string[]) => void;
+  onConfirm?: (confirmedTags: string[]) => void; //
   placeholder?: string;
   leftIcon?: React.ReactNode;
   className?: string;
@@ -17,6 +18,7 @@ const TagInput = React.forwardRef<HTMLDivElement, TagInputProps>(
     {
       value = [],
       onChange,
+      onConfirm,
       placeholder = "Add tag",
       leftIcon,
       className,
@@ -35,9 +37,9 @@ const TagInput = React.forwardRef<HTMLDivElement, TagInputProps>(
     const hasLeftIcon = Boolean(leftIcon);
 
     // Sync internal state with external value
-    React.useEffect(() => {
-      setInternalTags(value);
-    }, [value]);
+    // React.useEffect(() => {
+    //   setInternalTags(value);
+    // }, [value]);
 
     const addTag = (tag: string) => {
       const trimmedTag = tag.trim();
@@ -68,9 +70,27 @@ const TagInput = React.forwardRef<HTMLDivElement, TagInputProps>(
       ) {
         // Remove last tag when backspacing with empty input
         removeTag(internalTags[internalTags.length - 1]);
-      } else if (e.key === "Enter"){
+      } else if (e.key === "Enter") {
         e.preventDefault();
-        console.log("enter")
+        if (inputValue.trim()) {
+          // If there's still text in input, add it as a tag first
+          addTag(inputValue);
+        }
+        if (internalTags.length > 0 || inputValue.trim()) {
+          // Fire confirm with current tags
+          const tagsToConfirm = inputValue.trim()
+            ? [...internalTags, inputValue.trim()].filter(
+                (t, i, arr) => arr.indexOf(t) === i,
+              )
+            : internalTags;
+
+          onConfirm?.(tagsToConfirm);
+
+          // Clear the input box chips
+          setInternalTags([]);
+          onChange?.([]);
+          setInputValue("");
+        }
       }
     };
 
@@ -100,7 +120,7 @@ const TagInput = React.forwardRef<HTMLDivElement, TagInputProps>(
             onClick={handleContainerClick}
             className={cn(
               // Base styles
-              "w-full min-h-12 rounded-md bg-white border border-transparent",
+              "w-full min-h-[48px] rounded-md bg-white border border-transparent",
               "text-base outline-none",
               "shadow-input focus-within:shadow-input focus-visible:shadow-input",
               "transition-[color,box-shadow]",

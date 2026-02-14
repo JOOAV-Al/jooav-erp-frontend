@@ -75,8 +75,16 @@ export const useDeleteCategory = () => {
 export const useDeleteMultipleCategories = () => {
   return useInvalidatingMutation({
     mutationFn: ({categoryIds}: {categoryIds: string[]}) =>
-      api.post(`/categories/bulk-delete`, {categoryIds}), 
-    invalidateQueries: [["all-categories"], ["categories-stats"]]
+      api.post(`/categories/bulk/delete`, {categoryIds}), 
+    invalidateQueries: [["all-categories"], ["categories-stats"], ["all-subcategories"]]
+  });
+};
+
+export const useDeleteMultipleSubCategories = () => {
+  return useInvalidatingMutation({
+    mutationFn: ({subcategoryIds}: {subcategoryIds: string[]}) =>
+      api.post(`/categories/bulk/delete`, {subcategoryIds}), 
+    invalidateQueries: [["all-categories"], ["categories-stats"], ["all-subcategories"]]
   });
 };
 

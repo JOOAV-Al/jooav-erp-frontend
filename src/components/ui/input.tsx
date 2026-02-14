@@ -30,7 +30,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           data-slot="input"
           className={cn(
             // Base styles
-            "w-full min-w-0 h-12 rounded-md bg-white border border-transparent",
+            "w-full min-w-0 h-[48px] rounded-md bg-white border border-transparent",
             "py-md text-base outline-none leading-none",
             "placeholder:text-card-body placeholder:text-body-passive",
             "border border-transparent",

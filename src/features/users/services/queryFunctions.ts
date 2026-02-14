@@ -4,7 +4,7 @@ import { api, CustomAxiosRequestConfig } from "@/lib/api/axiosInstance"
 
 const LIMIT = 20
 export async function fetchUsers (params: GeneralFetchingParams): Promise<PaginatedResponse<UserItem>> {
-  const {search, status, role, page, limit=LIMIT} = params
+  const {search, status, role, page, limit} = params
   const filterParams = new URLSearchParams({})
   if(search) filterParams.append('search', search)
   if(status) filterParams.append('status', status)

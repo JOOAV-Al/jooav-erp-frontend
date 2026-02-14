@@ -6,7 +6,7 @@ import CategoryForm from "@/features/categories/components/CategoryForm";
 import {
   useCreateCategory,
   useDeleteCategory,
-  useDeleteMultipleCategories,
+  useDeleteMultipleSubCategories,
   useGetCategoriesStats,
   useGetSubcategories,
   useUpdateCategory,
@@ -43,7 +43,7 @@ const CategoryPage = () => {
     mutateAsync: deleteMultipleCategories,
     isPending: deletingMultiple,
     status,
-  } = useDeleteMultipleCategories();
+  } = useDeleteMultipleSubCategories();
   const { mutateAsync: deleteCategory, isPending: deleting } =
     useDeleteCategory();
 
@@ -75,7 +75,7 @@ const CategoryPage = () => {
 
   const handleBulkDelete = async (selectedCategories: CategoryItem[]) => {
     const idsToDelete = selectedCategories.map((category) => category?.id);
-    await deleteMultipleCategories({ categoryIds: idsToDelete });
+    await deleteMultipleCategories({ subcategoryIds: idsToDelete });
   };
 
   const handleDelete = async () => {
@@ -192,6 +192,8 @@ const CategoryPage = () => {
             handleBulkDelete(selectedRows);
           }}
           loading={isCategoriesPending || isRefetching}
+          deletingMultiple={deletingMultiple}
+          deletingMultipleStatus={status}
           data={categories ?? []}
           refetch={refetch}
           columns={[

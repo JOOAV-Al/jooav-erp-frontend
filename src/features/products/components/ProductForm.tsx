@@ -21,12 +21,12 @@ import {
   Workflow,
 } from "lucide-react";
 import { DialogFormProps } from "@/interfaces/general";
-import { CreateProductPayload, ProductItem } from "@/features/products/types";
+import { ProductItem } from "@/features/products/types";
 import { useEffect, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { useGetBrands } from "@/features/brands/services/brands.api";
 import { useGetVariants } from "@/features/variants/services/variants.api";
-import { useGetCategories } from "@/features/categories/services/category.api";
+// import { useGetCategories } from "@/features/categories/services/category.api";
 import { Select } from "@/components/general/Select";
 import FormGroupName from "@/components/general/FormGroupName";
 import FieldIcon from "@/components/general/FieldIcon";
@@ -35,6 +35,7 @@ import Image from "next/image";
 import { ImageUploadBox } from "@/components/general/ImageUploadBox";
 import { VariantItem } from "@/features/variants/types";
 import { ParentCategoryItem } from "@/features/categories/types";
+import { BrandItem } from "@/features/brands/types";
 
 const createProductSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -56,7 +57,9 @@ export function ProductForm({
   handleSubmitForm,
   product,
   submitAction = "primary",
-}: DialogFormProps & { product?: ProductItem }) {
+  brands,
+  categories,
+}: DialogFormProps & { product?: ProductItem, brands?: BrandItem[], categories?: ParentCategoryItem[] }) {
   const [selectedVariant, setSelectedVariant] = useState<
     VariantItem | undefined
   >();
@@ -70,8 +73,8 @@ export function ProductForm({
   const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
   const [shouldDeleteThumbnail, setShouldDeleteThumbnail] = useState(false);
 
-  const { data: brands } = useGetBrands({});
-  const { data: categories } = useGetCategories({});
+  // const { data: brands } = useGetBrands({});
+  // const { data: categories } = useGetCategories({});
 
   type ProductData = z.infer<typeof createProductSchema>;
   const form = useForm<ProductData>({
@@ -116,7 +119,7 @@ export function ProductForm({
   const watchedCategory = watch("categoryId");
   useEffect(() => {
     if (!watchedCategory || !categories) return;
-    const category = categories?.data?.find((v) => v.id === watchedCategory);
+    const category = categories?.find((v) => v.id === watchedCategory);
     setSelectedCategory(category);
   }, [watchedCategory, categories]);
 
@@ -290,7 +293,7 @@ export function ProductForm({
                       </div>
                       <Select
                         options={
-                          brands?.data?.map((m) => ({
+                          brands?.map((m) => ({
                             label: m.name,
                             value: m.id,
                           })) || []
@@ -447,7 +450,7 @@ export function ProductForm({
                       </div>
                       <Select
                         options={
-                          categories?.data?.map((m) => ({
+                          categories?.map((m) => ({
                             label: m.name,
                             value: m.id,
                           })) || []

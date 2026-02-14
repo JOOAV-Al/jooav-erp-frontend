@@ -76,7 +76,7 @@ export const useDeleteManufacturer = () => {
 export const useDeleteMultipleManufacturers = () => {
   return useInvalidatingMutation({
     mutationFn: ({manufacturerIds}: {manufacturerIds: string[]}) =>
-      api.post(`/manufacturers/bulk-delete`, {manufacturerIds}), 
+      api.post(`/manufacturers/bulk/delete`, {manufacturerIds}), 
     invalidateQueries: [["all-manufacturers"], ["manufacturers-stats"]]
   });
 };

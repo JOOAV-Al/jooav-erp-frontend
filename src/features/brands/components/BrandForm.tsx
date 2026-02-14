@@ -17,8 +17,9 @@ import { BrandItem } from "@/features/brands/types";
 import { useEffect, useState } from "react";
 import { Select } from "@/components/general/Select";
 import { FileInput } from "@/components/ui/FileInput";
-import { useGetManufacturers } from "@/features/manufacturers/services/manufacturers.api";
+// import { useGetManufacturers } from "@/features/manufacturers/services/manufacturers.api";
 import FieldIcon from "@/components/general/FieldIcon";
+import { ManufacturerItem } from "@/features/manufacturers/types";
 
 const createBrandSchema = z.object({
   logo: z.any().optional(),
@@ -29,10 +30,11 @@ const createBrandSchema = z.object({
 export function BrandForm({
   handleSubmitForm,
   brand,
-}: DialogFormProps & { brand?: BrandItem }) {
+  manufacturers
+}: DialogFormProps & { brand?: BrandItem; manufacturers?: ManufacturerItem[] }) {
   type BrandData = z.infer<typeof createBrandSchema>;
   const [logoFileName, setLogoFileName] = useState<string>("");
-  const { data: manufacturers } = useGetManufacturers({});
+  // const { data: manufacturers } = useGetManufacturers({});
   const form = useForm<BrandData>({
     resolver: zodResolver(createBrandSchema),
     mode: "onChange",
@@ -80,7 +82,7 @@ export function BrandForm({
     });
     // If editing and brand has logo filename, set it
     if (brand?.logo) {
-      setLogoFileName(brand.logo);
+      setLogoFileName(brand?.logo?.split("/")?.[10] ?? "");
     }
   }, [brand?.id, reset]);
 
@@ -167,7 +169,7 @@ export function BrandForm({
                   </div>
                   <Select
                     options={
-                      manufacturers?.data?.map((m) => ({
+                      manufacturers?.map((m) => ({
                         label: m.name,
                         value: m.id,
                       })) || []

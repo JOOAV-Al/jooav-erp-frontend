@@ -179,8 +179,8 @@ DataTableProps<T>) {
     );
   }
   return (
-    <div className="flex flex-col gap-4 relative">
-      <Table>
+    <div className="flex flex-col gap-4 relative table-shadow mb-6 rounded-xl">
+      <Table className="">
         <TableHeader className="bg-[#F7F7F7] gap-8">
           <TableRow>
             {withCheckbox && (
@@ -263,6 +263,7 @@ DataTableProps<T>) {
                   {withCheckbox && (
                     <TableCell className="w-12">
                       <Checkbox
+                        
                         checked={isSelected}
                         onCheckedChange={(checked) =>
                           handleSelectRow(row, !!checked)
@@ -348,7 +349,7 @@ DataTableProps<T>) {
           {onPublish && (
             <div
               onClick={handlePublish}
-              className="bg-storey-foreground rounded-lg shadow-input flex items-center group h-11"
+              className="bg-storey-foreground rounded-lg shadow-input flex items-center group h-[44px]"
             >
               <div
                 // onClick={handleClearSelection}
@@ -370,7 +371,7 @@ DataTableProps<T>) {
           {onDelete && (
             <button
               onClick={handleDelete}
-              className="bg-storey-foreground rounded-lg shadow-input px-main py-md flex items-center gap-5 group cursor-pointer h-11"
+              className="bg-storey-foreground rounded-lg shadow-input px-main py-md flex items-center gap-5 group cursor-pointer h-[44px]"
               aria-label="Delete selected"
             >
               {deletingMultiple ? (

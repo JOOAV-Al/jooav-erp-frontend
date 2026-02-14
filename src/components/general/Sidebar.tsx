@@ -121,7 +121,7 @@ const links = {
     },
     {
       label: "Roles & Permissions",
-      href: "/dashboard/roles",
+      href: "/dashboard/roles-and-permissions",
       icon: UserCog,
     },
   ],
@@ -271,7 +271,7 @@ export default function Sidebar({
               >
                 {!isCollapsed && (
                   <h6 className="font-mono leading-[1.2] text-sm text-body-passive mx-2">
-                    CATALOG CRUD
+                    CATALOG
                   </h6>
                 )}
                 <nav className="flex flex-col gap-4">
@@ -295,7 +295,7 @@ export default function Sidebar({
               >
                 {!isCollapsed && (
                   <h6 className="font-mono leading-[1.2] text-sm text-body-passive mx-2">
-                    USER CRUD
+                    USER
                   </h6>
                 )}
                 <nav className="flex flex-col gap-4">

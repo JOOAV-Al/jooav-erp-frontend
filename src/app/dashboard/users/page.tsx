@@ -160,9 +160,9 @@ const UserPage = () => {
               submitLabel="Save user"
               showFooter={!showLink}
             >
-              {showLink ? (
+
+              {!showLink ? (
                 <DrawerBoxContent
-                  // useScrollable={false}
                   heading={`Share link with user`}
                   description={`Send link to user. They can login to their dashboard using link.`}
                   content={

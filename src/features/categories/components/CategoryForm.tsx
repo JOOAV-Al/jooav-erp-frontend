@@ -21,7 +21,6 @@ import {
 } from "@/features/categories/types";
 import { useEffect, useState } from "react";
 import FieldIcon from "@/components/general/FieldIcon";
-import FormGroupName from "@/components/general/FormGroupName";
 
 const createCategorySchema = z.object({
   name: z.string().min(1, "Category name is required"),
@@ -38,7 +37,9 @@ export function CategoryForm({
   const [existingSubcategories, setExistingSubcategories] = useState<
     CategoryItem[]
   >(category?.subcategories ?? []);
-
+  const [pendingSubcategories, setPendingSubcategories] = useState<string[]>(
+    [],
+  );
   const [subcategoriesToDelete, setSubcategoriesToDelete] = useState<string[]>(
     [],
   );
@@ -65,9 +66,10 @@ export function CategoryForm({
     });
     setExistingSubcategories(category?.subcategories ?? []);
     setSubcategoriesToDelete([]);
+    setPendingSubcategories([]);
   }, [category?.id, reset]);
 
-  const handleRemoveExistingCategory = (name: string) => {
+  const handleRemoveExistingSubcategory = (name: string) => {
     const itemToRemove = existingSubcategories.find(
       (item) => item.name === name,
     );
@@ -78,6 +80,21 @@ export function CategoryForm({
       );
     }
   };
+
+  const handleConfirmCategories = (tags: string[]) => {
+    setPendingSubcategories((prev) => {
+      const merged = [...prev, ...tags.filter((t) => !prev.includes(t))];
+      form.setValue("subcategories", merged); // ✅ uses the same merged array
+      return merged;
+    });
+  };
+
+  const handleRemovePendingSubcategory = (tag: string) => {
+    const updated = pendingSubcategories.filter((t) => t !== tag);
+    setPendingSubcategories(updated);
+    form.setValue("subcategories", updated);
+  };
+
   const onSubmit = async (values: CategoryData) => {
     if (!handleSubmitForm) return;
     const newSubcategoryNames = values.subcategories ?? [];
@@ -166,13 +183,26 @@ export function CategoryForm({
                   </div>
                   <TagInput
                     value={value}
-                    onChange={onChange}
+                    // onChange={onChange}
+                    onChange={() => {}}
+                    onConfirm={handleConfirmCategories}
                     placeholder="Add sub-category"
                     leftIcon={<FieldIcon Icon={Folders} />}
-                    existingTags={existingSubcategories.map(
-                      (item) => item.name,
-                    )}
-                    onRemoveExisting={handleRemoveExistingCategory}
+                    // existingTags={existingSubcategories.map(
+                    //   (item) => item.name,
+                    // )}
+                    existingTags={[
+                      ...existingSubcategories.map((item) => item.name),
+                      ...pendingSubcategories,
+                    ]}
+                    // onRemoveExisting={handleRemoveExistingSubcategory}
+                    onRemoveExisting={(tag) => {
+                      if (pendingSubcategories.includes(tag)) {
+                        handleRemovePendingSubcategory(tag);
+                      } else {
+                        handleRemoveExistingSubcategory(tag);
+                      }
+                    }}
                   />
                 </Field>
               </div>

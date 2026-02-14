@@ -24,6 +24,7 @@ import FormDropdown from "@/components/general/FormDropdown";
 import StatsSkeleton from "@/components/general/StatsSkeleton";
 import Image from "next/image";
 import { ImageIcon } from "lucide-react";
+import { useGetBrands } from "@/features/brands/services/brands.api";
 
 const VariantPage = () => {
   const [page, setPage] = useState<number>(1);
@@ -58,6 +59,7 @@ const VariantPage = () => {
     refetch,
   } = useGetVariants({ search: debouncedQuery, sortOrder });
   const variants = data?.data;
+  const { data: brands } = useGetBrands({});
 
   const handleCreate = async (values: any) => {
     if (selectedVariant) {
@@ -98,6 +100,7 @@ const VariantPage = () => {
       content: (
         <VariantForm
           variant={selectedVariant}
+          brands={brands?.data}
           handleSubmitForm={handleCreate}
           loading={creating || updating}
           closeDialog={() => setOpen(false)}

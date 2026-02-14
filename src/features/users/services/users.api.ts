@@ -75,7 +75,7 @@ export const useRegenerateResetToken = () => {
 export const useDeleteMultipleUsers = () => {
   return useInvalidatingMutation({
     mutationFn: ({userIds}: {userIds: string[]}) =>
-      api.post(`/users/bulk-delete`, {userIds}), 
+      api.post(`/users/bulk/delete`, {userIds}), 
     invalidateQueries: [["all-users"], ["user-details"], ["users-stats"]]
   });
 };

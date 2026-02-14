@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { truncateText } from "@/lib/utils";
 import { CheckCheck, Copy, Link2 } from "lucide-react";
 import React, { useState } from "react";
 
@@ -18,18 +19,20 @@ const CopyLinkBox = ({ link, onShare, shareBtnIcon }: CopyLinkBoxProps) => {
       }, 1000);
     };
   return (
-    <div className="bg-white rounded-xl p-sm flex flex-col gap-6 shadow-input mt-2">
-      <div className="bg-storey-foreground rounded-lg p-md flex flex-col gap-4 shadow-input">
+    <div className="w-full bg-white rounded-xl p-sm flex flex-col gap-6 shadow-input mt-2">
+      <div className="w-full bg-storey-foreground rounded-lg p-md flex flex-col gap-4 shadow-input">
         <h6 className="font-mono text-heading font-normal tracking-[0.08] leading-[1.2] text-xs pt-3 pb-sm">
           COPY LOGIN LINK
         </h6>
         <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-[8px] min-w-0">
-            <div className="p-3 w-5.5 h-5.5">
+          <div className="flex items-center gap-[8px] min-w-0 w-full">
+            <div className="p-3 w-5.5 h-5.5 flex-shrink-0">
               <Link2 strokeWidth={2} className="text-brand-primary w-5 h-5" />
             </div>
-            <p className="flex-1 min-w-0 truncate overflow-hidden whitespace-nowrap text-clip text-brand-primary text-sm mt-[3px]">
-              {link}
+            <p className="flex-1 min-w-0 truncate overflow-hidden whitespace-nowrap text-brand-primary text-sm mt-[3px]">
+              {
+                truncateText(link ?? "", 45)
+              }
             </p>
           </div>
           <div

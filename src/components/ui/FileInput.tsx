@@ -64,7 +64,7 @@ const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
           onClick={handleClick}
           className={cn(
             // Base styles
-            "w-full min-w-0 h-12 rounded-lg bg-white border border-transparent",
+            "w-full min-w-0 h-[48px] rounded-lg bg-white border border-transparent",
             "py-md text-base outline-none leading-20",
             "shadow-input focus-within:shadow-input",
             "transition-[color,box-shadow]",

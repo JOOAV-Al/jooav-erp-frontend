@@ -50,7 +50,7 @@ const DashboardDrawer = ({
   isCustomWidth = false,
   secondarySubmitLabel,
   secondarySubmitLoading = false,
-  submitAction,
+  submitAction="primary",
   onSubmitActionChange,
   primaryBtnIcon,
   secondaryBtnIcon,
@@ -59,7 +59,7 @@ const DashboardDrawer = ({
     <RightDrawer open={isOpen} onOpenChange={openDrawer}>
       {showTrigger && (
         <RightDrawerTrigger asChild>
-          <Button size={"neutral"} className="mr-2">
+          <Button size={"neutral"} className="">
             <span className="h-4 w-5 flex justify-center">
               <Plus size={16} />
             </span>

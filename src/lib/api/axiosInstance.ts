@@ -232,28 +232,44 @@ axiosInstance.interceptors.response.use(
       case 403:
         // Forbidden - user doesn't have permission
         if (!originalRequest.noToast) {
-          toast.error("You don't have permission to perform this action");
+          toast.error("Failed", {
+            style: { backgroundColor: '#F43F5E', borderRadius: "12px" },
+            description: "You don't have permission to perform this action",
+            className: "force-white-toast",
+          })
         }
         break;
 
       case 404:
         // Not found
         if (!originalRequest.noToast && isMutation) {
-          toast.error("The requested resource was not found");
+          toast.error("Failed", {
+            style: { backgroundColor: '#F43F5E', borderRadius: "12px" },
+            description: "The requested resource was not found",
+            className: "force-white-toast",
+          })
         }
         break;
 
       case 422:
         // Validation error
         if (!originalRequest.noToast) {
-          toast.error("Please check your input and try again");
+          toast.error("Failed", {
+            style: { backgroundColor: '#F43F5E', borderRadius: "12px" },
+            description: "Please check your input and try again",
+            className: "force-white-toast",
+          })
         }
         break;
 
       case 429:
         // Rate limit
         if (!originalRequest.noToast) {
-          toast.error("Too many requests. Please try again later");
+          toast.error("Failed", {
+            style: { backgroundColor: '#F43F5E', borderRadius: "12px" },
+            description: "Too many requests. Please try again later",
+            className: "force-white-toast",
+          })
         }
         break;
 
@@ -263,7 +279,11 @@ axiosInstance.interceptors.response.use(
       case 504:
         // Server errors
         if (!originalRequest.noToast) {
-          toast.error("Server error. Please try again later");
+          toast.error("Failed", {
+            style: { backgroundColor: '#F43F5E', borderRadius: "12px" },
+            description: "Server error. Please try again later",
+            className: "force-white-toast",
+          })
         }
         break;
     }

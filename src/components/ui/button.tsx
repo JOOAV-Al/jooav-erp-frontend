@@ -27,7 +27,7 @@ const buttonVariants = cva(
       },
       size: {
         default: "h-11 p-main has-[>svg]:px-3 rounded-lg",
-        neutral: "h-9 px-md! py-sm! has-[>svg]:px-3 gap-1 rounded-lg text-[13px]",
+        neutral: "h-[36px] px-md! py-sm! has-[>svg]:px-3 gap-1 rounded-lg text-[13px]",
         filter: "h-7.25 px-sm! py-5! gap-5 rounded-md",
         ghost: "has-[>svg]:px-3 rounded-lg",
         sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",

@@ -26,3 +26,8 @@ export function formatBytesToKB(bytes: number = 0): string {
   const kb = bytes / 1024;
   return `${kb.toFixed(2)} KB`;
 }
+
+export function truncateText(text: string, maxLength: number=30): string {
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength);
+}

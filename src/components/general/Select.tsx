@@ -117,7 +117,7 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
           onClick={() => setIsOpen(!isOpen)}
           className={cn(
             // Base styles
-            `w-full min-w-0 h-12 rounded-md ${isOpen ? "bg-background" : "bg-white"} border border-transparent`,
+            `w-full min-w-0 h-[48px] rounded-md ${isOpen ? "bg-background" : "bg-white"} border border-transparent`,
             "py-md text-base outline-none",
             "shadow-input focus-within:shadow-input",
             "transition-[color,box-shadow]",
