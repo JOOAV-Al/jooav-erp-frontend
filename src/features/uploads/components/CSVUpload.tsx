@@ -5,7 +5,6 @@ import React from "react";
 
 interface CSVUploadProps {
   catalog: string;
-  
   onCTAClick?: () => void;
   onDownload?: () => void;
 }
@@ -26,8 +25,9 @@ const CSVUpload = ({
         />
         <div className="p-sm flex flex-col gap-5 max-w-[340px] text-center">
           <h4 className="text-heading">{`Import ${catalog} CSV`}</h4>
-          <p className="text-body-passive text-sm font-light">
-            CSV import populates all entity field across the {catalog} catalog.{" "} <br />
+          <p className="text-body-passive text-sm font-normal">
+            CSV import populates all entity field across the {catalog} catalog.{" "}
+            <br />
             <span
               onClick={onDownload}
               className="text-primary underline cursor-pointer"
@@ -37,6 +37,21 @@ const CSVUpload = ({
           </p>
         </div>
         <Button
+          type={"button"}
+          variant="neutral"
+          size={"neutral"}
+          onClick={onCTAClick}
+        >
+          <span className="px-2">
+            <UploadCloud
+              className="text-outline"
+              size={17}
+              strokeWidth={2.5}
+            />
+          </span>
+          <span className="px-2 py-4 text-secondary-foreground">{"Import csv"}</span>
+        </Button>
+        {/* <Button
           variant="neutral"
           size={"neutral"}
           type="submit"
@@ -47,7 +62,7 @@ const CSVUpload = ({
             <UploadCloud size={16} className="text-outline" />
           </span>
           {"Import csv"}
-        </Button>
+        </Button> */}
       </div>
     </div>
   );

@@ -18,6 +18,7 @@ export interface CreateProductPayload {
   deleteImages?: string[];
   createImages?: string[];
   deleteThumbnail?: string;
+  file?: File | null
 }
 export interface ProductItem {
   id: string;

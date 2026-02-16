@@ -88,8 +88,8 @@ const VariantPage = () => {
       value: stats?.totalVariants ? `${stats?.totalVariants}` : "0",
       label: "Variants",
     },
-    { value: stats?.active ? `${stats?.active}` : "0", label: "Brands" },
-    { value: stats?.active ? `${stats?.inactive}` : "0", label: "Archived" },
+    { value: stats?.totalBrands ? `${stats?.totalBrands}` : "0", label: "Brands" },
+    { value: stats?.inactiveVariants ? `${stats?.inactiveVariants}` : "0", label: "Archived" },
   ];
 
   const tabs: Tab[] = [

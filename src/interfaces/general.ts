@@ -68,9 +68,24 @@ export interface Tab {
   actionDropdown?: React.ReactNode;
   statusTag?: React.ReactNode;
   loading?: boolean
+  /** 
+   * The `id` of the <form> inside this tab's content.
+   * The drawer footer's submit buttons will use `form={activeFormId}` to
+   * target whichever tab is currently active.
+   *
+   * - Manual tab  → "product-form"  (already on the <form> inside ProductForm)
+   * - Bulk tab    → "bulk-upload-form"  (a hidden <form> added to the tab content)
+   */
+  formId?: string;
 }
 export interface DrawerTabsProps {
   tabs: Tab[];
+  /**
+   * Fires whenever the user switches tabs.
+   * Passes the active tab's `formId` (or undefined if the tab has none).
+   * The parent uses this to update which form the footer buttons target.
+   */
+  onActiveFormIdChange?: (formId: string | undefined) => void;
 }
 
 export interface DialogFormProps {

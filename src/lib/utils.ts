@@ -31,3 +31,17 @@ export function truncateText(text: string, maxLength: number=30): string {
   if (text.length <= maxLength) return text;
   return text.slice(0, maxLength);
 }
+
+export const downloadFileWithBlob = (blobLink: string) => {
+  // Create a temporary anchor element
+  const link = document.createElement("a");
+  // Set the href to the blob URL
+  link.href = blobLink
+  // Set the download attribute with a desired filename
+  link.download = "template.csv"; // Or a more descriptive name
+  // Programmatically click the link to trigger the download
+  document.body.appendChild(link); // Append to body is good practice, though often not strictly necessary for programmatic clicks
+  link.click();
+  document.body.removeChild(link); // Clean up the temporary link
+  console.log("download initiated"); 
+}

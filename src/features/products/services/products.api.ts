@@ -115,3 +115,28 @@ export const useGetProductsStats = () => {
     retry: 2,
   });
 };
+
+export const useBulkUploadProduct = () => {
+  return useInvalidatingMutation({
+    mutationFn: (payload: any) =>
+      api.post<ProductItem>("/products/bulk/upload", payload, {headers: {
+          "Content-Type": "multipart/form-data",
+        } as AxiosRequestHeaders}), 
+    invalidateQueries: [["all-products"], ["products-stats"], ["all-brands"], ["brands-stats"], ["all-categories"], ["categories-stats"], ["all-subcategories"], ["all-variants"], ["variants-stats"], ["all-manufacturers"], ["manufacturers-stats"]],
+  });
+};
+
+export const useGetTemplate = () => {
+  return useQuery({
+    queryKey: ["template-link"],
+    queryFn: async () => {
+      const response = await api.get(
+        "/products/bulk/upload/template",
+        { responseType: "blob", headers: {} as AxiosRequestHeaders }
+      );
+      return response.data;
+    },
+    enabled: false,
+  });
+};
+

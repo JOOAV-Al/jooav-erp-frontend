@@ -76,7 +76,7 @@ export interface VariantOrderItem {
 
 export interface VariantStatsItem {
   totalVariants: number;
-  active: number;
-  inactive: number;
+  totalBrands: number;
+  inactiveVariants: number;
   recentlyAdded: number;
 }

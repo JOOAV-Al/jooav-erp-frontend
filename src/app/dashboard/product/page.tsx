@@ -11,6 +11,8 @@ import {
   useUpdateProduct,
   useGetProductsStats,
   useUpdateMultipleProductStatus,
+  useGetTemplate,
+  useBulkUploadProduct,
 } from "@/features/products/services/products.api";
 import { Tab } from "@/interfaces/general";
 import React, { useState } from "react";
@@ -24,9 +26,13 @@ import StatsContainer from "@/components/general/StatsContainer";
 import FormDropdown from "@/components/general/FormDropdown";
 import StatsSkeleton from "@/components/general/StatsSkeleton";
 import TableTag from "@/components/general/TableTag";
-import { CloudUpload, SquareStack } from "lucide-react";
+import { CloudUpload, FileSpreadsheet, SquareStack, Trash2 } from "lucide-react";
 import { useGetBrands } from "@/features/brands/services/brands.api";
 import { useGetCategories } from "@/features/categories/services/category.api";
+import { useFileObjectUpload } from "@/features/uploads/hooks/useFileObjectUpload";
+
+const MANUAL_FORM_ID = "product-form";
+const BULK_FORM_ID = "bulk-upload-form";
 
 const ProductPage = () => {
   const [submitAction, setSubmitAction] = useState<"primary" | "secondary">(
@@ -42,6 +48,9 @@ const ProductPage = () => {
   const [selectedProducts, setSelectedProducts] = useState<ProductItem[] | []>(
     [],
   );
+  // Tracks which tab is active so the footer targets the right form
+  const [activeFormId, setActiveFormId] = useState<string>(MANUAL_FORM_ID);
+
   const debouncedQuery = useDebounce(query);
 
   const { mutateAsync: updateProduct, isPending: updating } =
@@ -60,6 +69,8 @@ const ProductPage = () => {
   } = useUpdateMultipleProductStatus();
   const { mutateAsync: deleteProduct, isPending: deleting } =
     useDeleteProduct();
+  const { mutateAsync: bulkUpload, isPending: bulkUploading } =
+    useBulkUploadProduct();
 
   const { data: stats, isPending: isStatsPending } = useGetProductsStats();
   const {
@@ -71,9 +82,10 @@ const ProductPage = () => {
   const products = data?.data;
   const { data: brands } = useGetBrands({});
   const { data: categories } = useGetCategories({});
+  const { refetch: fetchTemplate } = useGetTemplate();
 
+  // ── Handlers ─────────────────────────────────────────────────────────────────
   const handleCreate = async (values: any) => {
-    console.log(values);
     if (selectedProduct) {
       await updateProduct(values);
     } else {
@@ -115,6 +127,49 @@ const ProductPage = () => {
     setSelectedProduct(undefined);
   };
 
+  const handleDownloadTemplate = async () => {
+    const { data } = await fetchTemplate();
+    console.log(data);
+
+    if (!data) return;
+
+    const url = window.URL.createObjectURL(data);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "product-template.csv";
+    link.click();
+
+    window.URL.revokeObjectURL(url);
+  };
+
+  const handleBulkUpload = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!files.length) return;
+
+    const formData = new FormData();
+
+    // files.forEach((fileObj) => {
+    //   formData.append("file", fileObj.file);
+    // });
+    if (files?.[0]) {
+      formData.append("file", files?.[0]?.file);
+    }
+
+    await bulkUpload(formData);
+
+    clearFiles();
+    setOpen(false);
+  };
+
+  const {
+    files,
+    inputRef,
+    openFileDialog,
+    handleFileChange,
+    removeFile,
+    clearFiles,
+  } = useFileObjectUpload(true);
+
   const displayStats = [
     {
       value: stats?.totalProducts ? `${stats?.totalProducts}` : "0",
@@ -152,10 +207,13 @@ const ProductPage = () => {
     }
   };
 
+  const isBulkTab = activeFormId === BULK_FORM_ID;
+
   const tabs: Tab[] = [
     {
       value: "manual",
       label: "Manual",
+      formId: MANUAL_FORM_ID,
       heading: `${selectedProduct ? "Edit" : "Enter"} product details`,
       content: (
         <ProductForm
@@ -198,15 +256,82 @@ const ProductPage = () => {
     {
       value: "bulk",
       label: "Bulk Import",
-      // heading: "Upload product details",
+      formId: BULK_FORM_ID,
       content: (
-        <CSVUpload
-          catalog={"product"}
-          onCTAClick={() => setOpen(!open)}
-          onDownload={() => {
-            console.log("download");
-          }}
-        />
+        <>
+          {/*
+            Hidden form — has no visible fields.
+            The footer's submit button fires this via form={BULK_FORM_ID}.
+            onSubmit calls handleBulkUpload which reads `files` from the hook.
+          */}
+          <form id={BULK_FORM_ID} onSubmit={handleBulkUpload} />
+
+          {/* Selected files list */}
+          {files.length > 0 ? (
+            <div className="flex flex-col gap-main">
+              <div className={`flex flex-col gap-5 py-main`}>
+                <h4 className="leading-[1.2] tracking-[0.01]">File Uploaded</h4>
+                <p className="text-body-passive text-[15px] font-medium leading-normal tracking-[0.03]">
+                  The list shows files you selected
+                </p>
+              </div>
+              {files.map((file) => (
+                <div
+                  key={file.id}
+                  className="flex justify-between items-center bg-[#F7F7F7] shadow-input rounded-lg p-md gap-5"
+                >
+                  <div className="flex justify-center items-center h-[24px] w-[24px] p-3">
+                    <FileSpreadsheet
+                      className="text-brand-primary"
+                      strokeWidth={2.5}
+                      width={20}
+                      height={20}
+                    />
+                  </div>
+                  <p className="flex-1 text-[14px] font-medium leading-[1.5] tracking-[0.04] pb-3">
+                    {file?.name}
+                  </p>
+                  <div
+                    onClick={() => removeFile(file.id)}
+                    className="cursor-pointer flex justify-center items-center h-[24px] w-[24px] p-3"
+                  >
+                    <Trash2
+                      className="text-outline-passive"
+                      strokeWidth={2.5}
+                      width={20}
+                      height={20}
+                    />
+                  </div>
+                  {/* <button
+                    type="button"
+                    onClick={() => removeFile(file.id)}
+                    className="text-xs text-red-400 hover:text-red-600"
+                  >
+                    Remove
+                  </button> */}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <>
+              <CSVUpload
+                catalog="product"
+                onCTAClick={openFileDialog} // opens the file picker
+                onDownload={handleDownloadTemplate}
+              />
+
+              {/* Hidden file input wired to the hook */}
+              <input
+                type="file"
+                accept=".csv, .xlsx"
+                multiple
+                ref={inputRef}
+                onChange={handleFileChange}
+                className="hidden"
+              />
+            </>
+          )}
+        </>
       ),
     },
   ];
@@ -247,34 +372,44 @@ const ProductPage = () => {
                 if (isOpen) {
                   setSelectedProduct(undefined);
                   setSubmitAction("primary"); // Reset on open
+                  setActiveFormId(MANUAL_FORM_ID);
                 }
                 setOpen(isOpen);
               }}
               isOpen={open}
-              submitFormId={"product-form"}
-              submitLoading={updating || creating || deleting}
-              submitLabel="Queue"
-              secondarySubmitLabel="Publish"
+              submitFormId={activeFormId}
+              submitLoading={updating || creating || deleting || bulkUploading}
+              submitLabel={isBulkTab ? "Upload CSV" : "Queue"}
+              secondarySubmitLabel={isBulkTab ? undefined : "Publish"}
               secondarySubmitLoading={updating || creating || deleting}
               submitAction={submitAction}
               onSubmitActionChange={setSubmitAction}
               primaryBtnIcon={
-                <SquareStack
-                  className="text-secondary"
-                  size={17}
-                  strokeWidth={2.5}
-                />
+                isBulkTab ? undefined : (
+                  <SquareStack
+                    className="text-secondary"
+                    size={17}
+                    strokeWidth={2.5}
+                  />
+                )
               }
               secondaryBtnIcon={
-                <CloudUpload
-                  className="text-outline"
-                  size={17}
-                  strokeWidth={2.5}
-                />
+                !isBulkTab ? (
+                  <CloudUpload
+                    className="text-outline"
+                    size={17}
+                    strokeWidth={2.5}
+                  />
+                ) : undefined
               }
               showFooter
             >
-              <DrawerTabs tabs={tabs} />
+              <DrawerTabs
+                tabs={tabs}
+                onActiveFormIdChange={(formId) =>
+                  setActiveFormId(formId ?? MANUAL_FORM_ID)
+                }
+              />
             </DashboardDrawer>
           </div>
         </div>
