@@ -11,7 +11,7 @@ import {
   useUpdateManufacturer,
 } from "@/features/manufacturers/services/manufacturers.api";
 import { Tab } from "@/interfaces/general";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import DataTable from "@/components/general/DataTable";
 import { ManufacturerItem } from "@/features/manufacturers/types";
 import FilterContainer from "@/components/filters/FilterContainer";
@@ -40,6 +40,7 @@ const ManufacturerPage = () => {
   const [selectedManufacturers, setSelectedManufacturers] = useState<
     ManufacturerItem[] | []
   >([]);
+    const manufacturerFormResetRef = useRef<(() => void) | null>(null);
 
   const { mutateAsync: updateManufacturer, isPending: updating } =
     useUpdateManufacturer();
@@ -123,17 +124,27 @@ const ManufacturerPage = () => {
           handleSubmitForm={handleCreate}
           loading={updating || creating}
           closeDialog={() => setOpen(false)}
+          onResetReady={(fn) => {
+            manufacturerFormResetRef.current = fn;
+          }}
         />
       ),
       ...(selectedManufacturer
-        ? { actionDropdown: <FormDropdown deleteAction={handleDelete} /> }
+        ? {
+            actionDropdown: (
+              <FormDropdown
+                deleteAction={handleDelete}
+                onReset={() => manufacturerFormResetRef.current?.()}
+              />
+            ),
+          }
         : {}),
     },
     {
       value: "bulk",
       label: "Bulk Import",
       formId: BULK_FORM_ID,
-      content: bulkTabContent
+      content: bulkTabContent,
     },
   ];
 

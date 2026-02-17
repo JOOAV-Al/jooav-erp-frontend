@@ -11,7 +11,7 @@ import {
   FieldSet,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { TagInput } from "@/components/ui/TagInput";
+import { TagInput, TagInputHandle } from "@/components/ui/TagInput";
 import { Folders, FolderTree } from "lucide-react";
 import { DialogFormProps } from "@/interfaces/general";
 import {
@@ -19,7 +19,7 @@ import {
   CreateCategoryPayload,
   ParentCategoryItem,
 } from "@/features/categories/types";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import FieldIcon from "@/components/general/FieldIcon";
 
 const createCategorySchema = z.object({
@@ -31,6 +31,7 @@ export function CategoryForm({
   handleSubmitForm,
   category,
   formId = "category-form",
+  onResetReady,
 }: DialogFormProps & { category?: ParentCategoryItem; formId?: string }) {
   type CategoryData = z.infer<typeof createCategorySchema>;
 
@@ -43,6 +44,7 @@ export function CategoryForm({
   const [subcategoriesToDelete, setSubcategoriesToDelete] = useState<string[]>(
     [],
   );
+  const subcategoriesInputRef = useRef<TagInputHandle>(null);
   const form = useForm<CategoryData>({
     resolver: zodResolver(createCategorySchema),
     mode: "onChange",
@@ -67,6 +69,19 @@ export function CategoryForm({
     setExistingSubcategories(category?.subcategories ?? []);
     setSubcategoriesToDelete([]);
     setPendingSubcategories([]);
+  }, [category?.id, reset]);
+
+  useEffect(() => {
+    onResetReady?.(() => {
+      reset({
+        name: category?.name ?? "",
+        subcategories: [],
+      });
+      setExistingSubcategories(category?.subcategories ?? []);
+      setSubcategoriesToDelete([]);
+      setPendingSubcategories([]);
+      subcategoriesInputRef.current?.clear();
+    });
   }, [category?.id, reset]);
 
   const handleRemoveExistingSubcategory = (name: string) => {
@@ -182,6 +197,7 @@ export function CategoryForm({
                     )}
                   </div>
                   <TagInput
+                    ref={subcategoriesInputRef}
                     value={value}
                     // onChange={onChange}
                     onChange={() => {}}

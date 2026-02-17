@@ -49,6 +49,7 @@ const createUserSchema = z.object({
 export function UserForm({
   handleSubmitForm,
   user,
+  onResetReady,
 }: DialogFormProps & { user?: UserItem }) {
   const [linkGenerated, setLinkGenerated] = useState<boolean>(false);
   const [link, setLink] = useState<string>("");
@@ -98,7 +99,6 @@ export function UserForm({
     });
   };
 
-  console.log({ link, linkGenerated });
   const onSubmit = async (values: z.infer<typeof createUserSchema>) => {
     if (!handleSubmitForm) return;
 
@@ -127,6 +127,18 @@ export function UserForm({
       phone: user?.phone ?? "",
       role: user?.role ?? "",
     });
+  }, [user?.id, reset]);
+
+  useEffect(() => {
+    onResetReady?.(() => {
+      reset({
+        firstName: user?.firstName ?? "",
+        lastName: user?.lastName ?? "",
+        email: user?.email ?? "",
+        phone: user?.phone ?? "",
+        role: user?.role ?? "",
+      });
+    })
   }, [user?.id, reset]);
 
   return (

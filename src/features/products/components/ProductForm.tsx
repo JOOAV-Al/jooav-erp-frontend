@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import { DialogFormProps } from "@/interfaces/general";
 import { ProductItem } from "@/features/products/types";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { useGetVariants } from "@/features/variants/services/variants.api";
 // import { useGetCategories } from "@/features/categories/services/category.api";
@@ -36,7 +36,6 @@ import { VariantItem } from "@/features/variants/types";
 import { ParentCategoryItem } from "@/features/categories/types";
 import { BrandItem } from "@/features/brands/types";
 import { useProductDraft } from "@/features/products/hooks/useProductDraft";
-import { setTimeout } from "timers/promises";
 
 const createProductSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -60,6 +59,7 @@ export function ProductForm({
   submitAction = "primary",
   brands,
   categories,
+  onResetReady,
 }: DialogFormProps & {
   product?: ProductItem;
   brands?: BrandItem[];
@@ -79,7 +79,7 @@ export function ProductForm({
   const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
   const [shouldDeleteThumbnail, setShouldDeleteThumbnail] = useState(false);
   const [showDraftBanner, setShowDraftBanner] = useState(false);
-
+  const bannerTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   type ProductData = z.infer<typeof createProductSchema>;
   const EMPTY_VALUES: ProductData = {
     name: "",
@@ -110,59 +110,81 @@ export function ProductForm({
   } = form;
 
   // ─ Draft system (create mode only) ────────────────────────────────────────
-  const { clearDraft, discardDraft, hasDraft, readDraft } = useProductDraft(
+  const { clearDraft, discardDraft, readDraft } = useProductDraft(
     form,
     isEditMode,
   );
 
-  // Show the "draft restored" banner once on mount if there's a saved draft
-  // useEffect(() => {
-  //   if (!isEditMode && hasDraft()) {
-  //     setShowDraftBanner(true);
-  //   }
-  // }, []);
-
-  //─ Reset when switching between create / edit ──────────────────────────────
+  // ─ Expose a resetForm function to the parent (for FormDropdown) ──────────
   useEffect(() => {
-    if (isEditMode) {
-      reset({
-        name: product?.name ?? "",
-        description: product?.description ?? "",
-        brandId: product?.brandId ?? "",
-        variantId: product?.variantId ?? "",
-        packSizeId: product?.packSizeId ?? "",
-        packTypeId: product?.packTypeId ?? "",
-        sku: product?.sku ?? "",
-        categoryId: product?.subcategory?.category?.id ?? "",
-        subcategoryId: product?.subcategoryId ?? "",
-        price: Number(product?.price) || undefined,
-        images: [],
-      });
-      setExistingImages(product?.images ?? []);
-      setImagesToDelete([]);
-      setShouldDeleteThumbnail(false);
-      setShowDraftBanner(false);
-    } else {
-      // Create mode: check for a draft first, use it if present
-      const draft = readDraft();
-      if (draft) {
+    onResetReady?.(() => {
+      if (isEditMode) {
+        // Edit: reset to current product values, no draft involved
         reset({
-          ...EMPTY_VALUES,
-          ...draft,
-          // Files can't be serialised — always start empty
-          thumbnail: undefined,
-          images: [],
+          name: product?.name ?? "", description: product?.description ?? "",
+          brandId: product?.brandId ?? "", variantId: product?.variantId ?? "",
+          packSizeId: product?.packSizeId ?? "", packTypeId: product?.packTypeId ?? "",
+          sku: product?.sku ?? "",
+          categoryId: product?.subcategory?.category?.id ?? "",
+          subcategoryId: product?.subcategoryId ?? "",
+          price: Number(product?.price) || (undefined as any),
+          thumbnail: product?.thumbnail || undefined, images: [],
         });
-        setShowDraftBanner(true);
+        setExistingImages(product?.images ?? []);
+        setImagesToDelete([]);
+        setShouldDeleteThumbnail(false);
       } else {
-        reset(EMPTY_VALUES);
+        // Create: clear draft and blank the form
+        discardDraft(reset, EMPTY_VALUES);
         setShowDraftBanner(false);
       }
-      setExistingImages([]);
-      setImagesToDelete([]);
-      setShouldDeleteThumbnail(false);
-    }
+    });
+  // Deliberately only product?.id — we want a stable function ref per product
   }, [product?.id, isEditMode]);
+
+  // ── Single async reset effect ─────────────────────────────────────────────
+  // Only one reset() call happens here, so draft can never be wiped by a second reset.
+  useEffect(() => {
+    const run = async () => {
+      if (bannerTimer.current) clearTimeout(bannerTimer.current);
+
+      if (isEditMode) {
+        reset({
+          name: product?.name ?? "", description: product?.description ?? "",
+          brandId: product?.brandId ?? "", variantId: product?.variantId ?? "",
+          packSizeId: product?.packSizeId ?? "", packTypeId: product?.packTypeId ?? "",
+          sku: product?.sku ?? "",
+          categoryId: product?.subcategory?.category?.id ?? "",
+          subcategoryId: product?.subcategoryId ?? "",
+          price: Number(product?.price) || (undefined as any),
+          thumbnail: product?.thumbnail || undefined, images: [],
+        });
+        setExistingImages(product?.images ?? []);
+        setImagesToDelete([]);
+        setShouldDeleteThumbnail(false);
+        setShowDraftBanner(false);
+      } else {
+        // readDraft is async — it reconstructs File objects from stored base64
+        const draft = await readDraft();
+        if (draft) {
+          reset({ ...EMPTY_VALUES, ...draft });
+          // Banner shows for 2 seconds then auto-hides
+          setShowDraftBanner(true);
+          bannerTimer.current = setTimeout(() => setShowDraftBanner(false), 3000);
+        } else {
+          reset(EMPTY_VALUES);
+          setShowDraftBanner(false);
+        }
+        setExistingImages([]);
+        setImagesToDelete([]);
+        setShouldDeleteThumbnail(false);
+      }
+    };
+
+    run();
+    return () => { if (bannerTimer.current) clearTimeout(bannerTimer.current); };
+  }, [product?.id, isEditMode]);
+
 
   const watchedBrand = watch("brandId");
   const { data: variants } = useGetVariants({ brandId: watchedBrand });

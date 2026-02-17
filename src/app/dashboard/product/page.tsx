@@ -15,7 +15,7 @@ import {
   useBulkUploadProduct,
 } from "@/features/products/services/products.api";
 import { Tab } from "@/interfaces/general";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import DataTable from "@/components/general/DataTable";
 import { ProductItem } from "@/features/products/types";
 import FilterContainer from "@/components/filters/FilterContainer";
@@ -55,6 +55,8 @@ const ProductPage = () => {
   );
   // Tracks which tab is active so the footer targets the right form
   const [activeFormId, setActiveFormId] = useState<string>(MANUAL_FORM_ID);
+  // Stores the reset function surfaced by ProductForm via onResetReady
+  const productFormResetRef = useRef<(() => void) | null>(null);
 
   const debouncedQuery = useDebounce(query);
 
@@ -88,6 +90,14 @@ const ProductPage = () => {
   const { data: brands } = useGetBrands({});
   const { data: categories } = useGetCategories({});
   const { refetch: fetchTemplate } = useGetTemplate();
+  const {
+    files,
+    inputRef,
+    openFileDialog,
+    handleFileChange,
+    removeFile,
+    clearFiles,
+  } = useFileObjectUpload(true);
 
   // ── Handlers ─────────────────────────────────────────────────────────────────
   const handleCreate = async (values: any) => {
@@ -166,15 +176,6 @@ const ProductPage = () => {
     setOpen(false);
   };
 
-  const {
-    files,
-    inputRef,
-    openFileDialog,
-    handleFileChange,
-    removeFile,
-    clearFiles,
-  } = useFileObjectUpload(true);
-
   const displayStats = [
     {
       value: stats?.totalProducts ? `${stats?.totalProducts}` : "0",
@@ -229,6 +230,11 @@ const ProductPage = () => {
           submitAction={submitAction}
           brands={brands?.data}
           categories={categories?.data}
+          // ProductForm calls this once with its own reset function.
+          // We store it in a ref so FormDropdown can call it on demand.
+          onResetReady={(fn) => {
+            productFormResetRef.current = fn;
+          }}
         />
       ),
       ...(selectedProduct
@@ -246,10 +252,15 @@ const ProductPage = () => {
                     ? () => handleStatusChange("QUEUE")
                     : undefined
                 }
+                onReset={() => productFormResetRef.current?.()}
               />
             ),
           }
-        : {}),
+        : {
+            actionDropdown: (
+              <FormDropdown onReset={() => productFormResetRef.current?.()} />
+            ),
+          }),
       statusTag: (
         <TableTag
           className={`${getTagStyles(selectedProduct?.status)?.styles}`}
@@ -307,13 +318,6 @@ const ProductPage = () => {
                       height={20}
                     />
                   </div>
-                  {/* <button
-                    type="button"
-                    onClick={() => removeFile(file.id)}
-                    className="text-xs text-red-400 hover:text-red-600"
-                  >
-                    Remove
-                  </button> */}
                 </div>
               ))}
             </div>

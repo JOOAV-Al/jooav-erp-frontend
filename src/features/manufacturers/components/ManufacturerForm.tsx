@@ -23,14 +23,10 @@ const createManufacturerSchema = z.object({
 });
 
 export function ManufacturerForm({
-  // closeDialog,
-  // loading,
   handleSubmitForm,
   manufacturer,
+  onResetReady,
 }: DialogFormProps & { manufacturer?: ManufacturerItem }) {
-  // const { mutateAsync: createManufacturer, isPending } =
-  //   useCreateManufacturer();
-
   type ManufacturerData = z.infer<typeof createManufacturerSchema>;
   const form = useForm<ManufacturerData>({
     resolver: zodResolver(createManufacturerSchema),
@@ -49,7 +45,16 @@ export function ManufacturerForm({
 
   useEffect(() => {
     reset({
-      name: manufacturer?.name ?? "",
+      name: "",
+    });
+  }, [manufacturer?.id, reset]);
+
+  useEffect(() => {
+    onResetReady?.(() => {
+      console.log(2);
+      reset({
+        name: "",
+      });
     });
   }, [manufacturer?.id, reset]);
 

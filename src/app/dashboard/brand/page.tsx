@@ -1,5 +1,4 @@
 "use client";
-import CSVUpload from "@/features/uploads/components/CSVUpload";
 import DashboardDrawer from "@/components/general/DashboardDrawer";
 import DrawerTabs from "@/components/general/DrawerTabs";
 import BrandForm from "@/features/brands/components/BrandForm";
@@ -12,7 +11,7 @@ import {
   useUpdateBrand,
 } from "@/features/brands/services/brands.api";
 import { Tab } from "@/interfaces/general";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import DataTable from "@/components/general/DataTable";
 import { BrandItem } from "@/features/brands/types";
 import FilterContainer from "@/components/filters/FilterContainer";
@@ -29,7 +28,7 @@ import { useDynamicDrawer } from "@/hooks/useDynamicDrawer";
 import { BULK_FORM_ID, useBulkTabSetup } from "@/hooks/useBulkTabSetup";
 import { useBulkUploadProduct } from "@/features/products/services/products.api";
 
-const MANUAL_FORM_ID = "manufacturer-form";
+const MANUAL_FORM_ID = "brand-form";
 
 const BrandPage = () => {
   const [page, setPage] = useState<number>(1);
@@ -41,7 +40,7 @@ const BrandPage = () => {
     undefined,
   );
   const [selectedBrands, setSelectedBrands] = useState<BrandItem[] | []>([]);
-
+  const brandFormResetRef = useRef<(() => void) | null>(null);
   const { mutateAsync: updateBrand, isPending: updating } = useUpdateBrand();
   const { mutateAsync: createBrand, isPending: creating } = useCreateBrand();
   const { mutateAsync: deleteBrand, isPending: deleting } = useDeleteBrand();
@@ -118,10 +117,20 @@ const BrandPage = () => {
           handleSubmitForm={handleCreate}
           loading={creating || updating}
           closeDialog={() => setOpen(false)}
+          onResetReady={(fn) => {
+            brandFormResetRef.current = fn;
+          }}
         />
       ),
       ...(selectedBrand
-        ? { actionDropdown: <FormDropdown deleteAction={handleDelete} /> }
+        ? {
+            actionDropdown: (
+              <FormDropdown
+                deleteAction={handleDelete}
+                onReset={() => brandFormResetRef.current?.()}
+              />
+            ),
+          }
         : {}),
     },
     {

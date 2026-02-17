@@ -13,7 +13,12 @@ interface TagInputProps {
   onRemoveExisting?: (tag: string) => void;
 }
 
-const TagInput = React.forwardRef<HTMLDivElement, TagInputProps>(
+export interface TagInputHandle {
+  /** Clears internal tags and input text — called from the parent form's reset */
+  clear: () => void;
+}
+
+const TagInput = React.forwardRef<TagInputHandle, TagInputProps>(
   (
     {
       value = [],
@@ -32,7 +37,7 @@ const TagInput = React.forwardRef<HTMLDivElement, TagInputProps>(
     const inputRef = React.useRef<HTMLInputElement>(null);
     const containerRef = React.useRef<HTMLDivElement>(null);
 
-    React.useImperativeHandle(ref, () => containerRef.current!);
+    // React.useImperativeHandle(ref, () => containerRef.current!);
 
     const hasLeftIcon = Boolean(leftIcon);
 
@@ -40,6 +45,15 @@ const TagInput = React.forwardRef<HTMLDivElement, TagInputProps>(
     // React.useEffect(() => {
     //   setInternalTags(value);
     // }, [value]);
+
+    // Expose the clear method to the parent via ref
+    React.useImperativeHandle(ref, () => ({
+      clear: () => {
+        setInternalTags([]);
+        setInputValue("");
+        onChange?.([]);
+      },
+    }));
 
     const addTag = (tag: string) => {
       const trimmedTag = tag.trim();
@@ -55,6 +69,10 @@ const TagInput = React.forwardRef<HTMLDivElement, TagInputProps>(
       const newTags = internalTags.filter((tag) => tag !== tagToRemove);
       setInternalTags(newTags);
       onChange?.(newTags);
+    };
+
+    const clearInternalTags = () => {
+      setInternalTags([]);
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -208,7 +226,7 @@ const TagInput = React.forwardRef<HTMLDivElement, TagInputProps>(
         )}
       </div>
     );
-  },
+  }
 );
 
 TagInput.displayName = "TagInput";

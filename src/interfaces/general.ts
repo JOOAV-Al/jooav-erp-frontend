@@ -95,4 +95,5 @@ export interface DialogFormProps {
   loading?: boolean;
   closeDialog?: () => void;
   submitAction?: 'primary' | 'secondary';
+  onResetReady?: (resetFn: () => void) => void
 }

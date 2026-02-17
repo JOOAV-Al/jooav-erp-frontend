@@ -12,7 +12,7 @@ import {
   useUpdateCategory,
 } from "@/features/categories/services/category.api";
 import { Tab } from "@/interfaces/general";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import DataTable from "@/components/general/DataTable";
 import { CategoryItem } from "@/features/categories/types";
 import FilterContainer from "@/components/filters/FilterContainer";
@@ -26,7 +26,7 @@ import { useDynamicDrawer } from "@/hooks/useDynamicDrawer";
 import { BULK_FORM_ID, useBulkTabSetup } from "@/hooks/useBulkTabSetup";
 import { useBulkUploadProduct } from "@/features/products/services/products.api";
 
-const MANUAL_FORM_ID = "manufacturer-form";
+const MANUAL_FORM_ID = "category-form";
 
 const CategoryPage = () => {
   const [page, setPage] = useState<number>(1);
@@ -39,6 +39,7 @@ const CategoryPage = () => {
   const [selectedCategories, setSelectedCategories] = useState<
     CategoryItem[] | []
   >([]);
+  const categoryFormResetRef = useRef<(() => void) | null>(null);
 
   const { mutateAsync: updateCategory, isPending: updating } =
     useUpdateCategory();
@@ -118,7 +119,7 @@ const CategoryPage = () => {
     },
   ];
 
-  const formId = `category-form`;
+  // const formId = `category-form`;
   const tabs: Tab[] = [
     {
       value: "manual",
@@ -130,11 +131,21 @@ const CategoryPage = () => {
           handleSubmitForm={(values) => handleCreate(values)}
           loading={creating || updating}
           closeDialog={() => setOpen(false)}
-          formId={formId}
+          // formId={formId}
+          onResetReady={(fn) => {
+            categoryFormResetRef.current = fn;
+          }}
         />
       ),
       ...(selectedCategory
-        ? { actionDropdown: <FormDropdown deleteAction={handleDelete} /> }
+        ? {
+            actionDropdown: (
+              <FormDropdown
+                deleteAction={handleDelete}
+                onReset={() => categoryFormResetRef.current?.()}
+              />
+            ),
+          }
         : {}),
     },
     {

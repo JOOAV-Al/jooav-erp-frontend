@@ -30,8 +30,12 @@ const createBrandSchema = z.object({
 export function BrandForm({
   handleSubmitForm,
   brand,
-  manufacturers
-}: DialogFormProps & { brand?: BrandItem; manufacturers?: ManufacturerItem[] }) {
+  manufacturers,
+  onResetReady,
+}: DialogFormProps & {
+  brand?: BrandItem;
+  manufacturers?: ManufacturerItem[];
+}) {
   type BrandData = z.infer<typeof createBrandSchema>;
   const [logoFileName, setLogoFileName] = useState<string>("");
   // const { data: manufacturers } = useGetManufacturers({});
@@ -41,7 +45,7 @@ export function BrandForm({
     defaultValues: {
       name: brand?.name ?? "",
       manufacturerId: brand?.manufacturerId ?? "",
-      logo: null,
+      logo: brand?.logo ?? null,
     },
   });
 
@@ -55,8 +59,6 @@ export function BrandForm({
 
   const onSubmit = async (values: z.infer<typeof createBrandSchema>) => {
     if (!handleSubmitForm) return;
-    console.log({ brand });
-    console.log({ values });
 
     if (brand?.id) {
       // Build partial payload using dirty fields
@@ -82,10 +84,23 @@ export function BrandForm({
     });
     // If editing and brand has logo filename, set it
     if (brand?.logo) {
-      setLogoFileName(brand?.logo?.split("/")?.[10] ?? "");
+      setLogoFileName(brand?.logo?.split("/")?.at(-1) ?? "");
     }
   }, [brand?.id, reset]);
 
+  useEffect(() => {
+    onResetReady?.(() => {
+      reset({
+        name: brand?.name ?? "",
+        manufacturerId: brand?.manufacturerId ?? "",
+        logo: null,
+      });
+      // If editing and brand has logo filename, set it
+      if (brand?.logo) {
+        setLogoFileName(brand?.logo?.split("/")?.at(-1) ?? "");
+      }
+    });
+  }, [brand?.id, reset]);
   return (
     <form
       id="brand-form"
@@ -120,6 +135,7 @@ export function BrandForm({
                     onClear={() => {
                       onChange(null);
                       setLogoFileName("");
+                      setValue("logo", null);
                     }}
                     aria-invalid={fieldState.invalid}
                   />

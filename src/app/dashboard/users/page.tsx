@@ -10,7 +10,7 @@ import {
   useUpdateUser,
   // useRegenerateResetToken,
 } from "@/features/users/services/users.api";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import DataTable from "@/components/general/DataTable";
 import { UserItem } from "@/features/users/types";
 import FilterContainer from "@/components/filters/FilterContainer";
@@ -56,7 +56,7 @@ const UserPage = () => {
     undefined,
   );
   const [selectedUsers, setSelectedUsers] = useState<UserItem[] | []>([]);
-
+  const usersFormResetRef = useRef<(() => void) | null>(null);
   const { data: stats, isPending: isStatsPending } = useGetUsersStats();
   const {
     data,
@@ -207,11 +207,17 @@ const UserPage = () => {
                         setOpen(false);
                         setShowLink(false);
                       }}
+                      onResetReady={(fn) => {
+                        usersFormResetRef.current = fn;
+                      }}
                     />
                   }
                   actionDropdown={
                     selectedUser ? (
-                      <FormDropdown deleteAction={handleDelete} />
+                      <FormDropdown
+                        deleteAction={handleDelete}
+                        onReset={() => usersFormResetRef.current?.()}
+                      />
                     ) : undefined
                   }
                 />

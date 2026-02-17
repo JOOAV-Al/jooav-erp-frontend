@@ -12,7 +12,7 @@ import {
   useUpdateVariant,
 } from "@/features/variants/services/variants.api";
 import { Tab } from "@/interfaces/general";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import DataTable from "@/components/general/DataTable";
 import { VariantItem } from "@/features/variants/types";
 import FilterContainer from "@/components/filters/FilterContainer";
@@ -29,7 +29,7 @@ import { useDynamicDrawer } from "@/hooks/useDynamicDrawer";
 import { BULK_FORM_ID, useBulkTabSetup } from "@/hooks/useBulkTabSetup";
 import { useBulkUploadProduct } from "@/features/products/services/products.api";
 
-const MANUAL_FORM_ID = "manufacturer-form";
+const MANUAL_FORM_ID = "variant-form";
 
 const VariantPage = () => {
   const [page, setPage] = useState<number>(1);
@@ -43,6 +43,7 @@ const VariantPage = () => {
   const [selectedVariants, setSelectedVariants] = useState<VariantItem[] | []>(
     [],
   );
+  const variantFormResetRef = useRef<(() => void) | null>(null);
 
   const { mutateAsync: updateVariant, isPending: updating } =
     useUpdateVariant();
@@ -130,10 +131,20 @@ const VariantPage = () => {
           handleSubmitForm={handleCreate}
           loading={creating || updating}
           closeDialog={() => setOpen(false)}
+          onResetReady={(fn) => {
+            variantFormResetRef.current = fn;
+          }}
         />
       ),
       ...(selectedVariant
-        ? { actionDropdown: <FormDropdown deleteAction={handleDelete} /> }
+        ? {
+            actionDropdown: (
+              <FormDropdown
+                deleteAction={handleDelete}
+                onReset={() => variantFormResetRef.current?.()}
+              />
+            ),
+          }
         : {}),
     },
     {

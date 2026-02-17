@@ -10,13 +10,13 @@ interface FormDropdownProps {
   deleteAction?: () => void;
   publish?: () => void;
   unpublish?: () => void;
-  clear?: () => void;
+  onReset?: () => void;
 }
 function FormDropdown({
   deleteAction,
   publish,
   unpublish,
-  clear
+  onReset
 }: FormDropdownProps) {
   return (
     <DropdownMenu>
@@ -41,8 +41,8 @@ function FormDropdown({
             Publish
           </DropdownMenuItem>
         )}
-        {clear && (
-          <DropdownMenuItem onClick={() => clear?.()}>Clear</DropdownMenuItem>
+        {onReset && (
+          <DropdownMenuItem onClick={() => onReset?.()}>Reset</DropdownMenuItem>
         )}
         {deleteAction && (
           <DropdownMenuItem

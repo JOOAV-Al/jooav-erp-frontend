@@ -19,10 +19,10 @@ import {
   VariantPackSize,
   VariantPackType,
 } from "@/features/variants/types";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Select } from "@/components/general/Select";
 // import { useGetBrands } from "@/features/brands/services/brands.api";
-import { TagInput } from "@/components/ui/TagInput";
+import { TagInput, TagInputHandle } from "@/components/ui/TagInput";
 import FieldIcon from "@/components/general/FieldIcon";
 import FormGroupName from "@/components/general/FormGroupName";
 import { BrandItem } from "@/features/brands/types";
@@ -38,7 +38,8 @@ export function VariantForm({
   handleSubmitForm,
   variant,
   brands,
-}: DialogFormProps & { variant?: VariantItem, brands?: BrandItem[] }) {
+  onResetReady,
+}: DialogFormProps & { variant?: VariantItem; brands?: BrandItem[] }) {
   // const { data: brands } = useGetBrands({});
 
   // Track existing pack sizes and types (from backend)
@@ -54,6 +55,9 @@ export function VariantForm({
   // Track which existing ones to delete
   const [packSizesToDelete, setPackSizesToDelete] = useState<string[]>([]);
   const [packTypesToDelete, setPackTypesToDelete] = useState<string[]>([]);
+
+  const packSizesInputRef = useRef<TagInputHandle>(null);
+  const packTypesInputRef = useRef<TagInputHandle>(null);
 
   type VariantData = z.infer<typeof createVariantSchema>;
   const form = useForm<VariantData>({
@@ -89,6 +93,25 @@ export function VariantForm({
     setPendingPackTypes([]);
   }, [variant?.id, reset]);
 
+  useEffect(() => {
+    onResetReady?.(() => {
+      reset({
+        name: variant?.name ?? "",
+        brandId: variant?.brandId ?? "",
+        packSizes: [],
+        packTypes: [],
+      });
+      setExistingPackSizes(variant?.packSizes ?? []);
+      setExistingPackTypes(variant?.packTypes ?? []);
+      setPackSizesToDelete([]);
+      setPackTypesToDelete([]);
+      setPendingPackSizes([]);
+      setPendingPackTypes([]);
+      packSizesInputRef.current?.clear();
+      packTypesInputRef.current?.clear();
+    });
+  }, [variant?.id, reset]);
+
   const handleRemoveExistingSize = (name: string) => {
     const itemToRemove = existingPackSizes.find((item) => item.name === name);
     if (itemToRemove) {
@@ -109,21 +132,21 @@ export function VariantForm({
     }
   };
 
-const handleConfirmSizes = (tags: string[]) => {
-  setPendingPackSizes((prev) => {
-    const merged = [...prev, ...tags.filter((t) => !prev.includes(t))];
-    form.setValue("packSizes", merged); // ✅ uses the same merged array
-    return merged;
-  });
-};
+  const handleConfirmSizes = (tags: string[]) => {
+    setPendingPackSizes((prev) => {
+      const merged = [...prev, ...tags.filter((t) => !prev.includes(t))];
+      form.setValue("packSizes", merged); // ✅ uses the same merged array
+      return merged;
+    });
+  };
 
-const handleConfirmTypes = (tags: string[]) => {
-  setPendingPackTypes((prev) => {
-    const merged = [...prev, ...tags.filter((t) => !prev.includes(t))];
-    form.setValue("packTypes", merged); // ✅ uses the same merged array
-    return merged;
-  });
-};
+  const handleConfirmTypes = (tags: string[]) => {
+    setPendingPackTypes((prev) => {
+      const merged = [...prev, ...tags.filter((t) => !prev.includes(t))];
+      form.setValue("packTypes", merged); // ✅ uses the same merged array
+      return merged;
+    });
+  };
 
   const handleRemovePendingSize = (tag: string) => {
     const updated = pendingPackSizes.filter((t) => t !== tag);
@@ -275,6 +298,7 @@ const handleConfirmTypes = (tags: string[]) => {
                       )}
                     </div>
                     <TagInput
+                      ref={packSizesInputRef}
                       value={value}
                       // onChange={onChange}
                       onChange={() => {}}
@@ -315,6 +339,7 @@ const handleConfirmTypes = (tags: string[]) => {
                       )}
                     </div>
                     <TagInput
+                      ref={packTypesInputRef}
                       value={value}
                       // onChange={onChange}
                       onChange={() => {}}

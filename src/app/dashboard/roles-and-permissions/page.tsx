@@ -9,14 +9,14 @@ import {
   useGetUsersStats,
   useUpdateUser,
 } from "@/features/users/services/users.api";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { UserItem } from "@/features/users/types";
 import FilterContainer from "@/components/filters/FilterContainer";
 import SearchBox from "@/components/filters/SearchBox";
 import { useDebounce } from "@/hooks/useDebounce";
-import StatsContainer from "@/components/general/StatsContainer";
+// import StatsContainer from "@/components/general/StatsContainer";
 import FormDropdown from "@/components/general/FormDropdown";
-import StatsSkeleton from "@/components/general/StatsSkeleton";
+// import StatsSkeleton from "@/components/general/StatsSkeleton";
 import TableTag from "@/components/general/TableTag";
 import RoleFilter from "@/components/filters/RoleFilter";
 import DrawerBoxContent from "@/components/general/DrawerBoxContent";
@@ -49,6 +49,7 @@ const UserPage = () => {
     undefined,
   );
   const [selectedUsers, setSelectedUsers] = useState<UserItem[]>([]);
+  const usersFormResetRef = useRef<(() => void) | null>(null);
 
   const { mutateAsync: updateUser, isPending: updating } = useUpdateUser();
   const { mutateAsync: createUser, isPending: creating } = useCreateUser();
@@ -231,11 +232,17 @@ const UserPage = () => {
                         setOpen(false);
                         setShowLink(false);
                       }}
+                      onResetReady={(fn) => {
+                        usersFormResetRef.current = fn;
+                      }}
                     />
                   }
                   actionDropdown={
                     selectedUser ? (
-                      <FormDropdown deleteAction={handleDelete} />
+                      <FormDropdown
+                        deleteAction={handleDelete}
+                        onReset={() => usersFormResetRef.current?.()}
+                      />
                     ) : undefined
                   }
                 />
