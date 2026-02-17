@@ -10,14 +10,14 @@ interface CopyLinkBoxProps {
 }
 
 const CopyLinkBox = ({ link, onShare, shareBtnIcon }: CopyLinkBoxProps) => {
-    const [showCopied, setShowCopied] = useState(false);
-    const handleCopy = (text: string) => {
-      navigator.clipboard.writeText(text ?? "");
-      setShowCopied(true);
-      setTimeout(() => {
-        setShowCopied(false);
-      }, 1000);
-    };
+  const [showCopied, setShowCopied] = useState(false);
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text ?? "");
+    setShowCopied(true);
+    setTimeout(() => {
+      setShowCopied(false);
+    }, 1000);
+  };
   return (
     <div className="w-full bg-white rounded-xl p-sm flex flex-col gap-6 shadow-input mt-2">
       <div className="w-full bg-storey-foreground rounded-lg p-md flex flex-col gap-4 shadow-input">
@@ -29,10 +29,8 @@ const CopyLinkBox = ({ link, onShare, shareBtnIcon }: CopyLinkBoxProps) => {
             <div className="p-3 w-5.5 h-5.5 flex-shrink-0">
               <Link2 strokeWidth={2} className="text-brand-primary w-5 h-5" />
             </div>
-            <p className="flex-1 min-w-0 truncate overflow-hidden whitespace-nowrap text-brand-primary text-sm mt-[3px]">
-              {
-                truncateText(link ?? "", 45)
-              }
+            <p className="flex-1 min-w-0 truncate overflow-hidden text-clip whitespace-nowrap text-brand-primary text-sm mt-[3px]">
+              {truncateText(link ?? "", 45)}
             </p>
           </div>
           <div

@@ -25,7 +25,7 @@ const SortFilter: React.FC<SortFilterProps> = ({ value = "asc", onChange }) => {
                 ${sortOrder === "" ? "bg-storey-foreground text-body" : ""}
               `}
       >
-        <List strokeWidth={2.5} className="w-3.5 h-3.5 text-outline-passive" />
+        <List strokeWidth={2} className="w-3.5 h-3.5 text-outline-passive" />
         All
       </Button>
       <Button
@@ -38,7 +38,7 @@ const SortFilter: React.FC<SortFilterProps> = ({ value = "asc", onChange }) => {
         `}
       >
         <ListEnd
-          strokeWidth={2.5}
+          strokeWidth={2}
           className="w-3.5 h-3.5 text-outline-passive"
         />
         Oldest
@@ -54,7 +54,7 @@ const SortFilter: React.FC<SortFilterProps> = ({ value = "asc", onChange }) => {
         `}
       >
         <ListStart
-          strokeWidth={2.5}
+          strokeWidth={2}
           className="w-3.5 h-3.5 text-outline-passive"
         />
         Newest

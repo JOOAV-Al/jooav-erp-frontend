@@ -8,7 +8,7 @@ import {
   useGetUsers,
   useGetUsersStats,
   useUpdateUser,
-  useRegenerateResetToken,
+  // useRegenerateResetToken,
 } from "@/features/users/services/users.api";
 import React, { useState } from "react";
 import DataTable from "@/components/general/DataTable";
@@ -25,6 +25,7 @@ import { ImageIcon, Wheat } from "lucide-react";
 import DrawerBoxContent from "@/components/general/DrawerBoxContent";
 import CopyLinkBox from "@/components/general/CopyLinkBox";
 import Image from "next/image";
+import { normalizePhone } from "@/lib/utils";
 
 const UserPage = () => {
   const [page, setPage] = useState<number>(1);
@@ -33,6 +34,13 @@ const UserPage = () => {
   const [role, setRole] = useState<string>("");
   const [resetLink, setResetLink] = useState<string>("");
   const [showLink, setShowLink] = useState<boolean>(false);
+  const [messageObject, setMessageObject] = useState<{
+    phone: string;
+    role: string;
+  }>({
+    phone: "",
+    role: "",
+  });
   const debouncedQuery = useDebounce(query);
 
   const { mutateAsync: updateUser, isPending: updating } = useUpdateUser();
@@ -58,16 +66,18 @@ const UserPage = () => {
   } = useGetUsers({ search: debouncedQuery, role });
   const users = data?.data;
 
+  console.log(messageObject);
   const handleCreate = async (values: any) => {
     console.log({ finalValues: values });
+    const waPhone = normalizePhone(values.phone);
+    setMessageObject({ phone: waPhone, role: values.role });
     if (selectedUser) {
       await updateUser(values);
 
       setOpen(false);
     } else {
       const res = await createUser(values);
-      console.log(res);
-      setResetLink(res?.data?.data?.resetUrl)
+      setResetLink(res?.data?.data?.resetUrl);
       setShowLink(true);
     }
     // show link on success
@@ -160,8 +170,7 @@ const UserPage = () => {
               submitLabel="Save user"
               showFooter={!showLink}
             >
-
-              {!showLink ? (
+              {showLink ? (
                 <DrawerBoxContent
                   heading={`Share link with user`}
                   description={`Send link to user. They can login to their dashboard using link.`}
@@ -169,14 +178,18 @@ const UserPage = () => {
                     <CopyLinkBox
                       onShare={() => {
                         console.log("share");
+                        window.open(
+                          `https://wa.me/${messageObject?.phone}?text=Hi%20${messageObject?.role}%2C%20Use%20this%20link%20to%20reset%20your%20password%3A%0A${resetLink}`,
+                          "_blank",
+                        );
                       }}
                       link={resetLink}
                       shareBtnIcon={
                         <Image
                           src={"/dashboard/whatsApp.svg"}
-                          width={16}
-                          height={16}
-                          alt="Naira"
+                          width={18}
+                          height={18}
+                          alt="Whatsapp"
                         />
                       }
                     />
@@ -232,7 +245,7 @@ const UserPage = () => {
               label: (
                 <div className="flex justify-center">
                   <ImageIcon
-                    strokeWidth={2.5}
+                    strokeWidth={2}
                     className="w-5 h-5 text-border-accent"
                   />
                 </div>

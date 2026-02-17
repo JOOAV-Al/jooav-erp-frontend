@@ -25,12 +25,22 @@ import FormDropdown from "@/components/general/FormDropdown";
 import StatsSkeleton from "@/components/general/StatsSkeleton";
 import { ImageIcon } from "lucide-react";
 import { useGetManufacturers } from "@/features/manufacturers/services/manufacturers.api";
+import { useDynamicDrawer } from "@/hooks/useDynamicDrawer";
+import { BULK_FORM_ID, useBulkTabSetup } from "@/hooks/useBulkTabSetup";
+import { useBulkUploadProduct } from "@/features/products/services/products.api";
+
+const MANUAL_FORM_ID = "manufacturer-form";
+
 const BrandPage = () => {
   const [page, setPage] = useState<number>(1);
   const [open, setOpen] = useState<boolean>(false);
   const [query, setQuery] = useState<string>("");
   const [sortOrder, setSortOrder] = useState<"desc" | "asc" | "">("");
   const debouncedQuery = useDebounce(query);
+  const [selectedBrand, setSelectedBrand] = useState<BrandItem | undefined>(
+    undefined,
+  );
+  const [selectedBrands, setSelectedBrands] = useState<BrandItem[] | []>([]);
 
   const { mutateAsync: updateBrand, isPending: updating } = useUpdateBrand();
   const { mutateAsync: createBrand, isPending: creating } = useCreateBrand();
@@ -40,11 +50,8 @@ const BrandPage = () => {
     isPending: deletingMultiple,
     status,
   } = useDeleteMultipleBrands();
-
-  const [selectedBrand, setSelectedBrand] = useState<BrandItem | undefined>(
-    undefined,
-  );
-  const [selectedBrands, setSelectedBrands] = useState<BrandItem[] | []>([]);
+  const { mutateAsync: bulkUpload, isPending: bulkUploading } =
+    useBulkUploadProduct();
 
   const { data: stats, isPending: isStatsPending } = useGetBrandsStats();
   const {
@@ -56,8 +63,20 @@ const BrandPage = () => {
   const brands = data?.data;
   const { data: manufacturers } = useGetManufacturers({});
 
+  //─ Dynamic drawer (tracks which tab is active) ───────────────────────────
+  const { activeFormId, onActiveFormIdChange, resetToManual, isBulkTab } =
+    useDynamicDrawer(MANUAL_FORM_ID);
+
+  const { bulkTabContent } = useBulkTabSetup({
+    catalog: "product",
+    // onDownload: handleDownloadTemplate,
+    onUpload: async (formData) => {
+      await bulkUpload(formData);
+    },
+    onSuccess: () => setOpen(false),
+  });
+
   const handleCreate = async (values: any) => {
-    console.log({ finalValues: values });
     if (selectedBrand) {
       await updateBrand(values);
     } else {
@@ -108,16 +127,8 @@ const BrandPage = () => {
     {
       value: "bulk",
       label: "Bulk Import",
-      // heading: "Upload brand details",
-      content: (
-        <CSVUpload
-          catalog={"brand"}
-          onCTAClick={() => setOpen(!open)}
-          onDownload={() => {
-            console.log("download");
-          }}
-        />
-      ),
+      formId: BULK_FORM_ID,
+      content: bulkTabContent,
     },
   ];
 
@@ -150,14 +161,20 @@ const BrandPage = () => {
               openDrawer={(isOpen) => {
                 if (isOpen) {
                   setSelectedBrand(undefined);
+                  resetToManual();
                 }
                 setOpen(isOpen);
               }}
               isOpen={open}
-              submitFormId={"brand-form"}
-              submitLoading={updating || creating || deleting}
-              submitLabel="Save record"
-              children={<DrawerTabs tabs={tabs} />}
+              submitFormId={activeFormId}
+              submitLoading={updating || creating || deleting || bulkUploading}
+              submitLabel={isBulkTab ? "Upload CSV" : "Save record"}
+              children={
+                <DrawerTabs
+                  onActiveFormIdChange={onActiveFormIdChange}
+                  tabs={tabs}
+                />
+              }
               showFooter
             />
           </div>
@@ -194,7 +211,7 @@ const BrandPage = () => {
               label: (
                 <div className="flex justify-center">
                   <ImageIcon
-                    strokeWidth={2.5}
+                    strokeWidth={2}
                     className="w-5 h-5 text-border-accent"
                   />
                 </div>

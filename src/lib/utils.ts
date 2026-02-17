@@ -1,4 +1,5 @@
 import { clsx, type ClassValue } from "clsx"
+import parsePhoneNumberFromString from "libphonenumber-js";
 import { twMerge } from "tailwind-merge"
 
 export function cn(...inputs: ClassValue[]) {
@@ -45,3 +46,18 @@ export const downloadFileWithBlob = (blobLink: string) => {
   document.body.removeChild(link); // Clean up the temporary link
   console.log("download initiated"); 
 }
+
+export const normalizePhone = (phone: string) => {
+    // normalize phone to E.164 then strip the leading + for wa.me
+    let e164 = phone;
+    try {
+      const parsed = parsePhoneNumberFromString(phone, "NG");
+      if (parsed && parsed.isValid()) {
+        e164 = parsed.format("E.164"); // e.g. 234803...
+      }
+    } catch (e) {
+      // fallback: use rawPhone
+    }
+    const waDigits = e164.replace(/\D/g, ""); // remove '' and non-digits -> 234803...
+    return waDigits;
+  }

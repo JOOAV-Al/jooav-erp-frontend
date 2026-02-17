@@ -81,7 +81,7 @@ const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
           <div className="absolute inset-y-0 left-0 px-main py-md rounded-l-lg flex items-center justify-center pointer-events-none bg-storey-foreground border-r-2 border-border-main max-w-12">
             <div className="p-3 flex items-center justify-center">
               <Upload
-                strokeWidth={2.5}
+                strokeWidth={2}
                 className="h-5 w-5 text-outline-passive"
               />
             </div>

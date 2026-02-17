@@ -26,7 +26,12 @@ import StatsContainer from "@/components/general/StatsContainer";
 import FormDropdown from "@/components/general/FormDropdown";
 import StatsSkeleton from "@/components/general/StatsSkeleton";
 import TableTag from "@/components/general/TableTag";
-import { CloudUpload, FileSpreadsheet, SquareStack, Trash2 } from "lucide-react";
+import {
+  CloudUpload,
+  FileSpreadsheet,
+  SquareStack,
+  Trash2,
+} from "lucide-react";
 import { useGetBrands } from "@/features/brands/services/brands.api";
 import { useGetCategories } from "@/features/categories/services/category.api";
 import { useFileObjectUpload } from "@/features/uploads/hooks/useFileObjectUpload";
@@ -278,12 +283,12 @@ const ProductPage = () => {
               {files.map((file) => (
                 <div
                   key={file.id}
-                  className="flex justify-between items-center bg-[#F7F7F7] shadow-input rounded-lg p-md gap-5"
+                  className="flex jify-between items-center bg-[#F7F7F7] shadow-input rounded-lg p-md gap-5"
                 >
                   <div className="flex justify-center items-center h-[24px] w-[24px] p-3">
                     <FileSpreadsheet
                       className="text-brand-primary"
-                      strokeWidth={2.5}
+                      strokeWidth={2}
                       width={20}
                       height={20}
                     />
@@ -297,7 +302,7 @@ const ProductPage = () => {
                   >
                     <Trash2
                       className="text-outline-passive"
-                      strokeWidth={2.5}
+                      strokeWidth={2}
                       width={20}
                       height={20}
                     />
@@ -389,7 +394,7 @@ const ProductPage = () => {
                   <SquareStack
                     className="text-secondary"
                     size={17}
-                    strokeWidth={2.5}
+                    strokeWidth={2}
                   />
                 )
               }
@@ -398,7 +403,7 @@ const ProductPage = () => {
                   <CloudUpload
                     className="text-outline"
                     size={17}
-                    strokeWidth={2.5}
+                    strokeWidth={2}
                   />
                 ) : undefined
               }

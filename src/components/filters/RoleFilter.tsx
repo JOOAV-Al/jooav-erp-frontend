@@ -30,7 +30,7 @@ const RoleFilter: React.FC<RoleFilterProps> = ({
           ${role === "" ? "bg-storey-foreground text-body" : ""}
         `}
       >
-        {/* <List strokeWidth={2.5} className="w-3.5 h-3.5 text-outline-passive" /> */}
+        {/* <List strokeWidth={2} className="w-3.5 h-3.5 text-outline-passive" /> */}
         All
       </Button>
       {isUsers && (
@@ -44,7 +44,7 @@ const RoleFilter: React.FC<RoleFilterProps> = ({
         `}
           >
             {/* <PenLine
-              strokeWidth={2.5}
+              strokeWidth={2}
               className="w-3.5 h-3.5 text-outline-passive"
             /> */}
             S. admin
@@ -59,7 +59,7 @@ const RoleFilter: React.FC<RoleFilterProps> = ({
         `}
           >
             {/* <ListPlus
-              strokeWidth={2.5}
+              strokeWidth={2}
               className="w-3.5 h-3.5 text-outline-passive"
             /> */}
             Admin
@@ -73,7 +73,7 @@ const RoleFilter: React.FC<RoleFilterProps> = ({
         `}
           >
             {/* <CloudUpload
-              strokeWidth={2.5}
+              strokeWidth={2}
               className="w-3.5 h-3.5 text-outline-passive"
             /> */}
             Procurement
@@ -87,7 +87,7 @@ const RoleFilter: React.FC<RoleFilterProps> = ({
         `}
           >
             {/* <CloudUpload
-              strokeWidth={2.5}
+              strokeWidth={2}
               className="w-3.5 h-3.5 text-outline-passive"
             /> */}
             Wholesaler

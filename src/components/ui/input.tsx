@@ -72,7 +72,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {/* {hasRightIcon && (
           <div className="absolute inset-y-0 right-3 flex items-center pointer-events-auto">
             <div className="p-1 flex items-center justify-center">
-              {isEdit && <PenLine strokeWidth={2.5} className="h-5 w-5 text-outline-passive" />}
+              {isEdit && <PenLine strokeWidth={2} className="h-5 w-5 text-outline-passive" />}
               {rightIcon}
             </div>
           </div>

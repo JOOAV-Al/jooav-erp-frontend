@@ -24,11 +24,13 @@ import { useEffect, useState } from "react";
 import { Select } from "@/components/general/Select";
 import FieldIcon from "@/components/general/FieldIcon";
 import { userRoles } from "@/lib/rbac/roles";
-import { isValidPhoneNumber } from "libphonenumber-js";
+import { isValidPhoneNumber, parsePhoneNumberFromString } from "libphonenumber-js";
 import { Button } from "@/components/ui/button";
 import CopyLinkBox from "@/components/general/CopyLinkBox";
 import Image from "next/image";
 import { useRegenerateResetToken } from "@/features/users/services/users.api";
+import { normalizePhone } from "@/lib/utils";
+import Spinner from "@/components/general/Spinner";
 
 const createUserSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -36,7 +38,10 @@ const createUserSchema = z.object({
   email: z.email("Email is required"),
   // phone: z.string().min(10, "Phone is required"),
   phone: z.string().refine((val) => {
-    return isValidPhoneNumber(val, "NG");
+    return isValidPhoneNumber(val, {
+      defaultCountry: "NG",
+      defaultCallingCode: "+234"
+    });
   }, "Invalid Phone Number"),
   role: z.string().min(1, "user role is required"),
 });
@@ -47,8 +52,16 @@ export function UserForm({
 }: DialogFormProps & { user?: UserItem }) {
   const [linkGenerated, setLinkGenerated] = useState<boolean>(false);
   const [link, setLink] = useState<string>("");
+  const [messageObject, setMessageObject] = useState<{
+    phone: string;
+    role: string;
+  }>({
+    phone: "",
+    role: "",
+  });
 
-  const { mutateAsync: resetToken, isPending: resetting } = useRegenerateResetToken();
+  const { mutateAsync: resetToken, isPending: resetting } =
+    useRegenerateResetToken();
 
   type UserData = z.infer<typeof createUserSchema>;
   const form = useForm<UserData>({
@@ -69,16 +82,23 @@ export function UserForm({
     formState: { dirtyFields },
     reset,
     setValue,
+    getValues,
   } = form;
 
   const handleLinkRequest = async () => {
-    const response = await resetToken({id: user?.id ?? ""})
-    console.log(response)
+    const response = await resetToken({ id: user?.id ?? "" });
+    console.log(response);
     setLink(response?.data?.data?.resetUrl);
     setLinkGenerated(true);
+    const waDigits = normalizePhone(getValues("phone") ?? user?.phone ?? "");
+
+    setMessageObject({
+      phone: waDigits,
+      role: getValues("role") ?? user?.role ?? "",
+    });
   };
 
-  console.log({link, linkGenerated})
+  console.log({ link, linkGenerated });
   const onSubmit = async (values: z.infer<typeof createUserSchema>) => {
     if (!handleSubmitForm) return;
 
@@ -201,7 +221,7 @@ export function UserForm({
               <div>
                 <Field data-invalid={fieldState.invalid}>
                   <div className="flex gap-3 items-center">
-                    <FieldLabel>Phone number</FieldLabel>
+                    <FieldLabel>WhatsApp number</FieldLabel>
                     {fieldState.error && (
                       <FieldError>: {fieldState.error.message}</FieldError>
                     )}
@@ -209,9 +229,17 @@ export function UserForm({
                   <Input
                     {...field}
                     type="text"
-                    placeholder="Enter phone number"
+                    placeholder="Enter WhatsApp number"
                     aria-invalid={fieldState.invalid}
-                    leftIcon={<FieldIcon Icon={Phone} />}
+                    // leftIcon={<FieldIcon Icon={Phone} />}
+                    leftIcon={
+                      <Image
+                        src={"/dashboard/whatsApp.svg"}
+                        width={20}
+                        height={20}
+                        alt="Whatsapp"
+                      />
+                    }
                     isEdit={!!user}
                   />
                 </Field>
@@ -256,14 +284,18 @@ export function UserForm({
                 <CopyLinkBox
                   onShare={() => {
                     console.log("share");
+                    window.open(
+                      `https://wa.me/${messageObject?.phone}?text=Hi%20${messageObject?.role}%2C%20Use%20this%20link%20to%20reset%20your%20password%3A%0A${link}`,
+                      "_blank",
+                    );
                   }}
                   link={link}
                   shareBtnIcon={
                     <Image
                       src={"/dashboard/whatsApp.svg"}
-                      width={16}
-                      height={16}
-                      alt="Naira"
+                      width={18}
+                      height={18}
+                      alt="Whatsapp"
                     />
                   }
                 />
@@ -283,11 +315,15 @@ export function UserForm({
                     variant="input"
                     onClick={handleLinkRequest}
                     className="shadow-input! font-semibold w-fit"
+                    disabled={resetting}
                   >
                     {/* <span className="px-2">{shareBtnIcon && shareBtnIcon}</span> */}
                     <span className="px-2 py-4 text-[#FF803F] text-[15px]">
                       Generate login link
                     </span>
+                    {resetting && (
+                      <Spinner className="size-4" color="#FF803F" />
+                    )}
                   </Button>
                 </div>
               )}

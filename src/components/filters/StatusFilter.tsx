@@ -32,7 +32,7 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
           ${status === "" ? "bg-storey-foreground text-body" : ""}
         `}
       >
-        <List strokeWidth={2.5} className="w-3.5 h-3.5 text-outline-passive" />
+        <List strokeWidth={2} className="w-3.5 h-3.5 text-outline-passive" />
         All
       </Button>
       {isProducts && (
@@ -46,7 +46,7 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
         `}
           >
             <PenLine
-              strokeWidth={2.5}
+              strokeWidth={2}
               className="w-3.5 h-3.5 text-outline-passive"
             />
             Draft
@@ -61,7 +61,7 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
         `}
           >
             <ListPlus
-              strokeWidth={2.5}
+              strokeWidth={2}
               className="w-3.5 h-3.5 text-outline-passive"
             />
             Queue
@@ -75,7 +75,7 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
         `}
           >
             <CloudUpload
-              strokeWidth={2.5}
+              strokeWidth={2}
               className="w-3.5 h-3.5 text-outline-passive"
             />
             Live
@@ -94,7 +94,7 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
         `}
           >
             <PenLine
-              strokeWidth={2.5}
+              strokeWidth={2}
               className="w-3.5 h-3.5 text-outline-passive"
             />
             Pending
@@ -109,7 +109,7 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
         `}
           >
             <ListPlus
-              strokeWidth={2.5}
+              strokeWidth={2}
               className="w-3.5 h-3.5 text-outline-passive"
             />
             Active
@@ -123,7 +123,7 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
         `}
           >
             <CloudUpload
-              strokeWidth={2.5}
+              strokeWidth={2}
               className="w-3.5 h-3.5 text-outline-passive"
             />
             Suspended
@@ -137,7 +137,7 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
         `}
           >
             <CloudUpload
-              strokeWidth={2.5}
+              strokeWidth={2}
               className="w-3.5 h-3.5 text-outline-passive"
             />
             Inactive

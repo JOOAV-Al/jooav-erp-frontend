@@ -8,7 +8,7 @@ interface FieldIconProps {
   className?: string;
 }
 const FieldIcon = ({ Icon=Package }: FieldIconProps) => {
-  return <Icon className={`h-5 w-5 text-outline-passive `} strokeWidth={2.5} />;
+  return <Icon className={`h-5 w-5 text-outline-passive `} strokeWidth={2} />;
 };
 
 export default FieldIcon;

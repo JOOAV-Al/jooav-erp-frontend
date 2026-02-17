@@ -22,6 +22,11 @@ import { useDebounce } from "@/hooks/useDebounce";
 import StatsContainer from "@/components/general/StatsContainer";
 import StatsSkeleton from "@/components/general/StatsSkeleton";
 import FormDropdown from "@/components/general/FormDropdown";
+import { useDynamicDrawer } from "@/hooks/useDynamicDrawer";
+import { BULK_FORM_ID, useBulkTabSetup } from "@/hooks/useBulkTabSetup";
+import { useBulkUploadProduct } from "@/features/products/services/products.api";
+
+const MANUAL_FORM_ID = "manufacturer-form";
 
 const CategoryPage = () => {
   const [page, setPage] = useState<number>(1);
@@ -46,6 +51,8 @@ const CategoryPage = () => {
   } = useDeleteMultipleSubCategories();
   const { mutateAsync: deleteCategory, isPending: deleting } =
     useDeleteCategory();
+  const { mutateAsync: bulkUpload, isPending: bulkUploading } =
+    useBulkUploadProduct();
 
   const debouncedQuery = useDebounce(query);
 
@@ -59,8 +66,20 @@ const CategoryPage = () => {
     search: debouncedQuery,
     sortOrder,
   });
-
   const categories = data?.data;
+
+  //─ Dynamic drawer (tracks which tab is active) ───────────────────────────
+  const { activeFormId, onActiveFormIdChange, resetToManual, isBulkTab } =
+    useDynamicDrawer(MANUAL_FORM_ID);
+
+  const { bulkTabContent } = useBulkTabSetup({
+    catalog: "product",
+    // onDownload: handleDownloadTemplate,
+    onUpload: async (formData) => {
+      await bulkUpload(formData);
+    },
+    onSuccess: () => setOpen(false),
+  });
 
   const handleCreate = async (values: any) => {
     if (selectedCategory) {
@@ -121,16 +140,8 @@ const CategoryPage = () => {
     {
       value: "bulk",
       label: "Bulk Import",
-      // heading: "Upload category details",
-      content: (
-        <CSVUpload
-          catalog={"category"}
-          onCTAClick={() => setOpen(!open)}
-          onDownload={() => {
-            console.log("download");
-          }}
-        />
-      ),
+      formId: BULK_FORM_ID,
+      content: bulkTabContent,
     },
   ];
 
@@ -163,14 +174,20 @@ const CategoryPage = () => {
               openDrawer={(isOpen) => {
                 if (isOpen) {
                   setSelectedCategory(undefined);
+                  resetToManual();
                 }
                 setOpen(isOpen);
               }}
               isOpen={open}
-              submitFormId={formId}
-              submitLoading={updating || creating || deleting}
-              submitLabel="Save record"
-              children={<DrawerTabs tabs={tabs} />}
+              submitFormId={activeFormId}
+              submitLoading={updating || creating || deleting || bulkUploading}
+              submitLabel={isBulkTab ? "Upload CSV" : "Save record"}
+              children={
+                <DrawerTabs
+                  onActiveFormIdChange={onActiveFormIdChange}
+                  tabs={tabs}
+                />
+              }
               showFooter
             />
           </div>

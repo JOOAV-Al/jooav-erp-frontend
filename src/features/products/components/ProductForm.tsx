@@ -24,7 +24,6 @@ import { DialogFormProps } from "@/interfaces/general";
 import { ProductItem } from "@/features/products/types";
 import { useEffect, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
-import { useGetBrands } from "@/features/brands/services/brands.api";
 import { useGetVariants } from "@/features/variants/services/variants.api";
 // import { useGetCategories } from "@/features/categories/services/category.api";
 import { Select } from "@/components/general/Select";
@@ -36,6 +35,8 @@ import { ImageUploadBox } from "@/components/general/ImageUploadBox";
 import { VariantItem } from "@/features/variants/types";
 import { ParentCategoryItem } from "@/features/categories/types";
 import { BrandItem } from "@/features/brands/types";
+import { useProductDraft } from "@/features/products/hooks/useProductDraft";
+import { setTimeout } from "timers/promises";
 
 const createProductSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -59,7 +60,12 @@ export function ProductForm({
   submitAction = "primary",
   brands,
   categories,
-}: DialogFormProps & { product?: ProductItem, brands?: BrandItem[], categories?: ParentCategoryItem[] }) {
+}: DialogFormProps & {
+  product?: ProductItem;
+  brands?: BrandItem[];
+  categories?: ParentCategoryItem[];
+}) {
+  const isEditMode = !!product?.id;
   const [selectedVariant, setSelectedVariant] = useState<
     VariantItem | undefined
   >();
@@ -72,28 +78,27 @@ export function ProductForm({
   );
   const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
   const [shouldDeleteThumbnail, setShouldDeleteThumbnail] = useState(false);
-
-  // const { data: brands } = useGetBrands({});
-  // const { data: categories } = useGetCategories({});
+  const [showDraftBanner, setShowDraftBanner] = useState(false);
 
   type ProductData = z.infer<typeof createProductSchema>;
+  const EMPTY_VALUES: ProductData = {
+    name: "",
+    description: "",
+    brandId: "",
+    variantId: "",
+    packSizeId: "",
+    packTypeId: "",
+    sku: "",
+    categoryId: "",
+    subcategoryId: "",
+    price: undefined as any,
+    thumbnail: undefined,
+    images: [],
+  };
   const form = useForm<ProductData>({
     resolver: zodResolver(createProductSchema),
     mode: "onChange",
-    defaultValues: {
-      name: product?.name ?? "",
-      description: product?.description ?? "",
-      brandId: product?.brandId ?? "",
-      variantId: product?.variantId ?? "",
-      packSizeId: product?.packSizeId ?? "",
-      packTypeId: product?.packTypeId ?? "",
-      sku: product?.sku ?? "",
-      categoryId: product?.subcategory?.category?.id ?? "",
-      subcategoryId: product?.subcategoryId ?? "",
-      price: Number(product?.price && product?.price) || undefined,
-      thumbnail: (product?.thumbnail && product?.thumbnail) || undefined,
-      images: [],
-    },
+    defaultValues: EMPTY_VALUES,
   });
 
   const {
@@ -103,6 +108,61 @@ export function ProductForm({
     watch,
     reset,
   } = form;
+
+  // ─ Draft system (create mode only) ────────────────────────────────────────
+  const { clearDraft, discardDraft, hasDraft, readDraft } = useProductDraft(
+    form,
+    isEditMode,
+  );
+
+  // Show the "draft restored" banner once on mount if there's a saved draft
+  // useEffect(() => {
+  //   if (!isEditMode && hasDraft()) {
+  //     setShowDraftBanner(true);
+  //   }
+  // }, []);
+
+  //─ Reset when switching between create / edit ──────────────────────────────
+  useEffect(() => {
+    if (isEditMode) {
+      reset({
+        name: product?.name ?? "",
+        description: product?.description ?? "",
+        brandId: product?.brandId ?? "",
+        variantId: product?.variantId ?? "",
+        packSizeId: product?.packSizeId ?? "",
+        packTypeId: product?.packTypeId ?? "",
+        sku: product?.sku ?? "",
+        categoryId: product?.subcategory?.category?.id ?? "",
+        subcategoryId: product?.subcategoryId ?? "",
+        price: Number(product?.price) || undefined,
+        images: [],
+      });
+      setExistingImages(product?.images ?? []);
+      setImagesToDelete([]);
+      setShouldDeleteThumbnail(false);
+      setShowDraftBanner(false);
+    } else {
+      // Create mode: check for a draft first, use it if present
+      const draft = readDraft();
+      if (draft) {
+        reset({
+          ...EMPTY_VALUES,
+          ...draft,
+          // Files can't be serialised — always start empty
+          thumbnail: undefined,
+          images: [],
+        });
+        setShowDraftBanner(true);
+      } else {
+        reset(EMPTY_VALUES);
+        setShowDraftBanner(false);
+      }
+      setExistingImages([]);
+      setImagesToDelete([]);
+      setShouldDeleteThumbnail(false);
+    }
+  }, [product?.id, isEditMode]);
 
   const watchedBrand = watch("brandId");
   const { data: variants } = useGetVariants({ brandId: watchedBrand });
@@ -127,9 +187,9 @@ export function ProductForm({
     setImagesToDelete((prev) => [...prev, imageUrl]);
     setExistingImages((prev) => prev.filter((url) => url !== imageUrl));
   };
+
   const onSubmit = async (values: z.infer<typeof createProductSchema>) => {
     if (!handleSubmitForm) return;
-    console.log(values);
     // Determine status based on which button was clicked
     const status = submitAction === "secondary" ? "LIVE" : "QUEUE";
     // Build FormData
@@ -191,29 +251,11 @@ export function ProductForm({
       });
 
       await handleSubmitForm(formData);
+      // Clear the draft only after a successful create
+      clearDraft();
+      setShowDraftBanner(false)
     }
   };
-
-  useEffect(() => {
-    reset({
-      name: product?.name ?? "",
-      description: product?.description ?? "",
-      brandId: product?.brandId ?? "",
-      variantId: product?.variantId ?? "",
-      packSizeId: product?.packSizeId ?? "",
-      packTypeId: product?.packTypeId ?? "",
-      sku: product?.sku ?? "",
-      categoryId: product?.subcategory?.category?.id ?? "",
-      subcategoryId: product?.subcategoryId ?? "",
-      price: Number(product?.price && product?.price) || undefined,
-      images: [],
-    });
-
-    // Reset image tracking
-    setExistingImages(product?.images ?? []);
-    setImagesToDelete([]);
-    setShouldDeleteThumbnail(false);
-  }, [product?.id, reset]);
 
   return (
     <form
@@ -221,6 +263,25 @@ export function ProductForm({
       onSubmit={handleSubmit(onSubmit)}
       className="flex flex-col flex-1"
     >
+      {/* ── Draft restored banner ── */}
+      {showDraftBanner && !isEditMode && (
+        <div className="mx-xl mb-main flex items-center justify-between gap-4 rounded-lg border border-border-brand-stroke bg-tag-added px-md py-sm text-sm">
+          <span className="text-brand-primary font-medium">
+            Draft restored — continue where you left off.
+          </span>
+          <button
+            type="button"
+            onClick={() => {
+              discardDraft(reset, EMPTY_VALUES);
+              setShowDraftBanner(false);
+            }}
+            className="text-xs text-body-passive underline hover:text-body shrink-0"
+          >
+            Discard draft
+          </button>
+        </div>
+      )}
+
       <FieldSet className=" grid grid-cols-1 lg:grid-cols-2 gap-x-7">
         <div className="flex flex-col gap-lg pt-main lg:pb-main">
           <FieldGroup className="flex flex-col gap-sm">

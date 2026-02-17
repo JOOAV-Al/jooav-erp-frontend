@@ -25,6 +25,11 @@ import StatsSkeleton from "@/components/general/StatsSkeleton";
 import Image from "next/image";
 import { ImageIcon } from "lucide-react";
 import { useGetBrands } from "@/features/brands/services/brands.api";
+import { useDynamicDrawer } from "@/hooks/useDynamicDrawer";
+import { BULK_FORM_ID, useBulkTabSetup } from "@/hooks/useBulkTabSetup";
+import { useBulkUploadProduct } from "@/features/products/services/products.api";
+
+const MANUAL_FORM_ID = "manufacturer-form";
 
 const VariantPage = () => {
   const [page, setPage] = useState<number>(1);
@@ -50,6 +55,8 @@ const VariantPage = () => {
   } = useDeleteMultipleVariants();
   const { mutateAsync: deleteVariant, isPending: deleting } =
     useDeleteVariant();
+  const { mutateAsync: bulkUpload, isPending: bulkUploading } =
+    useBulkUploadProduct();
 
   const { data: stats, isPending: isStatsPending } = useGetVariantsStats();
   const {
@@ -60,6 +67,19 @@ const VariantPage = () => {
   } = useGetVariants({ search: debouncedQuery, sortOrder });
   const variants = data?.data;
   const { data: brands } = useGetBrands({});
+
+  //─ Dynamic drawer (tracks which tab is active) ───────────────────────────
+  const { activeFormId, onActiveFormIdChange, resetToManual, isBulkTab } =
+    useDynamicDrawer(MANUAL_FORM_ID);
+
+  const { bulkTabContent } = useBulkTabSetup({
+    catalog: "product",
+    // onDownload: handleDownloadTemplate,
+    onUpload: async (formData) => {
+      await bulkUpload(formData);
+    },
+    onSuccess: () => setOpen(false),
+  });
 
   const handleCreate = async (values: any) => {
     if (selectedVariant) {
@@ -88,8 +108,14 @@ const VariantPage = () => {
       value: stats?.totalVariants ? `${stats?.totalVariants}` : "0",
       label: "Variants",
     },
-    { value: stats?.totalBrands ? `${stats?.totalBrands}` : "0", label: "Brands" },
-    { value: stats?.inactiveVariants ? `${stats?.inactiveVariants}` : "0", label: "Archived" },
+    {
+      value: stats?.totalBrands ? `${stats?.totalBrands}` : "0",
+      label: "Brands",
+    },
+    {
+      value: stats?.inactiveVariants ? `${stats?.inactiveVariants}` : "0",
+      label: "Archived",
+    },
   ];
 
   const tabs: Tab[] = [
@@ -113,16 +139,8 @@ const VariantPage = () => {
     {
       value: "bulk",
       label: "Bulk Import",
-      // heading: "Upload variant details",
-      content: (
-        <CSVUpload
-          catalog={"variant"}
-          onCTAClick={() => setOpen(!open)}
-          onDownload={() => {
-            console.log("download");
-          }}
-        />
-      ),
+      formId: BULK_FORM_ID,
+      content: bulkTabContent,
     },
   ];
 
@@ -156,14 +174,20 @@ const VariantPage = () => {
               openDrawer={(isOpen) => {
                 if (isOpen) {
                   setSelectedVariant(undefined);
+                  resetToManual();
                 }
                 setOpen(isOpen);
               }}
               isOpen={open}
-              submitFormId={"variant-form"}
-              submitLoading={updating || creating || deleting}
-              submitLabel="Save record"
-              children={<DrawerTabs tabs={tabs} />}
+              submitFormId={activeFormId}
+              submitLoading={updating || creating || deleting || bulkUploading}
+              submitLabel={isBulkTab ? "Upload CSV" : "Save record"}
+              children={
+                <DrawerTabs
+                  onActiveFormIdChange={onActiveFormIdChange}
+                  tabs={tabs}
+                />
+              }
               showFooter
             />
           </div>
@@ -195,7 +219,7 @@ const VariantPage = () => {
               label: (
                 <div className="flex justify-center">
                   <ImageIcon
-                    strokeWidth={2.5}
+                    strokeWidth={2}
                     className="w-5 h-5 text-border-accent"
                   />
                 </div>
