@@ -72,7 +72,7 @@ const links = {
   order: [
     {
       label: "Order log",
-      href: "/dashboard/order-log",
+      href: "/dashboard/order-logs",
       icon: ShoppingBag,
     },
     {

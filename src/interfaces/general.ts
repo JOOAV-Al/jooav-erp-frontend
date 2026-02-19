@@ -53,6 +53,30 @@ export interface PaginatedObjectResponse<T> {
   }
 }
 
+export interface PaginatedOrdersResponse<T> {
+  status: string;
+  success: boolean;
+  data: {
+    data: T[];
+    meta: {
+      page: number;
+      limit: number;
+      totalItems: number;
+      nextPages: number;
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+    }
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  }
+  // result: T[];
+  // count: number;
+  // next: boolean;
+  // prev: boolean;
+}
+
 export interface MutationResponse<T> {
   message: string;
   status: string;

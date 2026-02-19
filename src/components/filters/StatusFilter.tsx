@@ -7,6 +7,7 @@ interface StatusFilterProps {
   onChange?: (value: string) => void;
   isProducts?: boolean;
   isManufacturers?: boolean;
+  isOrders?: boolean;
 }
 
 const StatusFilter: React.FC<StatusFilterProps> = ({
@@ -14,6 +15,7 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
   onChange,
   isProducts,
   isManufacturers,
+  isOrders,
 }) => {
   const [status, setStatus] = useState<string>(value);
 
@@ -82,7 +84,7 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
           </Button>
         </>
       )}
-      
+
       {isManufacturers && (
         <>
           <Button
@@ -141,6 +143,54 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
               className="w-3.5 h-3.5 text-outline-passive"
             />
             Inactive
+          </Button>
+        </>
+      )}
+
+      {isOrders && (
+        <>
+          <Button
+            size={"filter"}
+            variant={"filter"}
+            onClick={() => handleToggle("COMPLETED")}
+            className={`
+          ${status === "COMPLETED" ? "bg-storey-foreground text-body" : ""}
+        `}
+          >
+            {/* <PenLine
+              strokeWidth={2}
+              className="w-3.5 h-3.5 text-outline-passive"
+            /> */}
+            Completed
+          </Button>
+
+          <Button
+            onClick={() => handleToggle("PROCESSING")}
+            size={"filter"}
+            variant={"filter"}
+            className={`
+          ${status === "PROCESSING" ? "bg-storey-foreground text-body" : ""}
+        `}
+          >
+            {/* <ListPlus
+              strokeWidth={2}
+              className="w-3.5 h-3.5 text-outline-passive"
+            /> */}
+            In Progress
+          </Button>
+          <Button
+            onClick={() => handleToggle("CANCELLED")}
+            size={"filter"}
+            variant={"filter"}
+            className={`
+          ${status === "CANCELLED" ? "bg-storey-foreground text-body hover:bg-storey-foreground" : ""}
+        `}
+          >
+            {/* <CloudUpload
+              strokeWidth={2}
+              className="w-3.5 h-3.5 text-outline-passive"
+            /> */}
+            Cancelled
           </Button>
         </>
       )}

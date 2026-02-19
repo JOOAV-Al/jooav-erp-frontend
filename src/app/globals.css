@@ -816,6 +816,9 @@
   .select-option:hover {
     box-shadow: var(--table-selected);
   }
+  .grouped-box-item:hover {
+    box-shadow: var(--shadow-input);
+  }
   .table-tag {
     box-shadow: var(--table-tag);
   }
