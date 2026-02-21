@@ -35,10 +35,11 @@ import { ImageUploadBox } from "@/components/general/ImageUploadBox";
 import { VariantItem } from "@/features/variants/types";
 import { ParentCategoryItem } from "@/features/categories/types";
 import { BrandItem } from "@/features/brands/types";
-import { useProductDraft } from "@/features/products/hooks/useProductDraft";
+// import { useProductDraft } from "@/features/products/hooks/useProductDraft";
 
 const createProductSchema = z.object({
   name: z.string().min(1, "Name is required"),
+  // wholesalerId: z.string().min(1, "wholesaler is required"),
   description: z.string().min(1, "description is required"),
   brandId: z.string().min(1, "brand is required"),
   variantId: z.string().min(1, "variant is required"),
@@ -99,6 +100,7 @@ export function OrderForm({
     defaultValues: EMPTY_VALUES,
   });
 
+  console.log(product)
   const {
     handleSubmit,
     control,

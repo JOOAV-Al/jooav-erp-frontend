@@ -17,6 +17,7 @@ interface DashboardDrawerProps {
   children: React.ReactNode;
   openDrawer: (isOpen: boolean) => void;
   isOpen: boolean;
+  triggerText?: string;
   showTrigger?: boolean;
   showFooter?: boolean;
   // optional id of the form inside the drawer to target with footer submit
@@ -50,10 +51,11 @@ const DashboardDrawer = ({
   isCustomWidth = false,
   secondarySubmitLabel,
   secondarySubmitLoading = false,
-  submitAction="primary",
+  submitAction = "primary",
   onSubmitActionChange,
   primaryBtnIcon,
   secondaryBtnIcon,
+  triggerText = "Add new",
 }: DashboardDrawerProps) => {
   return (
     <RightDrawer open={isOpen} onOpenChange={openDrawer}>
@@ -63,7 +65,7 @@ const DashboardDrawer = ({
             <span className="h-4 w-5 flex justify-center">
               <Plus size={16} />
             </span>
-            {"Add new"}
+            {triggerText}
           </Button>
         </RightDrawerTrigger>
       )}

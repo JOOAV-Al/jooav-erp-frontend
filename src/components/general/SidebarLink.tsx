@@ -52,37 +52,38 @@ export default function SidebarLink({
       onClick={handleClick}
     >
       <div
-        className={`group flex items-center gap-6 px-sm py-5 rounded-main hover:bg-gray-300 hover:text-nominal-input-hover transition-colors cursor-pointer ${
-          isActive ? "bg-gray-300 sidebar-link font-semibold" : "font-medium"
+        // hover:text-nominal-input-hover
+        className={`group flex items-center gap-6 px-sm py-5 rounded-md hover:bg-[#EDEDED] transition-colors cursor-pointer ${
+          isActive ? "bg-[#EDEDED] sidebar-link font-medium" : "font-medium"
         } ${isCollapsed ? "w-fit mx-auto" : ""}`}
       >
         {/* {isTransitioning ? (
           <Spinner />
         ) : (
           <> */}
-            {!isCollapsed ? (
+        {!isCollapsed ? (
+          <Icon
+            size={18}
+            strokeWidth={2}
+            className={`transition-colors ${
+              isActive ? "text-outline" : "text-outline-passive"
+            } group-hover:text-outline`}
+          />
+        ) : (
+          <Tooltip>
+            <TooltipTrigger asChild className="">
               <Icon
-                size={18}
                 strokeWidth={2}
+                size={18}
                 className={`transition-colors ${
                   isActive ? "text-outline" : "text-outline-passive"
                 } group-hover:text-outline`}
               />
-            ) : (
-              <Tooltip>
-                <TooltipTrigger asChild className="">
-                  <Icon
-                    strokeWidth={2}
-                    size={18}
-                    className={`transition-colors ${
-                      isActive ? "text-outline" : "text-outline-passive"
-                    } group-hover:text-outline`}
-                  />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{label}</p>
-                </TooltipContent>
-              </Tooltip>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{label}</p>
+            </TooltipContent>
+          </Tooltip>
           //   )}
           // </>
         )}
@@ -91,7 +92,7 @@ export default function SidebarLink({
             className={`${
               isActive
                 ? "text-body"
-                : "text-nominal-input-hover group-hover:text-nominal-input-hover w-fit"
+                : "text-body group-hover:text-body w-fit"
             } text-[15px]`}
           >
             {label}

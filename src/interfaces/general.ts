@@ -18,12 +18,14 @@ export interface GeneralFetchingParams {
   isActive?: boolean;
   includeRelations?: boolean;
   parentId?: string;
+  orderNumber?: string;
   includeProductCount?: boolean;
   includeChildren?: boolean;
 }
 
 export interface PaginatedResponse<T> {
   status: string;
+  message: string;
   success: boolean;
   data: T[];
   meta: {
@@ -34,16 +36,29 @@ export interface PaginatedResponse<T> {
     hasNextPage: boolean;
     hasPreviousPage: boolean;
   }
-  // result: T[];
-  // count: number;
-  // next: boolean;
-  // prev: boolean;
+  pagination: {
+    page: number;
+    limit: number;
+    totalItems: number;
+    nextPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  }
 }
 export interface PaginatedObjectResponse<T> {
   status: string;
+  message: string;
   success: boolean;
   data: T;
   meta: {
+    page: number;
+    limit: number;
+    totalItems: number;
+    nextPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  }
+  pagination: {
     page: number;
     limit: number;
     totalItems: number;
@@ -57,8 +72,8 @@ export interface PaginatedOrdersResponse<T> {
   status: string;
   success: boolean;
   data: {
-    data: T[];
-    meta: {
+    orders: T[];
+    pagination: {
       page: number;
       limit: number;
       totalItems: number;

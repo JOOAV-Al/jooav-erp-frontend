@@ -1,7 +1,8 @@
 import { ProductItem } from "@/features/products/types";
 import { UserItem } from "@/features/users/types";
 
-export type OrderStatus = "SUSPENDED" | "ACTIVE" | "BLOCKED" | "PENDING_APPROVAL" | "DEACTIVATED"
+export type OrderStatus = "DRAFT" | "ACTIVE" | "BLOCKED" | "PENDING_APPROVAL" | "DEACTIVATED"
+export type OrderAssignmentStatus = "UNASSIGNED" | "ACTIVE" | "BLOCKED" | "PENDING_APPROVAL" | "DEACTIVATED"
 export interface CreateOrderPayload {
   items?: {
     productId: string;
@@ -16,10 +17,29 @@ export interface CreateOrderPayload {
   };
   customerNotes?: string;
   status?: string;
+
+  //Assigning procurement officer
   assignedProcurementOfficerId?: string;
+  assignmentNotes?: string;
+  response?: string;
+  reason?: string;
 }
 
-export interface OrderItem extends ProductItem {
+export interface UpdateOrderItemStatusPayload {
+  processingNotes?: string;
+  status?: string;
+}
+
+export interface UpdateMultipleOrderItemStatusPayload {
+  items?: {
+    itemId: string;
+    processingNotes?: string;
+    status?: string;
+  }[];
+  bulkNotes?: string;
+}
+
+export interface OrderItem {
   id: string;
   productId: string;
   productName: ProductItem
@@ -27,6 +47,7 @@ export interface OrderItem extends ProductItem {
   unitPrice: string;
   lineTotal: string;
   status: string;
+  product: ProductItem
 }
 export interface Order {
   id: string;
@@ -34,10 +55,13 @@ export interface Order {
   items: OrderItem[]
   wholesalerId: string;
   wholesalerBusinessName: string;
-  assignedProcurementOfficerId: string | null;
+  assignedProcurementOfficer: string | null;
   procurementOfficerName: string | null;
+  createdById: string | null;
   subtotal: string;
   totalAmount: string;
+  monnifyInvoiceRef: string;
+  checkoutUrl: string;
   deliveryAddress: {
     city: string;
     state: string;
@@ -45,13 +69,34 @@ export interface Order {
     contactName: string;
     contactPhone: string;
   };
+  virtualAccounts: {
+    bankCode: string;
+    bankName: string;
+    accountName: string;
+    accountNumber: string;
+  };
+  wholesaler: {
+    id: string;
+    user: {
+      id: string;
+      firstName: string;
+      lastName: string;
+      email: string;
+    }
+  };
   customerNotes: string;
+  assignmentNotes: string;
+  assignmentResponseReason: string;
   status: OrderStatus;
+  assignmentStatus: OrderAssignmentStatus;
   createdAt: string;
   updatedAt: string;
   confirmedAt: string | null;
+  assignedAt: string | null;
+  assignmentRespondedAt: string | null;
+  paymentExpiresAt: string | null;
+  orderDate: string | null;
   submittedAt: string;
-  orderDate: string;
 }
 
 

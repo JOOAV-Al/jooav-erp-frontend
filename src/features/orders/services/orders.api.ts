@@ -1,5 +1,5 @@
 import { fetchOrderDetails, fetchOrders, fetchOrdersStats } from "@/features/orders/services/queryFunctions";
-import { Order, CreateOrderPayload } from "@/features/orders/types";
+import { Order, CreateOrderPayload, UpdateOrderItemStatusPayload, UpdateMultipleOrderItemStatusPayload } from "@/features/orders/types";
 import { GeneralFetchingParams, MutationResponse } from "@/interfaces/general";
 import { api } from "@/lib/api/axiosInstance";
 import { useInvalidatingMutation } from "@/lib/api/useInvalidatingMutations";
@@ -16,10 +16,10 @@ export const useGetOrders = (params: GeneralFetchingParams) => {
   });
 };
 
-export const useGetOrderDetails = ({id}: {id: string}) => {
+export const useGetOrderDetails = ({orderNumber}: {orderNumber: string}) => {
   return useQuery({
-    queryKey: ["order-details", id],
-    queryFn: () => fetchOrderDetails({id}),
+    queryKey: ["order-details", orderNumber],
+    queryFn: () => fetchOrderDetails({orderNumber}),
     retry: 2,
   });
 };
@@ -64,18 +64,42 @@ export const useDeleteMultipleOrders = () => {
   });
 };
 
-export const useUpdateOrderStatus = () => {
+export const useUpdateOrderItemStatus = () => {
   return useInvalidatingMutation({
-    mutationFn: ({id, payload}: {id: string, payload: CreateOrderPayload}) =>
-      api.patch<Order>(`/orders/${id}/status`, {payload}), 
+    mutationFn: ({orderNumber, id, payload}: {orderNumber: string; id: string, payload: UpdateOrderItemStatusPayload}) =>
+      api.patch<Order>(`/orders/${orderNumber}/items/${id}/status`, {payload}), 
+    invalidateQueries: [["all-orders"], ["order-details"], ["orders-stats"]]
+  });
+};
+
+export const useUpdateMultipleOrderItemStatus = () => {
+  return useInvalidatingMutation({
+    mutationFn: ({orderNumber, payload}: {orderNumber: string; payload: UpdateMultipleOrderItemStatusPayload}) =>
+      api.patch<Order>(`/orders/${orderNumber}/items/bulk-update`, {payload}), 
     invalidateQueries: [["all-orders"], ["order-details"], ["orders-stats"]]
   });
 };
 
 export const useAssignOfficerToOrder = () => {
   return useInvalidatingMutation({
-    mutationFn: ({id, payload}: {id: string, payload: CreateOrderPayload}) =>
-      api.patch<Order>(`/orders/${id}/assign`, {payload}), 
+    mutationFn: ({orderNumber, payload}: {orderNumber: string, payload: CreateOrderPayload}) =>
+      api.patch<Order>(`/orders/${orderNumber}/assign`, {payload}), 
+    invalidateQueries: [["all-orders"], ["order-details"], ["orders-stats"]]
+  });
+};
+
+export const useAutoAssignOfficerToOrder = () => {
+  return useInvalidatingMutation({
+    mutationFn: ({orderNumber}: {orderNumber: string}) =>
+      api.post<Order>(`/orders/${orderNumber}/auto-assign`), 
+    invalidateQueries: [["all-orders"], ["order-details"], ["orders-stats"]]
+  });
+};
+
+export const useOfficerResponseToOrder = () => {
+  return useInvalidatingMutation({
+    mutationFn: ({orderNumber, payload}: {orderNumber: string, payload: CreateOrderPayload}) =>
+      api.patch<Order>(`/orders/${orderNumber}/assignment/respond`, {payload}), 
     invalidateQueries: [["all-orders"], ["order-details"], ["orders-stats"]]
   });
 };

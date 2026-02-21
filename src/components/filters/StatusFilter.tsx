@@ -165,11 +165,11 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
           </Button>
 
           <Button
-            onClick={() => handleToggle("PROCESSING")}
+            onClick={() => handleToggle("PENDING")}
             size={"filter"}
             variant={"filter"}
             className={`
-          ${status === "PROCESSING" ? "bg-storey-foreground text-body" : ""}
+          ${status === "PENDING" ? "bg-storey-foreground text-body" : ""}
         `}
           >
             {/* <ListPlus
