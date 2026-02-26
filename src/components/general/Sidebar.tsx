@@ -75,14 +75,14 @@ const links = {
       href: "/dashboard/order-logs",
       icon: ShoppingBag,
     },
+    // {
+    //   label: "Logistics",
+    //   href: "/dashboard/logistics",
+    //   icon: Bike,
+    // },
     {
-      label: "Logistics",
-      href: "/dashboard/logistics",
-      icon: Bike,
-    },
-    {
-      label: "Fulfillment",
-      href: "/dashboard/fulfillment",
+      label: "Fulfilled",
+      href: "/dashboard/fulfilled-orders",
       icon: CheckCheck,
     },
   ],

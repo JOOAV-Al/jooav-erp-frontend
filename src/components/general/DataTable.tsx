@@ -339,17 +339,17 @@ DataTableProps<T>) {
             </span>
             <button
               onClick={handleClearSelection}
-              className="flex items-center justify-center px-md py-3 cursor-pointer group"
+              className="flex items-center justify-center h-full hover:bg-border-main px-md py-3 cursor-pointer group"
               aria-label="Clear selection"
             >
-              <X className="w-5 h-5 text-outline group-hover:scale-108 group-hover:text-brand-primary" />
+              <X className="w-5 h-5 text-outline" />
             </button>
           </div>
 
           {onPublish && (
             <div
               onClick={handlePublish}
-              className="bg-storey-foreground rounded-lg shadow-input flex items-center group h-[44px]"
+              className="bg-storey-foreground hover:bg-border-main rounded-lg shadow-input flex items-center group h-[44px]"
             >
               <div
                 // onClick={handleClearSelection}
@@ -371,7 +371,7 @@ DataTableProps<T>) {
           {onDelete && (
             <button
               onClick={handleDelete}
-              className="bg-storey-foreground rounded-lg shadow-input px-main py-md flex items-center gap-5 group cursor-pointer h-[44px]"
+              className="bg-storey-foreground hover:bg-border-main rounded-lg shadow-input px-main py-md flex items-center gap-5 group cursor-pointer h-[44px]"
               aria-label="Delete selected"
             >
               {deletingMultiple ? (

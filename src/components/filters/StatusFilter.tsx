@@ -150,6 +150,36 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
       {isOrders && (
         <>
           <Button
+            onClick={() => handleToggle("DRAFT")}
+            size={"filter"}
+            variant={"filter"}
+            className={`
+          ${status === "DRAFT" ? "bg-storey-foreground text-body hover:bg-storey-foreground" : ""}
+        `}
+          >
+            Draft
+          </Button>
+          {/* <Button
+            onClick={() => handleToggle("CONFIRMED")}
+            size={"filter"}
+            variant={"filter"}
+            className={`
+          ${status === "CONFIRMED" ? "bg-storey-foreground text-body hover:bg-storey-foreground" : ""}
+        `}
+          >
+            Confirmed
+          </Button> */}
+          <Button
+            onClick={() => handleToggle("ASSIGNED")}
+            size={"filter"}
+            variant={"filter"}
+            className={`
+          ${status === "ASSIGNED" ? "bg-storey-foreground text-body hover:bg-storey-foreground" : ""}
+        `}
+          >
+            Assigned
+          </Button>
+          <Button
             size={"filter"}
             variant={"filter"}
             onClick={() => handleToggle("COMPLETED")}
@@ -157,27 +187,20 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
           ${status === "COMPLETED" ? "bg-storey-foreground text-body" : ""}
         `}
           >
-            {/* <PenLine
-              strokeWidth={2}
-              className="w-3.5 h-3.5 text-outline-passive"
-            /> */}
             Completed
           </Button>
 
           <Button
-            onClick={() => handleToggle("PENDING")}
+            onClick={() => handleToggle("IN_PROGRESS")}
             size={"filter"}
             variant={"filter"}
             className={`
-          ${status === "PENDING" ? "bg-storey-foreground text-body" : ""}
+          ${status === "IN_PROGRESS" ? "bg-storey-foreground text-body" : ""}
         `}
           >
-            {/* <ListPlus
-              strokeWidth={2}
-              className="w-3.5 h-3.5 text-outline-passive"
-            /> */}
             In Progress
           </Button>
+
           <Button
             onClick={() => handleToggle("CANCELLED")}
             size={"filter"}
@@ -186,10 +209,6 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
           ${status === "CANCELLED" ? "bg-storey-foreground text-body hover:bg-storey-foreground" : ""}
         `}
           >
-            {/* <CloudUpload
-              strokeWidth={2}
-              className="w-3.5 h-3.5 text-outline-passive"
-            /> */}
             Cancelled
           </Button>
         </>

@@ -77,6 +77,7 @@
   --success-300: hsl(120 59% 63%);
   --success-400: hsl(120 59% 63%);
   --success-500: hsl(120 73% 45%);
+  --app-success: hsla(120, 73%, 45%);
   --success-600: hsl(120 73% 37%);
   --success-700: hsl(120 72% 23%);
   --success-800: hsl(120 74% 15%);
@@ -115,6 +116,7 @@
   --0-75rem: 0.75rem;
   --0-8125rem: 0.8125rem;
   --0-875rem: 0.875rem;
+  --0-9375rem: 0.9375rem;
   --1rem: 1rem;
   --1-125rem: 1.125rem;
   --1-25rem: 1.25rem;
@@ -228,6 +230,7 @@
   --text-outline-passive: var(--outline-passive);
   --text-body-passive: var(--body-passive);
   --text-body: var(--app-body);
+  --text-success: var(--app-success);
 }
 
 /* Semantic Typography Tokens */
@@ -248,6 +251,7 @@
   --size-toast-body: var(--1rem);
   --size-body: var(--1-125rem);
   --size-h3: var(--1-25rem);
+  --size-h5: var(--0-9375rem);
   --size-card-heading: var(--1-5rem);
   --size-toast-heading: var(--1-5rem);
   --size-h2: var(--1-75rem);
@@ -369,6 +373,10 @@
   /* Sidebar links elevation effect */
   --sidebar-link:
     0px 0px 0px 2px rgba(0, 0, 0, 0.05), 0px 3px 2px 0px rgba(6, 16, 30, 0.08);
+
+  /* Sidebar links elevation effect */
+  --user-dropdown:
+    0px 16px 12px 4px rgba(16, 41, 78, 0.06), 0px 0px 0px 2px rgba(0, 0, 0, 0.05);
 
   /* Sidebar links elevation effect */
   --table-tag:
@@ -525,6 +533,7 @@
   --color-success-300: var(--success-300);
   --color-success-400: var(--success-400);
   --color-success-500: var(--success-500);
+  --color-success: var(--app-success);
   --color-success-600: var(--success-600);
   --color-success-700: var(--success-700);
   --color-success-800: var(--success-800);
@@ -586,6 +595,7 @@
   --font-size-toast: var(--size-toast-body);
   --font-size-body: var(--size-body);
   --font-size-h3: var(--size-h3);
+  --font-size-h5: var(--size-h5);
   --font-size-card-heading: var(--size-card-heading);
   --font-size-h2: var(--size-h2);
   --font-size-h1: var(--size-h1);
@@ -688,6 +698,7 @@
   --box-shadow-card: var(--shadow-card);
   --box-select-dropdown-shadow: var(--select-dropdown-shadow);
   --box-shadow-sidebar-link: var(--sidebar-link);
+  --box-shadow-user-dropdown: var(--user-dropdown);
   --box-shadow-table-selected: var(--table-selected);
   --box-shadow-table-tag: var(--table-tag);
   --box-shadow-table-shadow: var(--table-shadow);
@@ -809,6 +820,9 @@
   }
   .sidebar-link {
     box-shadow: var(--sidebar-link);
+  }
+  .user-dropdown {
+    box-shadow: var(--user-dropdown);
   }
   .table-selected {
     box-shadow: var(--table-selected);

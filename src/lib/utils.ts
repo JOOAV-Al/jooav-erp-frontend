@@ -52,12 +52,96 @@ export const normalizePhone = (phone: string) => {
     let e164 = phone;
     try {
       const parsed = parsePhoneNumberFromString(phone, "NG");
-      if (parsed && parsed.isValid()) {
-        e164 = parsed.format("E.164"); // e.g. 234803...
+      if (parsed && parsed?.isValid()) {
+        e164 = parsed?.format("E.164"); // e.g. 234803...
       }
     } catch (e) {
       // fallback: use rawPhone
     }
-    const waDigits = e164.replace(/\D/g, ""); // remove '' and non-digits -> 234803...
+    const waDigits = e164?.replace(/\D/g, ""); // remove '' and non-digits -> 234803...
     return waDigits;
   }
+
+
+/**
+ * Converts a string to proper case, capitalizing the first letter of each word
+ * and making the rest of the letters lowercase.
+ * 
+ * Examples:
+ *   toProperCase("ADMIN") // "Admin"
+ *   toProperCase("super-admin user") // "Super-Admin User"
+ * 
+ * @param text - The input string to format.
+ * @returns The formatted string in proper case.
+ */
+export function toProperCase(text: string): string {
+  if (!text) return "";
+  return text
+    .toLowerCase()
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+
+
+export const getItemStatusStyles = (status = "") => {
+  switch (status?.toUpperCase()) {
+    case "COMPLETED":
+    case "DELIVERED":
+      return {
+        styles:
+          "table-tag border-border-accent bg-tag-added text-brand-primary!",
+        text: "Completed",
+      };
+    case "PROCESSING":
+    case "SOURCING":
+    case "PAID":
+      return {
+        styles: "table-tag border-border-accent bg-tag-queue text-brand-signal",
+        text: "In Progress",
+      };
+    case "PENDING":
+    case "PENDING_APPROVAL":
+      return {
+        styles: "table-tag border-border-accent bg-tag-queue text-destructive",
+        text: "Pending",
+      };
+    default:
+      return {
+        styles: "table-tag border-border-accent bg-[#F7F7F7] text-body",
+        text: "Cancelled",
+      };
+  }
+};
+
+export const getOrderStatusStyles = (status = "") => {
+  switch (status?.toUpperCase()) {
+    case "COMPLETED":
+      return {
+        styles:
+          "table-tag border-border-main bg-storey-foreground text-heading!",
+        text: "Fulfilled",
+      };
+    case "ASSIGNED":
+      return {
+        styles:
+          "table-tag border-border-main bg-storey-foreground text-heading!",
+        text: "Assigned",
+      };
+    case "IN_PROGRESS":
+    case "CONFIRMED":
+      return {
+        styles: "table-tag border-border-main bg-tag-active text-success",
+        text: "Processing",
+      };
+    case "CANCELLED":
+      return {
+        styles: "table-tag border-border-main bg-tag-draft text-body-passive",
+        text: "Archived",
+      };
+    default:
+      return {
+        styles: "table-tag border-border-main bg-tag-draft text-body-passive",
+        text: "Draft",
+      };
+  }
+};

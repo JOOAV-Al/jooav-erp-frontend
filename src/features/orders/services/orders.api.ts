@@ -67,7 +67,7 @@ export const useDeleteMultipleOrders = () => {
 export const useUpdateOrderItemStatus = () => {
   return useInvalidatingMutation({
     mutationFn: ({orderNumber, id, payload}: {orderNumber: string; id: string, payload: UpdateOrderItemStatusPayload}) =>
-      api.patch<Order>(`/orders/${orderNumber}/items/${id}/status`, {payload}), 
+      api.patch<Order>(`/orders/${orderNumber}/items/${id}/status`, payload), 
     invalidateQueries: [["all-orders"], ["order-details"], ["orders-stats"]]
   });
 };
@@ -75,7 +75,7 @@ export const useUpdateOrderItemStatus = () => {
 export const useUpdateMultipleOrderItemStatus = () => {
   return useInvalidatingMutation({
     mutationFn: ({orderNumber, payload}: {orderNumber: string; payload: UpdateMultipleOrderItemStatusPayload}) =>
-      api.patch<Order>(`/orders/${orderNumber}/items/bulk-update`, {payload}), 
+      api.patch<Order>(`/orders/${orderNumber}/items/bulk-update`, payload), 
     invalidateQueries: [["all-orders"], ["order-details"], ["orders-stats"]]
   });
 };
@@ -83,7 +83,7 @@ export const useUpdateMultipleOrderItemStatus = () => {
 export const useAssignOfficerToOrder = () => {
   return useInvalidatingMutation({
     mutationFn: ({orderNumber, payload}: {orderNumber: string, payload: CreateOrderPayload}) =>
-      api.patch<Order>(`/orders/${orderNumber}/assign`, {payload}), 
+      api.patch<Order>(`/orders/${orderNumber}/assign`, payload), 
     invalidateQueries: [["all-orders"], ["order-details"], ["orders-stats"]]
   });
 };
@@ -99,7 +99,7 @@ export const useAutoAssignOfficerToOrder = () => {
 export const useOfficerResponseToOrder = () => {
   return useInvalidatingMutation({
     mutationFn: ({orderNumber, payload}: {orderNumber: string, payload: CreateOrderPayload}) =>
-      api.patch<Order>(`/orders/${orderNumber}/assignment/respond`, {payload}), 
+      api.patch<Order>(`/orders/${orderNumber}/assignment/respond`, payload), 
     invalidateQueries: [["all-orders"], ["order-details"], ["orders-stats"]]
   });
 };

@@ -18,7 +18,6 @@ import { useDebounce } from "@/hooks/useDebounce";
 import StatsContainer from "@/components/general/StatsContainer";
 import FormDropdown from "@/components/general/FormDropdown";
 import StatsSkeleton from "@/components/general/StatsSkeleton";
-import StatusFilter from "@/components/filters/StatusFilter";
 import DrawerBoxContent from "@/components/general/DrawerBoxContent";
 import TableTag from "@/components/general/TableTag";
 import { useGetProducts } from "@/features/products/services/products.api";
@@ -26,20 +25,14 @@ import { useGetUsers } from "@/features/users/services/users.api";
 import OrdersGroupedTable from "@/features/orders/components/OrdersGroupedTable";
 import SearchBox from "@/components/filters/SearchBox";
 import { getItemStatusStyles, getOrderStatusStyles } from "@/lib/utils";
+import SortFilter from "@/components/filters/SortFilter";
 
-const OrderLogsPage = () => {
+const FulfilledOrdersPage = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [page, setPage] = useState<number>(1);
   const [query, setQuery] = useState<string>("");
-  const [statusFilter, setStatusFilter] = useState<string>("");
+  const [sortOrder, setSortOrder] = useState<"desc" | "asc" | "">("");
   const [showPaymentScreen, setShowPaymentScreen] = useState<boolean>(false);
-  const [messageObject, setMessageObject] = useState<{
-    phone: string;
-    role: string;
-  }>({
-    phone: "",
-    role: "",
-  });
   const [selectedOrder, setSelectedOrder] = useState<Order | undefined>(
     undefined,
   );
@@ -67,7 +60,7 @@ const OrderLogsPage = () => {
     isPending: isOrdersPending,
     isRefetching,
     refetch,
-  } = useGetOrders({ page, search: debouncedQuery, status: statusFilter });
+  } = useGetOrders({ page, search: debouncedQuery, status: "COMPLETED" });
 
   const { data: products } = useGetProducts({});
   const { data: wholesalers } = useGetUsers({ role: "WHOLESALER" });
@@ -122,20 +115,16 @@ const OrderLogsPage = () => {
 
   return (
     <div className="flex flex-col gap-5 pb-main">
-      {isStatsPending ? (
+      {/* {isStatsPending ? (
         <StatsSkeleton count={2} />
       ) : (
         <StatsContainer stats={displayStats} />
-      )}
+      )} */}
 
       <div className="px-xl pt-xl pb-1 flex flex-col gap-7">
         <div className="flex justify-between flex-wrap gap-6">
           <FilterContainer label="">
-            <StatusFilter
-              value={statusFilter}
-              onChange={setStatusFilter}
-              isOrders
-            />
+            <SortFilter value={sortOrder} onChange={setSortOrder} />
           </FilterContainer>
 
           <div className="flex items-center gap-6 flex-wrap">
@@ -146,14 +135,10 @@ const OrderLogsPage = () => {
                 setQuery(value);
               }}
             />
-            <DashboardDrawer
-              // isCustomWidth
-              // customWidthStyle="aspect-517/959 max-w-md mdl:max-w-md lg:max-w-[517px]"
-              // customImage="/dashboard/wide-drawer-top-img.svg"
+            {/* <DashboardDrawer
               showTrigger
               triggerText="Create Order"
               openDrawer={(isOpen) => {
-                // setShowLink(false);
                 if (isOpen) {
                   setSelectedOrder(undefined);
                   setSelectedOrderItem(undefined);
@@ -197,28 +182,28 @@ const OrderLogsPage = () => {
                           handleUpdateOrderItemStatus(
                             "PENDING",
                             selectedOrderItem?.id ?? "",
-                            selectedOrder?.orderNumber ?? "",
+                            selectedOrder?.orderNumber ?? ""
                           )
                         }
                         onMarkItemCancelled={() =>
                           handleUpdateOrderItemStatus(
                             "CANCELLED",
                             selectedOrderItem?.id ?? "",
-                            selectedOrder?.orderNumber ?? "",
+                            selectedOrder?.orderNumber ?? ""
                           )
                         }
                         onMarkItemComplete={() =>
                           handleUpdateOrderItemStatus(
                             "DELIVERED",
                             selectedOrderItem?.id ?? "",
-                            selectedOrder?.orderNumber ?? "",
+                            selectedOrder?.orderNumber ?? ""
                           )
                         }
                         onMarkItemInProgress={() =>
                           handleUpdateOrderItemStatus(
                             "SOURCING",
                             selectedOrderItem?.id ?? "",
-                            selectedOrder?.orderNumber ?? "",
+                            selectedOrder?.orderNumber ?? ""
                           )
                         }
                         // onReset={() => ordersFormResetRef.current?.()}
@@ -248,7 +233,7 @@ const OrderLogsPage = () => {
                   }
                 />
               )}
-            </DashboardDrawer>
+            </DashboardDrawer> */}
           </div>
         </div>
 
@@ -263,7 +248,7 @@ const OrderLogsPage = () => {
           onOrderItemClick={(orderItem, order) => {
             setSelectedOrderItem(orderItem);
             setSelectedOrder(order);
-            setOpen(true);
+            // setOpen(true);
           }}
           onDelete={(rows) =>
             deleteMultipleOrders({ orderIds: rows.map((o) => o.id) })
@@ -300,10 +285,11 @@ const OrderLogsPage = () => {
           emptyImage="/dashboard/import-csv.svg"
           emptyCta="Refresh"
           onEmptyCta={refetch}
+          showActions={false}
         />
       </div>
     </div>
   );
 };
 
-export default OrderLogsPage;
+export default FulfilledOrdersPage;

@@ -1,25 +1,28 @@
 import { ProductItem } from "@/features/products/types";
 import { UserItem } from "@/features/users/types";
 
-export type OrderStatus = "DRAFT" | "ACTIVE" | "BLOCKED" | "PENDING_APPROVAL" | "DEACTIVATED"
+export type OrderStatus = "DRAFT" | "CONFIRMED" | "IN_PROGRESS" | "ASSIGNED" | "COMPLETED" | "CANCELLED"
 export type OrderAssignmentStatus = "UNASSIGNED" | "ACTIVE" | "BLOCKED" | "PENDING_APPROVAL" | "DEACTIVATED"
 export interface CreateOrderPayload {
+  wholesalerId?: string;
   items?: {
     productId: string;
     quantity: number;
+    unitPrice: number;
   }[];
   deliveryAddress?: {
-    city: string;
-    state: string;
-    address: string;
-    contactName: string;
-    contactPhone: string;
+    city?: string;
+    state?: string;
+    address?: string;
+    contactName?: string;
+    contactPhone?: string;
   };
   customerNotes?: string;
   status?: string;
 
   //Assigning procurement officer
   assignedProcurementOfficerId?: string;
+  procurementOfficerId?: string;
   assignmentNotes?: string;
   response?: string;
   reason?: string;
@@ -39,6 +42,17 @@ export interface UpdateMultipleOrderItemStatusPayload {
   bulkNotes?: string;
 }
 
+export interface OrderItemProduct {
+  name: string;
+  thumbnail: string;
+  images: string[];
+  packSize: {
+    name: string;
+  },
+  packType: {
+    name: string;
+  }
+}
 export interface OrderItem {
   id: string;
   productId: string;
@@ -47,7 +61,7 @@ export interface OrderItem {
   unitPrice: string;
   lineTotal: string;
   status: string;
-  product: ProductItem
+  product: OrderItemProduct
 }
 export interface Order {
   id: string;
@@ -55,8 +69,9 @@ export interface Order {
   items: OrderItem[]
   wholesalerId: string;
   wholesalerBusinessName: string;
-  assignedProcurementOfficer: string | null;
+  assignedProcurementOfficer: UserItem | null;
   procurementOfficerName: string | null;
+  assignedProcurementOfficerId: string | null;
   createdById: string | null;
   subtotal: string;
   totalAmount: string;

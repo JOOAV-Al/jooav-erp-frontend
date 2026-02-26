@@ -318,17 +318,17 @@ function GroupedDataTable<T>({
             </span>
             <button
               onClick={handleClearSelection}
-              className="flex items-center justify-center px-md py-3 cursor-pointer group"
+              className="flex items-center justify-center px-md py-3 cursor-pointer group h-full hover:bg-border-main"
               aria-label="Clear selection"
             >
-              <X className="w-5 h-5 text-outline group-hover:scale-105 group-hover:text-brand-primary" />
+              <X className="w-5 h-5 text-outline" />
             </button>
           </div>
 
           {onPublish && (
             <div
               onClick={handlePublish}
-              className="bg-storey-foreground rounded-lg shadow-input flex items-center group h-11 cursor-pointer"
+              className="bg-storey-foreground hover:bg-border-main rounded-lg shadow-input flex items-center group h-11 cursor-pointer"
             >
               <div className="flex items-center justify-center pl-md py-3">
                 {publishingMultiple ? (
@@ -344,7 +344,7 @@ function GroupedDataTable<T>({
           {onDelete && (
             <button
               onClick={handleDelete}
-              className="bg-storey-foreground rounded-lg shadow-input px-main py-md flex items-center gap-5 group cursor-pointer h-11"
+              className="bg-storey-foreground hover:bg-border-main rounded-lg shadow-input px-main py-md flex items-center gap-5 group cursor-pointer h-11"
               aria-label="Delete selected"
             >
               {deletingMultiple ? (

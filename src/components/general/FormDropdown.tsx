@@ -15,6 +15,7 @@ interface FormDropdownProps {
   onMarkItemPending?: () => void;
   onMarkItemCancelled?: () => void;
   onMarkItemInProgress?: () => void;
+  heading?: string;
 }
 function FormDropdown({
   deleteAction,
@@ -25,6 +26,7 @@ function FormDropdown({
   onMarkItemPending,
   onMarkItemCancelled,
   onMarkItemInProgress,
+  heading="",
 }: FormDropdownProps) {
   return (
     <DropdownMenu>
@@ -36,9 +38,10 @@ function FormDropdown({
       <DropdownMenuContent
         align="end"
         className={
-          "flex flex-col gap-5 p-sm! rounded-lg! max-h-90 select-dropdown-shadow"
+          "flex flex-col gap-5 p-sm! rounded-lg! max-h-90 select-dropdown-shadow min-w-[172px]"
         }
       >
+        {heading && <h5 className="py-3">{heading}</h5>}
         {unpublish && (
           <DropdownMenuItem onClick={() => unpublish?.()}>
             Unpublish

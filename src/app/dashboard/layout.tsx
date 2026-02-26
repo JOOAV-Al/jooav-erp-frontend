@@ -50,6 +50,8 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       ? "Permission categories"
       : pathname.startsWith("/dashboard/order-logs")
       ? "Order Management"
+      : pathname.startsWith("/dashboard/fulfilled-orders")
+      ? "Order Management"
       : "Home";
   };
   return (
