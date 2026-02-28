@@ -24,7 +24,10 @@ import { useEffect, useState } from "react";
 import { Select } from "@/components/general/Select";
 import FieldIcon from "@/components/general/FieldIcon";
 import { userRoles } from "@/lib/rbac/roles";
-import { isValidPhoneNumber, parsePhoneNumberFromString } from "libphonenumber-js";
+import {
+  isValidPhoneNumber,
+  parsePhoneNumberFromString,
+} from "libphonenumber-js";
 import { Button } from "@/components/ui/button";
 import CopyLinkBox from "@/components/general/CopyLinkBox";
 import Image from "next/image";
@@ -40,7 +43,7 @@ const createUserSchema = z.object({
   phone: z.string().refine((val) => {
     return isValidPhoneNumber(val, {
       defaultCountry: "NG",
-      defaultCallingCode: "+234"
+      defaultCallingCode: "+234",
     });
   }, "Invalid Phone Number"),
   role: z.string().min(1, "user role is required"),
@@ -51,6 +54,7 @@ export function UserForm({
   user,
   onResetReady,
 }: DialogFormProps & { user?: UserItem }) {
+  const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
   const [linkGenerated, setLinkGenerated] = useState<boolean>(false);
   const [link, setLink] = useState<string>("");
   const [messageObject, setMessageObject] = useState<{
@@ -138,7 +142,7 @@ export function UserForm({
         phone: user?.phone ?? "",
         role: user?.role ?? "",
       });
-    })
+    });
   }, [user?.id, reset]);
 
   return (
@@ -267,12 +271,14 @@ export function UserForm({
               <div>
                 <Field data-invalid={fieldState.invalid}>
                   <div className="flex gap-3 items-center">
-                    <FieldLabel>User role</FieldLabel>
+                    <FieldLabel dimLabel={dropdownOpen}>User role</FieldLabel>
                     {fieldState.error && (
                       <FieldError>: {fieldState.error.message}</FieldError>
                     )}
                   </div>
                   <Select
+                    isOpen={dropdownOpen}
+                    setIsOpen={setDropdownOpen}
                     options={
                       userRoles?.map((r) => ({
                         label: r.label,
@@ -314,10 +320,10 @@ export function UserForm({
               ) : (
                 <div className="py-sm gap-main flex flex-col">
                   <div className={`flex flex-col gap-5 ${`py-sm`}`}>
-                    <h4 className="leading-[1.2] tracking-[0.01]">
+                    <h4 className="leading-[1.2] tracking-[0.01em]">
                       Reset user credentials
                     </h4>
-                    <p className="text-body-passive text-[15px] font-medium leading-normal tracking-[0.03]">
+                    <p className="text-body-passive text-[15px] font-medium leading-normal tracking-[0.03em]">
                       {"Click the button to generate a link to"}
                     </p>
                   </div>

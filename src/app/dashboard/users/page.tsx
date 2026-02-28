@@ -257,7 +257,7 @@ const UserPage = () => {
                 </div>
               ),
               render: (item) => (
-                <div className="w-7.5 h-7.5 flex justify-center items-center rounded-full bg-brand-secondary border border-border-main text-[13px] font-semibold tracking-[0.05] text-brand-accent-2 mx-auto">{`${item?.firstName?.[0]}${item?.lastName?.[0]}`}</div>
+                <div className="w-7.5 h-7.5 flex justify-center items-center rounded-full bg-brand-secondary border border-border-main text-[13px] font-semibold tracking-[0.05em] text-brand-accent-2 mx-auto">{`${item?.firstName?.[0]}${item?.lastName?.[0]}`}</div>
               ),
             },
             { key: "firstName", label: "First Name", activeColor: true },

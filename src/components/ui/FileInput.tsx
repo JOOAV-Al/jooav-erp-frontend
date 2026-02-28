@@ -65,7 +65,7 @@ const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
           className={cn(
             // Base styles
             "w-full min-w-0 h-[48px] rounded-lg bg-white border border-transparent",
-            "py-md text-base outline-none leading-20",
+            "py-md text-sm outline-none leading-20 tracking-[0.04em] text-body font-medium",
             "shadow-input focus-within:shadow-input",
             "transition-[color,box-shadow]",
             "cursor-pointer",
@@ -90,7 +90,7 @@ const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
           {/* File name or placeholder */}
           <span
             className={cn(
-              "truncate flex-1",
+              "truncate flex-1 text-sm",
               selectedFile ? "text-foreground" : "text-body-passive",
             )}
           >

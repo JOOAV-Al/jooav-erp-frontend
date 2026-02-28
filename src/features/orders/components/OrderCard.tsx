@@ -38,7 +38,7 @@ export const InitialsAvatar = ({ name }: { name: string }) => {
   const initials =
     parts.length >= 2 ? `${parts[0][0]}${parts[1][0]}` : (parts[0]?.[0] ?? "?");
   return (
-    <div className="w-[26px] h-[26px] flex-shrink-0 flex justify-center items-center rounded-full bg-tag-added border border-border-main text-[13px] font-semibold tracking-[0.05] text-brand-primary uppercase">
+    <div className="w-[26px] h-[26px] flex-shrink-0 flex justify-center items-center rounded-full bg-tag-added border border-border-main text-[13px] font-semibold tracking-[0.05em] text-brand-primary uppercase">
       {initials}
     </div>
   );
@@ -130,12 +130,12 @@ export function OrderCard({
       >
         {/* Ordered By */}
         <div className="flex flex-col gap-5">
-          <span className="text-[12px] py-2 font-normal tracking-[0.08] leading-[1.2] text-body-passive uppercase font-mono">
+          <span className="text-[12px] py-2 font-normal tracking-[0.08em] leading-[1.2] text-body-passive uppercase font-mono">
             Ordered By:
           </span>
           <div className="flex items-center gap-5">
             <InitialsAvatar name={wholesaler || "—"} />
-            <span className="text-[14px] font-medium text-body leading-[1.5] tracking-[0.04]">
+            <span className="text-[14px] font-medium text-body leading-[1.5] tracking-[0.04em]">
               {wholesaler || "—"}
             </span>
           </div>
@@ -143,7 +143,7 @@ export function OrderCard({
 
         {/* Assigned To */}
         <div className="flex flex-col gap-5">
-          <span className="text-[12px] py-2 font-normal tracking-[0.08] leading-[1.2] text-body-passive uppercase font-mono">
+          <span className="text-[12px] py-2 font-normal tracking-[0.08em] leading-[1.2] text-body-passive uppercase font-mono">
             Assigned To:
           </span>
           <div onClick={(e) => e.stopPropagation()}>
@@ -151,7 +151,7 @@ export function OrderCard({
               order.status === "COMPLETED" ? (
                 <div className="flex items-center gap-[8px] cursor-pointer">
                   <InitialsAvatar name={displayOfficerName ?? "?"} />
-                  <span className="text-[14px] font-medium text-body leading-[1.5] tracking-[0.04]">
+                  <span className="text-[14px] font-medium text-body leading-[1.5] tracking-[0.04em]">
                     {displayOfficerName ?? "Unassigned"}
                   </span>
                 </div>
@@ -160,7 +160,7 @@ export function OrderCard({
                   <DropdownMenuTrigger asChild>
                     <div className="flex items-center gap-[8px] cursor-pointer">
                       <InitialsAvatar name={displayOfficerName ?? "?"} />
-                      <span className="text-[14px] font-medium text-body leading-[1.5] tracking-[0.04]">
+                      <span className="text-[14px] font-medium text-body leading-[1.5] tracking-[0.04em]">
                         {displayOfficerName ?? "Unassigned"}
                       </span>
                       {assigning ? (
@@ -191,7 +191,7 @@ export function OrderCard({
                           <InitialsAvatar
                             name={`${o.firstName} ${o.lastName}`}
                           />
-                          <span className="text-[14px] font-medium text-body leading-[1.5] tracking-[0.04]">
+                          <span className="text-[14px] font-medium text-body leading-[1.5] tracking-[0.04em]">
                             {o.firstName} {o.lastName}
                           </span>
                         </div>
@@ -201,7 +201,7 @@ export function OrderCard({
                 </DropdownMenu>
               )
             ) : (
-              <span className="text-[14px] font-medium text-body leading-[1.5] tracking-[0.04]">
+              <span className="text-[14px] font-medium text-body leading-[1.5] tracking-[0.04em]">
                 Unassigned
               </span>
             )}
@@ -210,17 +210,17 @@ export function OrderCard({
 
         {/* Delivery Address */}
         <div className="flex flex-col gap-5 lg:place-self-center">
-          <span className="text-[12px] py-2 font-normal tracking-[0.08] leading-[1.2] text-body-passive uppercase font-mono">
+          <span className="text-[12px] py-2 font-normal tracking-[0.08em] leading-[1.2] text-body-passive uppercase font-mono">
             Delivery Address:
           </span>
-          <span className="text-[14px] font-medium text-body leading-[1.5] tracking-[0.04]">
+          <span className="text-[14px] font-medium text-body leading-[1.5] tracking-[0.04em]">
             {address}
           </span>
         </div>
 
         {/* Date + Status */}
         <div className="flex flex-col gap-5 lg:ml-auto">
-          <span className="text-[14px] font-medium text-body leading-[1.5] tracking-[0.04]">
+          <span className="text-[14px] font-medium text-body leading-[1.5] tracking-[0.04em]">
             {formatOrderDate(order.orderDate ?? order.createdAt)}
           </span>
           <div className="lg:ml-auto">
@@ -265,16 +265,17 @@ export function OrderCard({
 
               {/* Thumbnail */}
               <div className="flex-shrink-0 w-[65px] h-[65px] rounded-lg border border-border-main overflow-hidden bg-storey-foreground flex items-center justify-center">
-                {(item as any)?.thumbnail ? (
+                {(item as any)?.product?.thumbnail &&
+                (item as any)?.product?.thumbnail?.startsWith("https://") ? (
                   <Image
-                    src={(item as any).thumbnail}
+                    src={(item as any)?.product?.thumbnail}
                     alt={productName}
                     width={65}
                     height={65}
                     className="object-cover w-full h-full"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-[10px] text-gray-400 font-mono">
+                  <div className="w-full h-full bg-storey-foreground flex items-center justify-center text-[10px] text-body-passive font-mono">
                     IMG
                   </div>
                 )}
@@ -382,27 +383,27 @@ export function OrderCard({
                 </div>
 
                 <div className="grid grid-cols-1 mdxl:grid-cols-3 lg:grid-cols-4 gap-[8px] py-3">
-                  <span className="font-mono text-[12px] text-body-passive tracking-[0.08] leading-[1.2]">
+                  <span className="font-mono text-[12px] text-body-passive tracking-[0.08em] leading-[1.2]">
                     QTY:{" "}
-                    <span className="text-body font-garantpro font-semibold text-[13px] tracking-[0.05px]">
+                    <span className="text-body font-garantpro font-semibold text-[13px] tracking-[0.05em]">
                       {item.quantity}
                     </span>
                   </span>
-                  <span className="font-mono text-[12px] lg:place-self-center text-body-passive tracking-[0.08] leading-[1.2]">
+                  <span className="font-mono text-[12px] lg:place-self-center text-body-passive tracking-[0.08em] leading-[1.2]">
                     SIZE:{" "}
-                    <span className="text-body font-garantpro font-semibold text-[13px] tracking-[0.05px]">
+                    <span className="text-body font-garantpro font-semibold text-[13px] tracking-[0.05em]">
                       {item?.product?.packSize?.name ?? "—"}
                     </span>
                   </span>
-                  <span className="font-mono text-[12px] lg:place-self-center text-body-passive tracking-[0.08] leading-[1.2]">
+                  <span className="font-mono text-[12px] lg:place-self-center text-body-passive tracking-[0.08em] leading-[1.2]">
                     TYPE:{" "}
-                    <span className="text-body font-garantpro font-semibold text-[13px] tracking-[0.05px]">
+                    <span className="text-body font-garantpro font-semibold text-[13px] tracking-[0.05em]">
                       {item?.product?.packType?.name ?? "—"}
                     </span>
                   </span>
-                  <span className="font-mono text-[12px] text-body-passive tracking-[0.08] leading-[1.2] lg:ml-auto">
+                  <span className="font-mono text-[12px] text-body-passive tracking-[0.08em] leading-[1.2] lg:ml-auto">
                     PRICE:{" ₦"}
-                    <span className="ml-1 text-body font-garantpro font-semibold text-[13px] tracking-[0.05px]">
+                    <span className="ml-1 text-body font-garantpro font-semibold text-[13px] tracking-[0.05em]">
                       {formatCurrency(item.unitPrice ?? item.lineTotal ?? 0)}
                     </span>
                   </span>
@@ -416,15 +417,15 @@ export function OrderCard({
       {/* ── Amount footer ──────────────────────────────────────────────────── */}
       <div className="flex justify-between items-center px-md py-lg border-t-2 border-border-main gap-5">
         <div className="flex flex-col gap-5">
-          <span className="text-[12px] py-2 font-normal tracking-[0.08] leading-[1.2] text-body-passive uppercase font-mono">
+          <span className="text-[12px] py-2 font-normal tracking-[0.08em] leading-[1.2] text-body-passive uppercase font-mono">
             Order No:
           </span>
-          <span className="text-[14px] font-medium text-body leading-[1.5] tracking-[0.04]">
+          <span className="text-[14px] font-medium text-body leading-[1.5] tracking-[0.04em]">
             {order.orderNumber}
           </span>
         </div>
         <div className="flex items-center gap-5">
-          <span className="text-[12px] font-normal tracking-[0.08] text-body uppercase">
+          <span className="text-[12px] font-normal tracking-[0.08em] text-body uppercase">
             Amount:
           </span>
           <div className="flex items-center gap-1">

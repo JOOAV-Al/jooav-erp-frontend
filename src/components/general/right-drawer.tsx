@@ -35,6 +35,7 @@ const RightDrawerContent = React.forwardRef<
     customWidthStyle?: string;
     customImage?: string;
     aspectRatio?: string;
+    showHeader?: boolean;
   }
 >(
   (
@@ -44,6 +45,7 @@ const RightDrawerContent = React.forwardRef<
       isCustomWidth = false,
       customWidthStyle,
       customImage,
+      showHeader,
       ...props
     },
     ref,
@@ -62,8 +64,12 @@ const RightDrawerContent = React.forwardRef<
         )}
         {...props}
       >
-        <div
-          style={{ background: customImage ? `url(${customImage})` : `url("/dashboard/drawer-top-img.svg")` }}
+        {showHeader && <div
+          style={{
+            background: customImage
+              ? `url(${customImage})`
+              : `url("/dashboard/drawer-top-img.svg")`,
+          }}
           className="h-24 rounded-t-2xl p-main"
         >
           <div className="flex justify-between items-center">
@@ -74,7 +80,7 @@ const RightDrawerContent = React.forwardRef<
               </div>
             </RightDrawerClose>
           </div>
-        </div>
+        </div>}
         {children}
       </DialogPrimitive.Content>
     </RightDrawerPortal>

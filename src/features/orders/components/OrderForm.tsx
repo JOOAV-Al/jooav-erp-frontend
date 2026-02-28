@@ -52,6 +52,11 @@ export function OrderForm({
   wholesalers?: UserItem[];
   products?: ProductItem[];
 }) {
+  const [wholesalerIdDropdownOpen, setWholesalerIdDropdownOpen] =
+    useState(false);
+  const [productIdDropdownOpen, setProductIdDropdownOpen] = useState(false);
+  const [addressDropdownOpen, setAddressDropdownOpen] = useState(false);
+
   const [selectedProduct, setSelectedProduct] = useState<
     ProductItem | undefined
   >(undefined);
@@ -80,17 +85,11 @@ export function OrderForm({
     setValue,
   } = form;
 
-  console.log({ order });
-  console.log({ orderItem });
-  console.log({ errors });
-  console.log(orderItem?.product?.packSize?.name);
-  console.log(order?.wholesaler?.user?.id);
-
   useEffect(() => {
     onResetReady?.(() => {
       reset({
         wholesalerId: order?.wholesaler?.user?.id ?? "",
-        productId: orderItem?.productId ?? "",
+        productId: orderItem?.product?.id ?? "",
         quantity: Number(orderItem?.quantity) || (undefined as any),
         address: order?.deliveryAddress?.address ?? "",
         size: orderItem?.product?.packSize?.name ?? "",
@@ -121,14 +120,14 @@ export function OrderForm({
       await handleSubmitForm({ payload: sharedPayload, id: order?.id });
       return;
     }
-    console.log(sharedPayload)
+    console.log(sharedPayload);
     await handleSubmitForm(sharedPayload);
   };
 
   useEffect(() => {
     reset({
       wholesalerId: order?.wholesaler?.user?.id ?? "",
-      productId: orderItem?.productId ?? "",
+      productId: orderItem?.product?.id ?? "",
       quantity: Number(orderItem?.quantity) || (undefined as any),
       address: order?.deliveryAddress?.address ?? "",
       size: orderItem?.product?.packSize?.name ?? "",
@@ -142,8 +141,8 @@ export function OrderForm({
       setSelectedProduct(undefined);
       setValue("size", "");
       setValue("type", "");
-      return
-    };
+      return;
+    }
     const product = products?.find((p) => p.id === watchedProductId);
     console.log(product);
     setSelectedProduct(product);
@@ -166,12 +165,16 @@ export function OrderForm({
               <div>
                 <Field data-invalid={fieldState.invalid}>
                   <div className="flex gap-3 items-center">
-                    <FieldLabel>Order for</FieldLabel>
+                    <FieldLabel dimLabel={wholesalerIdDropdownOpen}>
+                      Order for
+                    </FieldLabel>
                     {fieldState.error && (
                       <FieldError>: {fieldState.error.message}</FieldError>
                     )}
                   </div>
                   <Select
+                    isOpen={wholesalerIdDropdownOpen}
+                    setIsOpen={setWholesalerIdDropdownOpen}
                     options={
                       wholesalers?.map((w) => ({
                         value: w?.id,
@@ -196,12 +199,16 @@ export function OrderForm({
               <div>
                 <Field data-invalid={fieldState.invalid}>
                   <div className="flex gap-3 items-center">
-                    <FieldLabel>Product name</FieldLabel>
+                    <FieldLabel dimLabel={productIdDropdownOpen}>
+                      Product name
+                    </FieldLabel>
                     {fieldState.error && (
                       <FieldError>: {fieldState.error.message}</FieldError>
                     )}
                   </div>
                   <Select
+                    isOpen={productIdDropdownOpen}
+                    setIsOpen={setProductIdDropdownOpen}
                     options={
                       products?.map((p) => ({
                         value: p?.id,
@@ -341,12 +348,16 @@ export function OrderForm({
               <div>
                 <Field data-invalid={fieldState.invalid}>
                   <div className="flex gap-3 items-center">
-                    <FieldLabel>Delivery Address</FieldLabel>
+                    <FieldLabel dimLabel={addressDropdownOpen}>
+                      Delivery Address
+                    </FieldLabel>
                     {fieldState.error && (
                       <FieldError>: {fieldState.error.message}</FieldError>
                     )}
                   </div>
                   <Select
+                    isOpen={addressDropdownOpen}
+                    setIsOpen={setAddressDropdownOpen}
                     options={[
                       {
                         label: "123 Main St, Springfield, IL 62704",

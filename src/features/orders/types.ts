@@ -61,7 +61,7 @@ export interface OrderItem {
   unitPrice: string;
   lineTotal: string;
   status: string;
-  product: OrderItemProduct
+  product: ProductItem
 }
 export interface Order {
   id: string;
@@ -117,6 +117,19 @@ export interface Order {
 
 export interface OrderStatsItem {
   totalOrders: number;
+  summary: {
+    activeOrders: number;
+    completedOrders: number;
+    cancelledOrders: number;
+  }
+  statusBreakdown: {
+    draft: number;
+    confirmed: number;
+    assigned: number;
+    inProgress: number;
+    completed: number;
+    cancelled: number;
+  };
   activeOrders: number;
   deactivatedOrders: number;
   adminOrders: number;

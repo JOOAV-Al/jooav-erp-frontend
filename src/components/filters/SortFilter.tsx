@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { List, ListEnd, ListStart } from "lucide-react";
+import { ListEnd, ListFilterPlus, ListStart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface SortFilterProps {
@@ -25,7 +25,7 @@ const SortFilter: React.FC<SortFilterProps> = ({ value = "asc", onChange }) => {
                 ${sortOrder === "" ? "bg-storey-foreground text-body" : ""}
               `}
       >
-        <List strokeWidth={2} className="w-3.5 h-3.5 text-outline-passive" />
+        <ListFilterPlus strokeWidth={2} className="w-3.5 h-3.5 text-outline-passive" />
         All
       </Button>
       <Button

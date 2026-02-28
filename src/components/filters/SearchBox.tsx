@@ -34,7 +34,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
         placeholder={placeholder}
         value={searchValue}
         onChange={handleChange}
-        className={`pl-9 pr-4 py-4 border border-border-main table-selected rounded-lg text-sm focus:outline-none w-62.5 h-[34px] placeholder:text-body-passive placeholder:text-sm ${inputClassName}`}
+        className={`pl-10 pr-4 py-4  border border-border-main table-selected rounded-lg text-sm focus:outline-none w-62.5 h-[34px] placeholder:text-body-passive placeholder:text-sm leading-[1.5] tracking-[0.04em] font-medium ${inputClassName}`}
       />
     </div>
   );

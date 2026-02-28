@@ -35,7 +35,7 @@ const CSVUpload = ({ catalog, onCTAClick, onDownload }: CSVUploadProps) => {
         />
         <div className="p-sm flex flex-col gap-5 max-w-[340px] text-center">
           <h4 className="text-heading">{`Import ${catalog} CSV`}</h4>
-          <p className="text-body-passive text-[15px] tracking-[0.03] leading-[1.5] font-normal">
+          <p className="text-body-passive text-[15px] tracking-[0.03em] leading-[1.5] font-normal">
             CSV import populates all entity field across the {catalog} catalog.{" "}
             {/* <br /> */}
             <span

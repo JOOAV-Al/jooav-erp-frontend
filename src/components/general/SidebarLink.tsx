@@ -46,7 +46,7 @@ export default function SidebarLink({
   return (
     <Link
       className={`block w-full ${
-        isCollapsed ? "mr-2 max-w-15.5" : "mx-2 max-w-50"
+        isCollapsed ? "mr-2 max-w-15.5" : "max-w-full"
       } ${className}`}
       href={href}
       onClick={handleClick}
@@ -93,7 +93,7 @@ export default function SidebarLink({
               isActive
                 ? "text-body"
                 : "text-body group-hover:text-body w-fit"
-            } text-[15px]`}
+            } text-[15px] leading-[1.2] tracking-[0.04em]`}
           >
             {label}
           </p>

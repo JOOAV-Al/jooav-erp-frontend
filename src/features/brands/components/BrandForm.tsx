@@ -38,6 +38,7 @@ export function BrandForm({
 }) {
   type BrandData = z.infer<typeof createBrandSchema>;
   const [logoFileName, setLogoFileName] = useState<string>("");
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   // const { data: manufacturers } = useGetManufacturers({});
   const form = useForm<BrandData>({
     resolver: zodResolver(createBrandSchema),
@@ -124,6 +125,7 @@ export function BrandForm({
                   </div>
                   <FileInput
                     {...field}
+                    placeholder="Upload brand logo"
                     accept="image/*"
                     fileName={logoFileName}
                     onFileSelect={(file) => {
@@ -178,12 +180,16 @@ export function BrandForm({
               <div>
                 <Field data-invalid={fieldState.invalid}>
                   <div className="flex gap-3 items-center">
-                    <FieldLabel>Manufacturer name</FieldLabel>
+                    <FieldLabel dimLabel={dropdownOpen}>
+                      Manufacturer name
+                    </FieldLabel>
                     {fieldState.error && (
                       <FieldError>: {fieldState.error.message}</FieldError>
                     )}
                   </div>
                   <Select
+                    isOpen={dropdownOpen}
+                    setIsOpen={setDropdownOpen}
                     options={
                       manufacturers?.map((m) => ({
                         label: m.name,

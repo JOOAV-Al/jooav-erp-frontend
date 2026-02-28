@@ -31,7 +31,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           className={cn(
             // Base styles
             "w-full min-w-0 h-[48px] rounded-md bg-white border border-transparent",
-            "py-md text-base outline-none leading-none",
+            "py-md outline-none leading-normal tracking-[0.04em] text-body font-medium text-sm",
             "placeholder:text-card-body placeholder:text-body-passive",
             "border border-transparent",
 
@@ -54,7 +54,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             "focus-visible:bg-background",
 
             // Disabled state
-            "disabled:bg-background disabled:text-body-passive/50 disabled:cursor-not-allowed disabled:pointer-events-none",
+            "disabled:bg-background disabled:text-body disabled:cursor-not-allowed disabled:pointer-events-none",
 
             // File input styles
             "file:inline-flex file:h-7 file:border-0 file:bg-transparent",

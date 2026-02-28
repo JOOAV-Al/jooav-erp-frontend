@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
+  ClockFading,
   GitBranch,
   GitBranchPlus,
   GitFork,
@@ -39,15 +40,16 @@ import { useProductDraft } from "@/features/products/hooks/useProductDraft";
 
 const createProductSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  description: z.string().min(1, "description is required"),
-  brandId: z.string().min(1, "brand is required"),
+  description: z.string().min(1, "Description is required"),
+  brandId: z.string().min(1, "Brand is required"),
   variantId: z.string().min(1, "variant is required"),
   sku: z.string().optional(),
-  categoryId: z.string().min(1, "category is required"),
-  subcategoryId: z.string().min(1, "subcategory is required"),
-  packTypeId: z.string().min(1, "pack type is required"),
-  packSizeId: z.string().min(1, "pack size is required"),
-  price: z.number().min(0, "Enter Price"),
+  categoryId: z.string().min(1, "Category is required"),
+  subcategoryId: z.string().min(1, "Subcategory is required"),
+  packTypeId: z.string().min(1, "Pack type is required"),
+  packSizeId: z.string().min(1, "Pack size is required"),
+  price: z.number().min(0, "Price is required"),
+  quantity: z.number().min(0, "Quantity is required"),
   // discount: z.number().min(0, "Enter discount"),
   thumbnail: z.any().optional(),
   images: z.array(z.any()).optional(),
@@ -66,6 +68,12 @@ export function ProductForm({
   categories?: ParentCategoryItem[];
 }) {
   const isEditMode = !!product?.id;
+  const [brandDropdownOpen, setBrandDropdownOpen] = useState(false);
+  const [variantDropdownOpen, setVariantDropdownOpen] = useState(false);
+  const [sizeDropdownOpen, setSizeDropdownOpen] = useState(false);
+  const [typeDropdownOpen, setTypeDropdownOpen] = useState(false);
+  const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
+  const [subcategoryDropdownOpen, setSubcategoryDropdownOpen] = useState(false);
   const [selectedVariant, setSelectedVariant] = useState<
     VariantItem | undefined
   >();
@@ -92,6 +100,7 @@ export function ProductForm({
     categoryId: "",
     subcategoryId: "",
     price: undefined as any,
+    quantity: undefined as any,
     thumbnail: undefined,
     images: [],
   };
@@ -121,14 +130,19 @@ export function ProductForm({
       if (isEditMode) {
         // Edit: reset to current product values, no draft involved
         reset({
-          name: product?.name ?? "", description: product?.description ?? "",
-          brandId: product?.brandId ?? "", variantId: product?.variantId ?? "",
-          packSizeId: product?.packSizeId ?? "", packTypeId: product?.packTypeId ?? "",
+          name: product?.name ?? "",
+          description: product?.description ?? "",
+          brandId: product?.brandId ?? "",
+          variantId: product?.variantId ?? "",
+          packSizeId: product?.packSizeId ?? "",
+          packTypeId: product?.packTypeId ?? "",
           sku: product?.sku ?? "",
           categoryId: product?.subcategory?.category?.id ?? "",
           subcategoryId: product?.subcategoryId ?? "",
           price: Number(product?.price) || (undefined as any),
-          thumbnail: product?.thumbnail || undefined, images: [],
+          quantity: Number(product?.quantity) || (undefined as any),
+          thumbnail: product?.thumbnail || undefined,
+          images: [],
         });
         setExistingImages(product?.images ?? []);
         setImagesToDelete([]);
@@ -139,7 +153,7 @@ export function ProductForm({
         setShowDraftBanner(false);
       }
     });
-  // Deliberately only product?.id — we want a stable function ref per product
+    // Deliberately only product?.id — we want a stable function ref per product
   }, [product?.id, isEditMode]);
 
   // ── Single async reset effect ─────────────────────────────────────────────
@@ -150,14 +164,19 @@ export function ProductForm({
 
       if (isEditMode) {
         reset({
-          name: product?.name ?? "", description: product?.description ?? "",
-          brandId: product?.brandId ?? "", variantId: product?.variantId ?? "",
-          packSizeId: product?.packSizeId ?? "", packTypeId: product?.packTypeId ?? "",
+          name: product?.name ?? "",
+          description: product?.description ?? "",
+          brandId: product?.brandId ?? "",
+          variantId: product?.variantId ?? "",
+          packSizeId: product?.packSizeId ?? "",
+          packTypeId: product?.packTypeId ?? "",
           sku: product?.sku ?? "",
           categoryId: product?.subcategory?.category?.id ?? "",
           subcategoryId: product?.subcategoryId ?? "",
           price: Number(product?.price) || (undefined as any),
-          thumbnail: product?.thumbnail || undefined, images: [],
+          quantity: Number(product?.quantity) || (undefined as any),
+          thumbnail: product?.thumbnail || undefined,
+          images: [],
         });
         setExistingImages(product?.images ?? []);
         setImagesToDelete([]);
@@ -170,7 +189,10 @@ export function ProductForm({
           reset({ ...EMPTY_VALUES, ...draft });
           // Banner shows for 2 seconds then auto-hides
           setShowDraftBanner(true);
-          bannerTimer.current = setTimeout(() => setShowDraftBanner(false), 3000);
+          bannerTimer.current = setTimeout(
+            () => setShowDraftBanner(false),
+            3000,
+          );
         } else {
           reset(EMPTY_VALUES);
           setShowDraftBanner(false);
@@ -182,9 +204,10 @@ export function ProductForm({
     };
 
     run();
-    return () => { if (bannerTimer.current) clearTimeout(bannerTimer.current); };
+    return () => {
+      if (bannerTimer.current) clearTimeout(bannerTimer.current);
+    };
   }, [product?.id, isEditMode]);
-
 
   const watchedBrand = watch("brandId");
   const { data: variants } = useGetVariants({ brandId: watchedBrand });
@@ -227,6 +250,7 @@ export function ProductForm({
     formData.append("packSizeId", values.packSizeId);
     formData.append("status", status);
     formData.append("price", values.price.toString());
+    formData.append("quantity", values.quantity.toString());
 
     if (product?.id) {
       // EDITING MODE
@@ -275,7 +299,7 @@ export function ProductForm({
       await handleSubmitForm(formData);
       // Clear the draft only after a successful create
       clearDraft();
-      setShowDraftBanner(false)
+      setShowDraftBanner(false);
     }
   };
 
@@ -304,7 +328,7 @@ export function ProductForm({
         </div>
       )}
 
-      <FieldSet className=" grid grid-cols-1 lg:grid-cols-2 gap-x-7">
+      <FieldSet className=" grid grid-cols-1 lg:grid-cols-2 gap-x-7 gap-y-7">
         <div className="flex flex-col gap-lg pt-main lg:pb-main">
           <FieldGroup className="flex flex-col gap-sm">
             <FormGroupName name="OVERVIEW" />
@@ -369,12 +393,16 @@ export function ProductForm({
                   <div>
                     <Field data-invalid={fieldState.invalid}>
                       <div className="flex gap-3 items-center">
-                        <FieldLabel>Select brand</FieldLabel>
+                        <FieldLabel dimLabel={brandDropdownOpen}>
+                          Select brand
+                        </FieldLabel>
                         {fieldState.error && (
                           <FieldError>: {fieldState.error.message}</FieldError>
                         )}
                       </div>
                       <Select
+                        isOpen={brandDropdownOpen}
+                        setIsOpen={setBrandDropdownOpen}
                         options={
                           brands?.map((m) => ({
                             label: m.name,
@@ -398,12 +426,16 @@ export function ProductForm({
                   <div>
                     <Field data-invalid={fieldState.invalid}>
                       <div className="flex gap-3 items-center">
-                        <FieldLabel>Select variant</FieldLabel>
+                        <FieldLabel dimLabel={variantDropdownOpen}>
+                          Select variant
+                        </FieldLabel>
                         {fieldState.error && (
                           <FieldError>: {fieldState.error.message}</FieldError>
                         )}
                       </div>
                       <Select
+                        isOpen={variantDropdownOpen}
+                        setIsOpen={setVariantDropdownOpen}
                         options={
                           variants?.data?.map((m) => ({
                             label: m.name,
@@ -433,12 +465,16 @@ export function ProductForm({
                   <div>
                     <Field data-invalid={fieldState.invalid}>
                       <div className="flex gap-3 items-center">
-                        <FieldLabel>Select pack size</FieldLabel>
+                        <FieldLabel dimLabel={sizeDropdownOpen}>
+                          Select pack size
+                        </FieldLabel>
                         {fieldState.error && (
                           <FieldError>: {fieldState.error.message}</FieldError>
                         )}
                       </div>
                       <Select
+                        isOpen={sizeDropdownOpen}
+                        setIsOpen={setSizeDropdownOpen}
                         options={
                           selectedVariant?.packSizes?.map((m) => ({
                             label: m.name,
@@ -462,12 +498,16 @@ export function ProductForm({
                   <div>
                     <Field data-invalid={fieldState.invalid}>
                       <div className="flex gap-3 items-center">
-                        <FieldLabel>Select pack type</FieldLabel>
+                        <FieldLabel dimLabel={typeDropdownOpen}>
+                          Select pack type
+                        </FieldLabel>
                         {fieldState.error && (
                           <FieldError>: {fieldState.error.message}</FieldError>
                         )}
                       </div>
                       <Select
+                        isOpen={typeDropdownOpen}
+                        setIsOpen={setTypeDropdownOpen}
                         options={
                           selectedVariant?.packTypes?.map((m) => ({
                             label: m.name,
@@ -526,12 +566,16 @@ export function ProductForm({
                   <div>
                     <Field data-invalid={fieldState.invalid}>
                       <div className="flex gap-3 items-center">
-                        <FieldLabel>Select category</FieldLabel>
+                        <FieldLabel dimLabel={categoryDropdownOpen}>
+                          Select category
+                        </FieldLabel>
                         {fieldState.error && (
                           <FieldError>: {fieldState.error.message}</FieldError>
                         )}
                       </div>
                       <Select
+                        isOpen={categoryDropdownOpen}
+                        setIsOpen={setCategoryDropdownOpen}
                         options={
                           categories?.map((m) => ({
                             label: m.name,
@@ -555,12 +599,16 @@ export function ProductForm({
                   <div>
                     <Field data-invalid={fieldState.invalid}>
                       <div className="flex gap-3 items-center">
-                        <FieldLabel>Select subcategory</FieldLabel>
+                        <FieldLabel dimLabel={subcategoryDropdownOpen}>
+                          Select subcategory
+                        </FieldLabel>
                         {fieldState.error && (
                           <FieldError>: {fieldState.error.message}</FieldError>
                         )}
                       </div>
                       <Select
+                        isOpen={subcategoryDropdownOpen}
+                        setIsOpen={setSubcategoryDropdownOpen}
                         options={
                           selectedCategory?.subcategories?.map((m) => ({
                             label: m.name,
@@ -618,11 +666,37 @@ export function ProductForm({
             />
             <Controller
               control={control}
+              name="quantity"
+              render={({ field, fieldState }) => (
+                <div>
+                  <Field data-invalid={fieldState.invalid}>
+                    <div className="flex gap-3 items-center">
+                      <FieldLabel>Quantity</FieldLabel>
+                      {fieldState.error && (
+                        <FieldError>: {fieldState.error.message}</FieldError>
+                      )}
+                    </div>
+                    <Input
+                      // {...field}
+                      type="number"
+                      placeholder="20"
+                      aria-invalid={fieldState.invalid}
+                      leftIcon={<FieldIcon Icon={ClockFading} />}
+                      isEdit={!!product}
+                      defaultValue={field.value}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                    />
+                  </Field>
+                </div>
+              )}
+            />
+            <Controller
+              control={control}
               name="thumbnail"
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <div className="flex gap-3 items-center">
-                    <FieldLabel>Upload product thumbnail</FieldLabel>
+                  <div className="flex gap-3 items-center py-sm">
+                    <h4>Upload product thumbnail</h4>
                     {fieldState.error && (
                       <FieldError>: {fieldState.error.message}</FieldError>
                     )}
@@ -640,8 +714,8 @@ export function ProductForm({
                       }
                     }}
                     width={100}
-                    height={83.34}
-                    className=""
+                    height={100}
+                    className="p-md"
                   />
                 </Field>
               )}
@@ -651,8 +725,8 @@ export function ProductForm({
               name="images"
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <div className="flex gap-3 items-center">
-                    <FieldLabel>Upload product images</FieldLabel>
+                  <div className="flex gap-3 items-center py-sm">
+                    <h4>Upload product images</h4>
                     {fieldState.error && (
                       <FieldError>: {fieldState.error.message}</FieldError>
                     )}
@@ -672,6 +746,7 @@ export function ProductForm({
                         }}
                         width={376.5}
                         height={376.5}
+                        // imageClassName="p-16!"
                       />
                     ))}
 
@@ -691,7 +766,7 @@ export function ProductForm({
                         }}
                         width={376.5}
                         height={376.5}
-                        // className="max-w-[376.5px] w-full max-h-[376.5px] h-full"
+                        imageClassName="p-16!"
                       />
                     ))}
                     {/* Add new image box */}

@@ -11,6 +11,7 @@ interface ImageUploadBoxProps {
   width?: number;
   height?: number;
   className?: string;
+  imageClassName?: string;
 }
 
 export function ImageUploadBox({
@@ -19,6 +20,7 @@ export function ImageUploadBox({
   width = 120,
   height = 120,
   className,
+  imageClassName,
 }: ImageUploadBoxProps) {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [preview, setPreview] = React.useState<string | null>(null);
@@ -68,25 +70,27 @@ export function ImageUploadBox({
       />
 
       {preview ? (
-        <>
+        <div className={`${imageClassName}`}>
           <Image
             src={preview}
             alt="Preview"
-            fill
+            // fill
+            width={width}
+            height={height}
             className="object-contain rounded-lg"
           />
           <button
             type="button"
             onClick={handleClear}
-            className="absolute cursor-pointer top-2 right-2 z-10 bg-white rounded-full p-1 shadow"
+            className="absolute cursor-pointer top-2 right-2 z-10 bg-white rounded-full p-4 shadow"
           >
             <X className="w-4 h-4" />
           </button>
-        </>
+        </div>
       ) : (
-          <div className="p-2">
-            <Plus className="w-[17px] h-[17px] text-outline-passive" />
-          </div>
+        <div className="p-2">
+          <Plus className="w-[17px] h-[17px] text-outline-passive" />
+        </div>
       )}
     </div>
   );

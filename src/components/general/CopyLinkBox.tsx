@@ -21,7 +21,7 @@ const CopyLinkBox = ({ link, onShare, shareBtnIcon }: CopyLinkBoxProps) => {
   return (
     <div className="w-full bg-white rounded-xl p-sm flex flex-col gap-6 shadow-input mt-2">
       <div className="w-full bg-storey-foreground rounded-lg p-md flex flex-col gap-4 shadow-input">
-        <h6 className="font-mono text-heading font-normal tracking-[0.08] leading-[1.2] text-xs pt-3 pb-sm">
+        <h6 className="font-mono text-heading font-normal tracking-[0.08em] leading-[1.2] text-xs pt-3 pb-sm">
           COPY LOGIN LINK
         </h6>
         <div className="flex items-center justify-between gap-2">

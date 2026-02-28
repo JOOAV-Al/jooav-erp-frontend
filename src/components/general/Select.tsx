@@ -19,6 +19,8 @@ interface SelectProps {
   className?: string;
   marginBottom?: string;
   disableAutoMargin?: boolean;
+  isOpen: boolean;
+  setIsOpen: (state: boolean) => void
 }
 
 const Select = React.forwardRef<HTMLDivElement, SelectProps>(
@@ -31,12 +33,14 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
       leftIcon,
       searchable = false,
       className,
+      isOpen, 
+      setIsOpen,
       // marginBottom = "mb-62",
       // disableAutoMargin = false,
     },
     ref,
   ) => {
-    const [isOpen, setIsOpen] = React.useState(false);
+    
     const [searchQuery, setSearchQuery] = React.useState("");
     const containerRef = React.useRef<HTMLDivElement>(null);
 
@@ -142,8 +146,8 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
           {/* Selected value or placeholder */}
           <span
             className={cn(
-              "truncate flex-1",
-              selectedOption ? "text-foreground" : "text-body-passive",
+              "truncate flex-1 font-medium leading-[1.5] tracking-[0.04em] text-sm",
+              selectedOption ? "text-body" : "text-body-passive",
             )}
           >
             {selectedOption?.label || placeholder}
@@ -197,7 +201,7 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
                             "bg-storey-foreground text-body table-selected",
                         )}
                       >
-                        <span className="leading-[1.2] tracking-[0.04] text-[15px] font-medium">
+                        <span className="leading-[1.2] tracking-[0.04em] text-[15px] font-medium">
                           {option.label}
                         </span>
                       </div>

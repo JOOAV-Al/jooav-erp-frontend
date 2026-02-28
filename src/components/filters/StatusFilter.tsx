@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { CloudUpload, List, ListPlus, PenLine } from "lucide-react";
+import { CloudUpload, ListPlus, PenLine, Table2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface StatusFilterProps {
@@ -34,7 +34,7 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
           ${status === "" ? "bg-storey-foreground text-body" : ""}
         `}
       >
-        <List strokeWidth={2} className="w-3.5 h-3.5 text-outline-passive" />
+        {!isOrders && <Table2 strokeWidth={2} className="w-3.5 h-3.5 text-outline-passive" />}
         All
       </Button>
       {isProducts && (

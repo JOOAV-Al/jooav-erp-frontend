@@ -20,6 +20,7 @@ interface DashboardDrawerProps {
   triggerText?: string;
   showTrigger?: boolean;
   showFooter?: boolean;
+  showHeader?: boolean;
   // optional id of the form inside the drawer to target with footer submit
   submitFormId?: string;
   submitLabel?: string;
@@ -43,6 +44,7 @@ const DashboardDrawer = ({
   isOpen,
   showTrigger = false,
   showFooter = true,
+  showHeader = true,
   submitFormId,
   submitLabel = "Submit",
   submitLoading = false,
@@ -73,6 +75,7 @@ const DashboardDrawer = ({
         isCustomWidth={isCustomWidth}
         customWidthStyle={customWidthStyle}
         customImage={customImage}
+        showHeader={showHeader}
       >
         <RightDrawerHeader className="hidden">
           <RightDrawerTitle>Are you absolutely sure?</RightDrawerTitle>

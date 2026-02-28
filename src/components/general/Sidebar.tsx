@@ -9,7 +9,7 @@ import {
   // PencilRuler,
   // Table,
   // TabletSmartphone,
-  X,
+  // X,
   // Settings,
   // LogOut,
   PanelRightOpen,
@@ -47,6 +47,7 @@ import { useDispatch, useSelector } from "react-redux";
 // import { truncateText } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { RootState } from "@/redux/store";
+import { HideIfRole } from "@/lib/rbac/HideIfRole";
 // import { logout } from "@/redux/slices/authSlice";
 interface SidebarProps {
   isOpen: boolean;
@@ -170,10 +171,10 @@ export default function Sidebar({
           ${isCollapsed ? "max-w-17" : "max-w-57.5"} w-full
         `}
       >
-        <div className={`flex flex-col gap-main overflow-y-auto h-full pl-3`}>
+        <div className={`flex flex-col gap-main h-full`}>
           {/* Top Section */}
           <div
-            className={`flex items-center justify-between border-b border-border-main ${
+            className={`flex-none flex items-center justify-between border-b border-border-main ${
               isCollapsed ? "justify-center" : ""
             } py-lg max-h-18 h-full px-main`}
           >
@@ -194,9 +195,9 @@ export default function Sidebar({
                 } rounded hover:bg-gray-200 cursor-pointer text-outline`}
               >
                 {isCollapsed ? (
-                  <PanelRightClose size={24} />
+                  <PanelRightClose strokeWidth={2} size={24} />
                 ) : (
-                  <PanelRightOpen size={24} />
+                  <PanelRightOpen strokeWidth={2} size={24} />
                 )}
               </button>
               {/* Hide Button */}
@@ -211,10 +212,9 @@ export default function Sidebar({
               </button> */}
             </div>
           </div>
-
           {/* Divider */}
-          <ScrollArea isSidebar className="min-h-72 w-full">
-            <div className="pb-main py-2.5 flex flex-col gap-sm px-sm">
+          <ScrollArea isSidebar className="flex-1 min-h-52 min-w-0">
+            <div className="py-main flex flex-col gap-sm px-md">
               {/* Overview */}
               <div
                 className={`flex flex-col gap-7 ${
@@ -222,7 +222,7 @@ export default function Sidebar({
                 }`}
               >
                 {!isCollapsed && (
-                  <h6 className="font-mono leading-[1.2] text-sm text-body-passive mx-2">
+                  <h6 className="font-mono leading-[1.2] tracking-[0.08em] text-[12px] text-body-passive">
                     OVERVIEW
                   </h6>
                 )}
@@ -240,84 +240,95 @@ export default function Sidebar({
               </div>
 
               {/* Order */}
-              <div
-                className={`flex flex-col gap-7 ${
-                  isCollapsed ? "border-t-2 border-[#EDEDED] pt-main" : ""
-                }`}
-              >
-                {!isCollapsed && (
-                  <h6 className="font-mono leading-[1.2] text-sm text-body-passive mx-2">
-                    ORDER
-                  </h6>
-                )}
-                <nav className="flex flex-col gap-4">
-                  {links.order.map((link) => (
-                    <SidebarLink
-                      key={link.href}
-                      href={link.href}
-                      label={link.label}
-                      Icon={link.icon}
-                      isCollapsed={isCollapsed}
-                    />
-                  ))}
-                </nav>
-              </div>
+              <HideIfRole roles={["PROCUREMENT_OFFICER"]}>
+                <div
+                  className={`flex flex-col gap-7 ${
+                    isCollapsed ? "border-t-2 border-[#EDEDED] pt-main" : ""
+                  }`}
+                >
+                  {!isCollapsed && (
+                    <h6 className="font-mono leading-[1.2] tracking-[0.08em] text-[12px] text-body-passive">
+                      ORDER
+                    </h6>
+                  )}
+                  <nav className="flex flex-col gap-4">
+                    {links.order.map((link) => (
+                      <SidebarLink
+                        key={link.href}
+                        href={link.href}
+                        label={link.label}
+                        Icon={link.icon}
+                        isCollapsed={isCollapsed}
+                      />
+                    ))}
+                  </nav>
+                </div>
+              </HideIfRole>
 
               {/* Catalog */}
-              <div
-                className={`flex flex-col gap-7 ${
-                  isCollapsed ? "border-t-2 border-[#EDEDED] pt-main" : ""
-                }`}
-              >
-                {!isCollapsed && (
-                  <h6 className="font-mono leading-[1.2] text-sm text-body-passive mx-2">
-                    CATALOG
-                  </h6>
-                )}
-                <nav className="flex flex-col gap-4">
-                  {links.catalog.map((link) => (
-                    <SidebarLink
-                      key={link.href}
-                      href={link.href}
-                      label={link.label}
-                      Icon={link.icon}
-                      isCollapsed={isCollapsed}
-                    />
-                  ))}
-                </nav>
-              </div>
+              <HideIfRole roles={["PROCUREMENT_OFFICER"]}>
+                <div
+                  className={`flex flex-col gap-7 ${
+                    isCollapsed ? "border-t-2 border-[#EDEDED] pt-main" : ""
+                  }`}
+                >
+                  {!isCollapsed && (
+                    <h6 className="font-mono leading-[1.2] tracking-[0.08em] text-[12px] text-body-passive">
+                      CATALOG
+                    </h6>
+                  )}
+                  <nav className="flex flex-col gap-4">
+                    {links.catalog.map((link) => (
+                      <SidebarLink
+                        key={link.href}
+                        href={link.href}
+                        label={link.label}
+                        Icon={link.icon}
+                        isCollapsed={isCollapsed}
+                      />
+                    ))}
+                  </nav>
+                </div>
+              </HideIfRole>
 
               {/* Users */}
-              <div
-                className={`flex flex-col gap-7 ${
-                  isCollapsed ? "border-t-2 border-[#EDEDED] pt-main" : ""
-                }`}
-              >
-                {!isCollapsed && (
-                  <h6 className="font-mono leading-[1.2] text-sm text-body-passive mx-2">
-                    USER
-                  </h6>
-                )}
-                <nav className="flex flex-col gap-4">
-                  {links.user.map((link) => (
-                    <SidebarLink
-                      key={link.href}
-                      href={link.href}
-                      label={link.label}
-                      Icon={link.icon}
-                      isCollapsed={isCollapsed}
-                    />
-                  ))}
-                </nav>
-              </div>
+              <HideIfRole roles={["PROCUREMENT_OFFICER"]}>
+                <div
+                  className={`flex flex-col gap-7 ${
+                    isCollapsed ? "border-t-2 border-[#EDEDED] pt-main" : ""
+                  }`}
+                >
+                  {!isCollapsed && (
+                    <h6 className="font-mono leading-[1.2] tracking-[0.08em] text-[12px] text-body-passive">
+                      USER
+                    </h6>
+                  )}
+                  <nav className="flex flex-col gap-4">
+                    {links.user.map((link) => (
+                      <SidebarLink
+                        key={link.href}
+                        href={link.href}
+                        label={link.label}
+                        Icon={link.icon}
+                        isCollapsed={isCollapsed}
+                      />
+                    ))}
+                  </nav>
+                </div>
+              </HideIfRole>
             </div>
           </ScrollArea>
-          <div className="py-main px-sm">
+          {/* Banner section */}
+          <div className="flex-none p-sm">
             <div className="w-full rounded-lg">
               <Image
                 height={150}
                 width={300}
-                src={"/dashboard/drawer-top-img.svg"}
+                src={
+                  isCollapsed
+                    ? "/dashboard/sidebar-banner-col.svg"
+                    : "/dashboard/sidebar-banner.svg"
+                }
                 alt="sidebar image"
               />
             </div>

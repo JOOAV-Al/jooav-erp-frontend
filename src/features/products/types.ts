@@ -1,7 +1,7 @@
 import { BrandItem } from "@/features/brands/types";
 import { CategoryItem } from "@/features/categories/types";
 import { ManufacturerItem } from "@/features/manufacturers/types";
-import { VariantPackSize, VariantPackType } from "@/features/variants/types";
+import { VariantItem, VariantPackSize, VariantPackType } from "@/features/variants/types";
 
 export type ProductStatus = "DRAFT" | "QUEUE" | "LIVE"
 export interface CreateProductPayload {
@@ -14,6 +14,7 @@ export interface CreateProductPayload {
   status?: string;
   price?: number;
   discount?: number;
+  quantity?: number; 
   thumbnail?: File | null;
   images?: File[] | null;
   deleteImages?: string[];
@@ -35,8 +36,10 @@ export interface ProductItem {
   packTypeId: string;
   packSize: VariantPackSize;
   packType: VariantPackType;
+  variant: VariantItem;
   price: string;
-  discount: number;
+  discount: string;
+  quantity: number;
   thumbnail: string;
   images: string[];
   status: string;

@@ -22,11 +22,6 @@ const padCount = (n: number) => String(n).padStart(2, "0");
  * It intentionally does NOT use <thead>/<th> — it's a plain flex div
  * that stretches across the entire card width regardless of column count.
  *
- * Usage:
- *   <div className="rounded-2xl border border-border-main overflow-hidden">
- *     <GroupTableHeader label="Admin accounts" count={3} />
- *     <table>...</table>
- *   </div>
  */
 const GroupTableHeader = ({
   label,
@@ -49,12 +44,12 @@ const GroupTableHeader = ({
             }`}
           />
         )}
-        <h5 className="tracking-[-0.02em] text-[15px]">{label}</h5>
+        <h5 className="">{label}</h5>
       </div>
       <div
         className={`flex justify-center items-center rounded-main bg-storey-foreground h-[18px] py-2 px-5 table-tag w-fit`}
       >
-        <span className="text-[12px] tracking-[0.08] leading-[1.2] text-center text-xs font-normal text-heading font-mono">
+        <span className="text-[12px] tracking-[0.08em] leading-[1.2] text-center font-normal text-heading font-mono">
           {padCount(count)}
         </span>
       </div>

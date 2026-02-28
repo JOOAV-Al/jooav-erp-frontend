@@ -35,6 +35,7 @@ import {
 import { useGetBrands } from "@/features/brands/services/brands.api";
 import { useGetCategories } from "@/features/categories/services/category.api";
 import { useFileObjectUpload } from "@/features/uploads/hooks/useFileObjectUpload";
+import { toProperCase } from "@/lib/utils";
 
 const MANUAL_FORM_ID = "product-form";
 const BULK_FORM_ID = "bulk-upload-form";
@@ -286,8 +287,8 @@ const ProductPage = () => {
           {files.length > 0 ? (
             <div className="flex flex-col gap-main">
               <div className={`flex flex-col gap-5 py-main`}>
-                <h4 className="leading-[1.2] tracking-[0.01]">File Uploaded</h4>
-                <p className="text-body-passive text-[15px] font-medium leading-normal tracking-[0.03]">
+                <h4 className="leading-[1.2] tracking-[0.01em]">File Uploaded</h4>
+                <p className="text-body-passive text-[15px] font-medium leading-normal tracking-[0.03em]">
                   The list shows files you selected
                 </p>
               </div>
@@ -304,7 +305,7 @@ const ProductPage = () => {
                       height={20}
                     />
                   </div>
-                  <p className="flex-1 text-[14px] font-medium leading-[1.5] tracking-[0.04] pb-3">
+                  <p className="flex-1 text-[14px] font-medium leading-[1.5] tracking-[0.04em] pb-3">
                     {file?.name}
                   </p>
                   <div
@@ -471,6 +472,7 @@ const ProductPage = () => {
               key: "sku",
               label: "SKU",
               activeColor: true,
+              render: (row) => toProperCase(row?.sku ?? "")
             },
             {
               key: "price",

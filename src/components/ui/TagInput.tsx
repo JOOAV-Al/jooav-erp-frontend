@@ -139,7 +139,7 @@ const TagInput = React.forwardRef<TagInputHandle, TagInputProps>(
             className={cn(
               // Base styles
               "w-full min-h-[48px] rounded-md bg-white border border-transparent",
-              "text-base outline-none",
+              "text-base outline-none tracking-[0.04em] leading-normal text-body",
               "shadow-input focus-within:shadow-input focus-visible:shadow-input",
               "transition-[color,box-shadow]",
               "cursor-text",
@@ -166,7 +166,7 @@ const TagInput = React.forwardRef<TagInputHandle, TagInputProps>(
                   className="inline-flex items-center gap-6 px-4 py-5 bg-storey-foreground border border-border-main table-selected rounded-md"
                 >
                   <p className="h-[9px] flex justify-center items-center">
-                    <span className="text-body rounded-md text-[13px] font-semibold">
+                    <span className="text-body rounded-md text-[13px] tracking-[0.05em] leading-[1] font-semibold">
                       {tag}
                     </span>
                   </p>
@@ -194,7 +194,7 @@ const TagInput = React.forwardRef<TagInputHandle, TagInputProps>(
               placeholder={internalTags.length === 0 ? placeholder : ""}
               className={cn(
                 "flex-1 min-w-[120px] bg-transparent outline-none border-none",
-                "placeholder:text-body-passive text-foreground",
+                "placeholder:text-body-passive text-body font-medium text-sm",
                 "py-1",
               )}
             />
@@ -209,7 +209,7 @@ const TagInput = React.forwardRef<TagInputHandle, TagInputProps>(
                 className="inline-flex items-center gap-5 px-sm py-5 bg-[#F6F9FE] border-[0.5px] border-[#97BDF5] table-selected rounded-main"
               >
                 <p className="h-[17px] flex justify-center items-center">
-                  <span className="text-body rounded-md text-[13px] font-semibold">
+                  <span className="text-body rounded-md text-[13px] leading-[1] tracking-[0.05em] font-semibold">
                     {tag}
                   </span>
                 </p>

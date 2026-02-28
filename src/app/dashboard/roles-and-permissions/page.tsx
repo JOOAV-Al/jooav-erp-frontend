@@ -140,7 +140,7 @@ const UserPage = () => {
     {
       key: "avatar",
       render: (item: UserItem) => (
-        <div className="w-7.5 h-7.5 flex justify-center items-center rounded-full bg-brand-secondary border border-border-main text-[13px] font-semibold tracking-[0.05] text-brand-accent-2">
+        <div className="w-7.5 h-7.5 flex justify-center items-center rounded-full bg-brand-secondary border border-border-main text-[13px] font-semibold tracking-[0.05em] text-brand-accent-2">
           {`${item?.firstName?.[0] ?? ""}${item?.lastName?.[0] ?? ""}`}
         </div>
       ),

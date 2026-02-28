@@ -40,6 +40,7 @@ export function VariantForm({
   brands,
   onResetReady,
 }: DialogFormProps & { variant?: VariantItem; brands?: BrandItem[] }) {
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   // const { data: brands } = useGetBrands({});
 
   // Track existing pack sizes and types (from backend)
@@ -257,12 +258,14 @@ export function VariantForm({
               <div>
                 <Field data-invalid={fieldState.invalid}>
                   <div className="flex gap-3 items-center">
-                    <FieldLabel>Brand</FieldLabel>
+                    <FieldLabel dimLabel={dropdownOpen}>Brand</FieldLabel>
                     {fieldState.error && (
                       <FieldError>: {fieldState.error.message}</FieldError>
                     )}
                   </div>
                   <Select
+                    isOpen={dropdownOpen}
+                    setIsOpen={setDropdownOpen}
                     options={
                       brands?.map((m) => ({
                         label: m.name,
@@ -274,6 +277,7 @@ export function VariantForm({
                     placeholder="Select brand"
                     searchable
                     leftIcon={<FieldIcon Icon={GitBranchPlus} />}
+                    aria-invalid={fieldState.invalid}
                   />
                 </Field>
               </div>

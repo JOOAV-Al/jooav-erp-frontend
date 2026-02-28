@@ -251,6 +251,7 @@
   --size-toast-body: var(--1rem);
   --size-body: var(--1-125rem);
   --size-h3: var(--1-25rem);
+  --size-h4: var(--1rem);
   --size-h5: var(--0-9375rem);
   --size-card-heading: var(--1-5rem);
   --size-toast-heading: var(--1-5rem);
@@ -293,9 +294,9 @@
   /* Letter Spacing - Updated with proper values */
   --letter-spacing-body: 0;
   --letter-spacing-card-body: 0;
-  --letter-spacing-card-heading: -0.01em;
-  --letter-spacing-display: -0.02em;
-  --letter-spacing-heading: -0.01em;
+  --letter-spacing-card-heading: 0.01em;
+  --letter-spacing-display: 0.02em;
+  --letter-spacing-heading: 0.01em;
 }
 
 /* Semantic Spacing Tokens */
@@ -595,6 +596,7 @@
   --font-size-toast: var(--size-toast-body);
   --font-size-body: var(--size-body);
   --font-size-h3: var(--size-h3);
+  --font-size-h4: var(--size-h4);
   --font-size-h5: var(--size-h5);
   --font-size-card-heading: var(--size-card-heading);
   --font-size-h2: var(--size-h2);
@@ -724,7 +726,7 @@
     @apply border-border outline-ring/50;
   }
   .auth-card {
-    @apply p-xl rounded-3xl mx-auto w-full max-w-[clamp(270px,80vw,370px)] mdl:max-w-[clamp(370px,60vw,420px)] 2xxl:max-w-[clamp(420px,45vw,560px)] bg-card;
+    @apply p-xl rounded-3xl mx-auto w-full max-w-[clamp(270px,80vw,370px)] mdl:max-w-[clamp(370px,60vw,420px)] 2xl:max-w-[clamp(420px,45vw,450px)] bg-card;
   }
   html {
     text-rendering: optimizeLegibility;
@@ -797,7 +799,7 @@
     font-weight: var(--weight-integer-display);
     color: var(--text-heading-color);
     line-height: var(--leading-card-heading);
-    letter-spacing: var(--letter-spacing-heading);
+    letter-spacing: var(--letter-spacing-display);
   }
 }
 
@@ -908,4 +910,15 @@
   text-box-trim: trim-both;
   /* border-top: 5px solid magenta;
   border-bottom: 5px solid magenta; */
+}
+
+/* In your global CSS file */
+.lucide {
+  stroke-width: 2px;
+  vector-effect: non-scaling-stroke;
+}
+
+/* Ensure the path inside the SVG also inherits this */
+.lucide * {
+  vector-effect: non-scaling-stroke;
 }
