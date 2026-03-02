@@ -85,25 +85,28 @@ export function toProperCase(text: string): string {
 
 export const getItemStatusStyles = (status = "") => {
   switch (status?.toUpperCase()) {
-    case "COMPLETED":
+    // case "COMPLETED":
     case "DELIVERED":
       return {
         styles:
           "table-tag border-border-accent bg-tag-added text-brand-primary!",
         text: "Completed",
       };
-    case "PROCESSING":
+    case "SHIPPED":
     case "SOURCING":
-    case "PAID":
       return {
         styles: "table-tag border-border-accent bg-tag-queue text-brand-signal",
         text: "In Progress",
       };
     case "PENDING":
-    case "PENDING_APPROVAL":
       return {
         styles: "table-tag border-border-accent bg-tag-queue text-destructive",
         text: "Pending",
+      };
+    case "PAID":
+      return {
+        styles: "table-tag border-border-accent bg-tag-queue text-destructive",
+        text: "Paid",
       };
     default:
       return {
@@ -127,8 +130,13 @@ export const getOrderStatusStyles = (status = "") => {
           "table-tag border-border-main bg-storey-foreground text-heading!",
         text: "Assigned",
       };
-    case "IN_PROGRESS":
     case "CONFIRMED":
+      return {
+        styles:
+          "table-tag border-border-main bg-storey-foreground text-heading!",
+        text: "Confirmed",
+      };
+    case "IN_PROGRESS":
       return {
         styles: "table-tag border-border-main bg-tag-active text-success",
         text: "Processing",
@@ -145,3 +153,12 @@ export const getOrderStatusStyles = (status = "") => {
       };
   }
 };
+
+
+export function enumToTitleCase(value: string): string {
+  return value
+    .toLowerCase()
+    .split("_")
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}

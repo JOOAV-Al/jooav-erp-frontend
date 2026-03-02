@@ -62,8 +62,8 @@ const FulfilledOrdersPage = () => {
     refetch,
   } = useGetOrders({ page, search: debouncedQuery, status: "COMPLETED" });
 
-  const { data: products } = useGetProducts({});
-  const { data: wholesalers } = useGetUsers({ role: "WHOLESALER" });
+  // const { data: products } = useGetProducts({});
+  // const { data: wholesalers } = useGetUsers({ role: "WHOLESALER" });
   const { data: officers } = useGetUsers({ role: "PROCUREMENT_OFFICER" });
 
   const orders: Order[] = data?.data?.orders ?? [];

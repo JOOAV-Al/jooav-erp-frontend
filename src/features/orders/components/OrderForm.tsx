@@ -294,7 +294,7 @@ export function OrderForm({
               control={control}
               name="size"
               render={({ field, fieldState }) => (
-                <div>
+                <div className="w-full">
                   <Field data-invalid={fieldState.invalid}>
                     <div className="flex gap-3 items-center">
                       <FieldLabel>Size</FieldLabel>
@@ -319,7 +319,7 @@ export function OrderForm({
               control={control}
               name="type"
               render={({ field, fieldState }) => (
-                <div>
+                <div className="w-full">
                   <Field data-invalid={fieldState.invalid}>
                     <div className="flex gap-3 items-center">
                       <FieldLabel>Package type</FieldLabel>

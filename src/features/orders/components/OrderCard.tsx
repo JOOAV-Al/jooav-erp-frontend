@@ -15,7 +15,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { UserItem } from "@/features/users/types";
 import { useAssignOfficerToOrder } from "@/features/orders/services/orders.api";
-import { cn, getItemStatusStyles, getOrderStatusStyles } from "@/lib/utils";
+import {
+  cn,
+  enumToTitleCase,
+  getItemStatusStyles,
+  getOrderStatusStyles,
+} from "@/lib/utils";
 import { format } from "date-fns";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -148,14 +153,7 @@ export function OrderCard({
           </span>
           <div onClick={(e) => e.stopPropagation()}>
             {order.status !== "DRAFT" ? (
-              order.status === "COMPLETED" ? (
-                <div className="flex items-center gap-[8px] cursor-pointer">
-                  <InitialsAvatar name={displayOfficerName ?? "?"} />
-                  <span className="text-[14px] font-medium text-body leading-[1.5] tracking-[0.04em]">
-                    {displayOfficerName ?? "Unassigned"}
-                  </span>
-                </div>
-              ) : (
+              <div className="flex flex-col gap-2">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <div className="flex items-center gap-[8px] cursor-pointer">
@@ -199,7 +197,8 @@ export function OrderCard({
                     ))}
                   </DropdownMenuContent>
                 </DropdownMenu>
-              )
+                <TableTag text={enumToTitleCase(order?.assignmentStatus)} />
+              </div>
             ) : (
               <span className="text-[14px] font-medium text-body leading-[1.5] tracking-[0.04em]">
                 Unassigned

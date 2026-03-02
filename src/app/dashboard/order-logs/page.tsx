@@ -122,10 +122,10 @@ const OrderLogsPage = () => {
 
   const displayStats = [
     { value: `${stats?.totalOrders ?? 0}`, label: "Orders" },
-    { value: `${stats?.statusBreakdown?.assigned ?? 0}`, label: "Active Items" },
-    { value: `${stats?.statusBreakdown?.completed ?? 0}`, label: "Completed Items" },
-    { value: `${stats?.statusBreakdown?.inProgress ?? 0}`, label: "Pending Items" },
-    { value: `${stats?.statusBreakdown?.cancelled ?? 0}`, label: "Cancelled Items" },
+    { value: `${stats?.summary?.activeOrders ?? 0}`, label: "Active Order" },
+    { value: `${stats?.summary?.completedOrders ?? 0}`, label: "Completed Order" },
+    { value: `${stats?.statusBreakdown?.confirmed ?? 0}`, label: "Pending Order" },
+    { value: `${stats?.summary?.cancelledOrders ?? 0}`, label: "Cancelled Order" },
   ];
 
   return (
@@ -305,6 +305,7 @@ const OrderLogsPage = () => {
             )
           }
           actionLoading={updatingItem}
+          showActions
           deletingMultiple={deletingMultiple}
           deletingMultipleStatus={status}
           emptyHeader="No orders yet"
