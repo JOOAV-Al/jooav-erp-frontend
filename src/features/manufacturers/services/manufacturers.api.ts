@@ -1,9 +1,10 @@
 import { fetchDeletedManufacturers, fetchManufacturerDetails, fetchManufacturerOrders, fetchManufacturerProducts, fetchManufacturers, fetchManufacturersStats } from "@/features/manufacturers/services/queryFunctions";
 import { CreateManufacturerPayload } from "@/features/manufacturers/types";
 import { GeneralFetchingParams } from "@/interfaces/general";
-import { api } from "@/lib/api/axiosInstance";
+import { api, CustomAxiosRequestConfig } from "@/lib/api/axiosInstance";
 import { useInvalidatingMutation } from "@/lib/api/useInvalidatingMutations";
-import { useQuery } from "@tanstack/react-query";
+import { handleBulkMutationMessage } from "@/lib/utils";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 
 export const useGetManufacturers = (params: GeneralFetchingParams) => {
@@ -74,10 +75,19 @@ export const useDeleteManufacturer = () => {
 };
 
 export const useDeleteMultipleManufacturers = () => {
+  const queryClient = useQueryClient()
   return useInvalidatingMutation({
     mutationFn: ({manufacturerIds}: {manufacturerIds: string[]}) =>
-      api.post(`/manufacturers/bulk/delete`, {manufacturerIds}), 
-    invalidateQueries: [["all-manufacturers"], ["manufacturers-stats"]]
+      api.post(`/manufacturers/bulk/delete`, {manufacturerIds}, {noToast: true} as CustomAxiosRequestConfig), 
+    // invalidateQueries: [["all-manufacturers"], ["manufacturers-stats"]],
+    onSuccess: (data) => {
+      const res = data?.data
+      const {hasSuccess} = handleBulkMutationMessage(res, "Manufacturers")
+      if(hasSuccess) {
+        queryClient.invalidateQueries({queryKey: ["all-manufacturers"]})
+        queryClient.invalidateQueries({queryKey: ["manufacturers-stats"]})
+      }
+    }
   });
 };
 

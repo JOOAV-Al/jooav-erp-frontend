@@ -3,7 +3,8 @@ import { CreateCategoryPayload, CategoryItem, UpdateBulkCategoryPayload } from "
 import { GeneralFetchingParams } from "@/interfaces/general";
 import { api } from "@/lib/api/axiosInstance";
 import { useInvalidatingMutation } from "@/lib/api/useInvalidatingMutations";
-import { useQuery } from "@tanstack/react-query";
+import { handleBulkMutationMessage } from "@/lib/utils";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 
 export const useGetCategories = (params: GeneralFetchingParams) => {
@@ -81,10 +82,20 @@ export const useDeleteMultipleCategories = () => {
 };
 
 export const useDeleteMultipleSubCategories = () => {
+    const queryClient = useQueryClient()
   return useInvalidatingMutation({
     mutationFn: ({subcategoryIds}: {subcategoryIds: string[]}) =>
       api.post(`/categories/bulk/delete`, {subcategoryIds}), 
-    invalidateQueries: [["all-categories"], ["categories-stats"], ["all-subcategories"]]
+    invalidateQueries: [["all-categories"], ["categories-stats"], ["all-subcategories"]],
+        onSuccess: (data) => {
+      const res = data?.data
+      const {hasSuccess} = handleBulkMutationMessage(res, "Categories")
+      if(hasSuccess) {
+        queryClient.invalidateQueries({queryKey: ["all-subcategories"]})
+        queryClient.invalidateQueries({queryKey: ["all-categories"]})
+        queryClient.invalidateQueries({queryKey: ["categories-stats"]})
+      }
+    }
   });
 };
 

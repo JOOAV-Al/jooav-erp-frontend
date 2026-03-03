@@ -23,7 +23,7 @@ import { UserItem } from "@/features/users/types";
 import { useEffect, useState } from "react";
 import { Select } from "@/components/general/Select";
 import FieldIcon from "@/components/general/FieldIcon";
-import { userRoles } from "@/lib/rbac/roles";
+import { ROLES } from "@/lib/rbac/roles";
 import {
   isValidPhoneNumber,
   parsePhoneNumberFromString,
@@ -145,6 +145,13 @@ export function UserForm({
     });
   }, [user?.id, reset]);
 
+  const userRoles = [
+    { value: ROLES.ADMIN, label: "Admin" },
+    { value: ROLES.PROCUREMENT_OFFICER, label: "Procurement" },
+    { value: ROLES.WHOLESALER, label: "Wholesaler" },
+    ...(user?.role === ROLES.SUPER_ADMIN ? [{ value: ROLES.SUPER_ADMIN, label: "Superadmin" }] : []),
+  ];
+
   return (
     <form
       id="user-form"
@@ -263,7 +270,7 @@ export function UserForm({
             )}
           />
 
-          {/* MANUFACTURER */}
+          {/* User Type */}
           <Controller
             control={control}
             name="role"

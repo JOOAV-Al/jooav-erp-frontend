@@ -1,10 +1,12 @@
 import { fetchDeletedBrands, fetchBrandDetails, fetchBrands, fetchBrandsStats, fetchBrandsByManufacturer } from "@/features/brands/services/queryFunctions";
 import { BrandItem, CreateBrandPayload } from "@/features/brands/types";
-import { GeneralFetchingParams } from "@/interfaces/general";
-import { api } from "@/lib/api/axiosInstance";
+import { BulkMutationResponse, DefaultBulkMutationData, GeneralFetchingParams } from "@/interfaces/general";
+import { api, CustomAxiosRequestConfig } from "@/lib/api/axiosInstance";
 import { useInvalidatingMutation } from "@/lib/api/useInvalidatingMutations";
-import { useQuery } from "@tanstack/react-query";
+import { handleBulkMutationMessage } from "@/lib/utils";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosHeaders, AxiosRequestHeaders } from "axios";
+import { toast } from "sonner";
 
 
 export const useGetBrands = (params: GeneralFetchingParams) => {
@@ -69,10 +71,20 @@ export const useDeleteBrand = () => {
 };
 
 export const useDeleteMultipleBrands = () => {
+  const queryClient = useQueryClient()
   return useInvalidatingMutation({
     mutationFn: ({brandIds}: {brandIds: string[]}) =>
-      api.post(`/brands/bulk/delete`, {brandIds}), 
-    invalidateQueries: [["all-brands"], ["brand-details"], ["brands-stats"]]
+      api.post<BulkMutationResponse<DefaultBulkMutationData>>(`/brands/bulk/delete`, {brandIds}, {noToast: true} as CustomAxiosRequestConfig), 
+    // invalidateQueries: [["all-brands"], ["brand-details"], ["brands-stats"]],
+    onSuccess: (data) => {
+      const res = data?.data
+      const {hasSuccess} = handleBulkMutationMessage(res, "Brands")
+      if(hasSuccess) {
+        queryClient.invalidateQueries({queryKey: ["all-brands"]})
+        queryClient.invalidateQueries({queryKey: ["brands-details"]})
+        queryClient.invalidateQueries({queryKey: ["brands-stats"]})
+      }
+    }
   });
 };
 

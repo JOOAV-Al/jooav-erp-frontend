@@ -61,6 +61,7 @@ export function OrderForm({
     ProductItem | undefined
   >(undefined);
   const isEditMode = !!order?.id && !!orderItem?.id;
+  const isEditable = isEditMode ? order?.status === "DRAFT" : true;
   type OrderData = z.infer<typeof createOrderSchema>;
   const EMPTY_VALUES: OrderData = {
     wholesalerId: "",
@@ -117,6 +118,7 @@ export function OrderForm({
     };
 
     if (order?.id) {
+      if (!isEditable) return;
       await handleSubmitForm({ payload: sharedPayload, id: order?.id });
       return;
     }
@@ -173,6 +175,7 @@ export function OrderForm({
                     )}
                   </div>
                   <Select
+                    disabled={!isEditable}
                     isOpen={wholesalerIdDropdownOpen}
                     setIsOpen={setWholesalerIdDropdownOpen}
                     options={
@@ -207,6 +210,7 @@ export function OrderForm({
                     )}
                   </div>
                   <Select
+                    disabled={!isEditable}
                     isOpen={productIdDropdownOpen}
                     setIsOpen={setProductIdDropdownOpen}
                     options={
@@ -283,6 +287,7 @@ export function OrderForm({
                     isEdit={isEditMode}
                     defaultValue={field.value}
                     onChange={(e) => field.onChange(Number(e.target.value))}
+                    disabled={!isEditable}
                   />
                 </Field>
               </div>
@@ -356,6 +361,7 @@ export function OrderForm({
                     )}
                   </div>
                   <Select
+                    disabled={!isEditable}
                     isOpen={addressDropdownOpen}
                     setIsOpen={setAddressDropdownOpen}
                     options={[

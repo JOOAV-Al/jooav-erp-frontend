@@ -1,5 +1,7 @@
+import { BulkMutationResponse, DefaultBulkMutationData } from "@/interfaces/general";
 import { clsx, type ClassValue } from "clsx"
 import parsePhoneNumberFromString from "libphonenumber-js";
+import { toast } from "sonner";
 import { twMerge } from "tailwind-merge"
 
 export function cn(...inputs: ClassValue[]) {
@@ -161,4 +163,18 @@ export function enumToTitleCase(value: string): string {
     .split("_")
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
+}
+
+export function handleBulkMutationMessage (response: BulkMutationResponse<DefaultBulkMutationData>, entity: string) {
+  const res = response?.data
+  const hasFailed = res?.failed > 0
+  const hasSuccess = res?.successful > 0
+  const title = `${res.successful ?? 0} Successful. ${res?.failed ?? 0} Failed`
+  const message = hasFailed ? `Failed to delete some ${entity} associated to a product` : `Multiple ${entity} deleted successfully`
+    toast.error(title, {
+    style: { backgroundColor: hasFailed ? '#F43F5E' : "hsl(216 82% 55%)", borderRadius: "12px" },
+    description: message,
+    className: "force-white-toast",
+  })
+  return {hasFailed, hasSuccess}
 }

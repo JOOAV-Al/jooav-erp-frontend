@@ -99,6 +99,23 @@ export interface MutationResponse<T> {
   data: T;
 }
 
+export interface DefaultBulkMutationData {
+  id: string;
+  success: boolean;
+  error: string;
+}
+export interface BulkMutationResponse<T> {
+  message: string;
+  status: string;
+  data: {
+    results: T[]
+    totalRequested: number;
+    successful: number;
+    failed: number;
+  }
+  timestamp: string;
+}
+
 export interface Tab {
   value: string;
   label: string;

@@ -3,7 +3,8 @@ import { VariantItem, CreateVariantPayload } from "@/features/variants/types";
 import { GeneralFetchingParams } from "@/interfaces/general";
 import { api } from "@/lib/api/axiosInstance";
 import { useInvalidatingMutation } from "@/lib/api/useInvalidatingMutations";
-import { useQuery } from "@tanstack/react-query";
+import { handleBulkMutationMessage } from "@/lib/utils";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 
 export const useGetVariants = (params: GeneralFetchingParams) => {
@@ -64,10 +65,19 @@ export const useDeleteVariant = () => {
 };
 
 export const useDeleteMultipleVariants = () => {
+  const queryClient = useQueryClient()
   return useInvalidatingMutation({
     mutationFn: ({variantIds}: {variantIds: string[]}) =>
       api.post(`/variants/bulk/delete`, {variantIds}), 
-    invalidateQueries: [["all-variants"], ["variants-stats"]]
+    invalidateQueries: [["all-variants"], ["variants-stats"]],
+        onSuccess: (data) => {
+      const res = data?.data
+      const {hasSuccess} = handleBulkMutationMessage(res, "Variant")
+      if(hasSuccess) {
+        queryClient.invalidateQueries({queryKey: ["all-variant"]})
+        queryClient.invalidateQueries({queryKey: ["variant-stats"]})
+      }
+    }
   });
 };
 
