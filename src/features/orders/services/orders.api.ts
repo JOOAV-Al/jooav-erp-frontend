@@ -1,5 +1,5 @@
 import { fetchOrderDetails, fetchOrders, fetchOrdersStats } from "@/features/orders/services/queryFunctions";
-import { Order, CreateOrderPayload, UpdateOrderItemStatusPayload, UpdateMultipleOrderItemStatusPayload } from "@/features/orders/types";
+import { Order, CreateOrderPayload, UpdateOrderItemStatusPayload, UpdateMultipleOrderItemStatusPayload, OrderVirtualAccount } from "@/features/orders/types";
 import { GeneralFetchingParams, MutationResponse } from "@/interfaces/general";
 import { api } from "@/lib/api/axiosInstance";
 import { useInvalidatingMutation } from "@/lib/api/useInvalidatingMutations";
@@ -24,34 +24,59 @@ export const useGetOrderDetails = ({orderNumber}: {orderNumber: string}) => {
   });
 };
 
-export const useCreateOrder = () => {
+export const useCreateDraftOrder = () => {
   return useInvalidatingMutation({
     mutationFn: (payload: CreateOrderPayload) =>
-      api.post<MutationResponse<Order>>("/orders", payload,), 
-    invalidateQueries: [["all-orders"], ["orders-stats"]]
+      api.post<MutationResponse<{order: Order}>>("/orders", payload), 
+    invalidateQueries: [["all-orders"], ["orders-stats"], ["order-details"]]
   });
 };
 
-export const useSubmitDraftOrder = () => {
+export const useUpdateDraftOrder = () => {
   return useInvalidatingMutation({
     mutationFn: ({payload, id}: {payload: CreateOrderPayload, id: string}) =>
-      api.post<Order>(`/orders/${id}/submit`, payload), 
-    invalidateQueries: [["all-orders"], ["order-details"], ["orders-stats"]]
-  });
-};
-
-export const useUpdateOrder = () => {
-  return useInvalidatingMutation({
-    mutationFn: ({payload, id}: {payload: CreateOrderPayload, id: string}) =>
-      api.patch<MutationResponse<Order>>(`/orders/${id}`, payload), 
+      api.patch<MutationResponse<{order: Order}>>(`/orders/${id}`, payload), 
     invalidateQueries: [["all-orders"], ["order-details"]]
+  });
+};
+
+// export const useCreateOrderInitiation = () => {
+//   return useInvalidatingMutation({
+//     mutationFn: (payload: CreateOrderPayload) =>
+//       api.post<MutationResponse<Order>>("/orders", payload,), 
+//     invalidateQueries: [["all-orders"], ["orders-stats"]]
+//   });
+// };
+
+// Initiates payment for an order — generates virtual account
+// TODO: Confirm full payload shape with BE (may need amount, callbackUrl, etc.)
+export const useInitiateOrderPayment = () => {
+  return useInvalidatingMutation({
+    mutationFn: ({ orderNumber }: { orderNumber: string }) =>
+      api.post<MutationResponse<{order: Order, virtualAccounts: OrderVirtualAccount[], checkoutUrl: string; paymentExpiresAt: string;}>>(`/orders/${orderNumber}/initiate-payment`,),
+    invalidateQueries: [["all-orders"], ["order-details"], ["orders-stats"]],
+  });
+};
+export const useReInitiateOrderPayment = () => {
+  return useInvalidatingMutation({
+    mutationFn: ({ orderNumber }: { orderNumber: string }) =>
+      api.post<MutationResponse<{order: Order, virtualAccounts: OrderVirtualAccount[], checkoutUrl: string; paymentExpiresAt: string;}>>(`/orders/${orderNumber}/reinitiate-payment`),
+    invalidateQueries: [["all-orders"], ["order-details"], ["orders-stats"]],
+  });
+};
+
+export const useConfirmOrderPayment = () => {
+  return useInvalidatingMutation({
+    mutationFn: ({ orderNumber }: { orderNumber: string }) =>
+      api.post<MutationResponse<{order: Order, virtualAccounts: OrderVirtualAccount[], checkoutUrl: string; paymentExpiresAt: string;}>>(`/orders/${orderNumber}/verify-payment`,),
+    invalidateQueries: [["all-orders"], ["order-details"], ["orders-stats"]],
   });
 };
 
 export const useDeleteOrder = () => {
   return useInvalidatingMutation({
     mutationFn: ({id}: {id: string}) =>
-      api.delete(`/orders/${id}`), 
+      api.delete(`/orders/${id}/cancel`), 
     invalidateQueries: [["all-orders"], ["order-details"], ["orders-stats"]]
   });
 };

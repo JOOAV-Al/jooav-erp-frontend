@@ -34,6 +34,8 @@ import Image from "next/image";
 import { useRegenerateResetToken } from "@/features/users/services/users.api";
 import { normalizePhone } from "@/lib/utils";
 import Spinner from "@/components/general/Spinner";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 const createUserSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -54,6 +56,7 @@ export function UserForm({
   user,
   onResetReady,
 }: DialogFormProps & { user?: UserItem }) {
+  const authUser = useSelector((state: RootState) => state.auth.user)
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
   const [linkGenerated, setLinkGenerated] = useState<boolean>(false);
   const [link, setLink] = useState<string>("");
@@ -145,11 +148,14 @@ export function UserForm({
     });
   }, [user?.id, reset]);
 
+  console.log(user)
   const userRoles = [
     { value: ROLES.ADMIN, label: "Admin" },
+    ...(authUser?.role === ROLES.SUPER_ADMIN
+      ? [{ value: ROLES.SUPER_ADMIN, label: "Superadmin" }]
+      : []),
     { value: ROLES.PROCUREMENT_OFFICER, label: "Procurement" },
     { value: ROLES.WHOLESALER, label: "Wholesaler" },
-    ...(user?.role === ROLES.SUPER_ADMIN ? [{ value: ROLES.SUPER_ADMIN, label: "Superadmin" }] : []),
   ];
 
   return (

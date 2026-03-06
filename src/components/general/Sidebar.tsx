@@ -17,7 +17,7 @@ import {
   // MessageCircleMoreIcon,
   // ChartLineIcon,
   LayoutDashboard,
-  Bell,
+  // Bell,
   ShoppingBag,
   // FolderPen,
   // FolderTree,
@@ -29,7 +29,7 @@ import {
   // UserStar,
   // Users,
   PackagePlus,
-  Bike,
+  // Bike,
   CheckCheck,
   ListTree,
   // Router,
@@ -64,11 +64,11 @@ const links = {
       href: "/dashboard",
       icon: LayoutDashboard,
     },
-    {
-      label: "Notification",
-      href: "/dashboard/notification",
-      icon: Bell,
-    },
+    // {
+    //   label: "Notification",
+    //   href: "/dashboard/notification",
+    //   icon: Bell,
+    // },
   ],
   order: [
     {

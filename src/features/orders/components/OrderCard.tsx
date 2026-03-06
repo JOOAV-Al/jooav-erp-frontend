@@ -18,25 +18,14 @@ import { useAssignOfficerToOrder } from "@/features/orders/services/orders.api";
 import {
   cn,
   enumToTitleCase,
+  formatCurrency,
+  formatOrderDate,
   getItemStatusStyles,
   getOrderStatusStyles,
 } from "@/lib/utils";
 import { format } from "date-fns";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-
-const formatCurrency = (value: string | number) => {
-  const num = typeof value === "string" ? parseFloat(value) : value;
-  return new Intl.NumberFormat("en-NG").format(num);
-};
-
-const formatOrderDate = (dateStr: string) => {
-  try {
-    return format(new Date(dateStr), "dd/MM/yyyy. h:mmaaa");
-  } catch {
-    return dateStr;
-  }
-};
 
 export const InitialsAvatar = ({ name }: { name: string }) => {
   const parts = name?.trim().split(" ") ?? [];
@@ -116,9 +105,9 @@ export function OrderCard({
     : "—";
 
   const wholesaler =
-    (order.wholesaler?.user?.firstName ?? "") +
+    (order.wholesaler?.firstName ?? "") +
     " " +
-    (order.wholesaler?.user?.lastName ?? "");
+    (order.wholesaler?.lastName ?? "");
 
   const orderStatusStyles = getOrderStatusStyles(order.status);
 
@@ -152,7 +141,7 @@ export function OrderCard({
             Assigned To:
           </span>
           <div onClick={(e) => e.stopPropagation()}>
-            {order.status !== "DRAFT" ? (
+            {order.status !== "DRAFT" && order?.status !== "PENDING_PAYMENT" ? (
               <div className="flex flex-col gap-2">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>

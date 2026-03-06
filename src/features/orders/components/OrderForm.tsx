@@ -29,6 +29,7 @@ import Spinner from "@/components/general/Spinner";
 import { UserItem } from "@/features/users/types";
 import { ProductItem } from "@/features/products/types";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import FormOrderList from "@/features/orders/components/FormOrderList";
 
 const createOrderSchema = z.object({
   wholesalerId: z.string().min(1, "Wholesaler is required"),
@@ -46,11 +47,17 @@ export function OrderForm({
   wholesalers,
   products,
   onResetReady,
+  showOrderItemsList,
+  setShowOrderItemsList,
+  formMode,
 }: DialogFormProps & {
   order?: Order;
   orderItem?: OrderItem;
   wholesalers?: UserItem[];
   products?: ProductItem[];
+  setShowOrderItemsList?: (showItems: boolean) => void;
+  showOrderItemsList?: boolean;
+  formMode?: "add" | "view" | "update" | "create" | null;
 }) {
   const [wholesalerIdDropdownOpen, setWholesalerIdDropdownOpen] =
     useState(false);
@@ -89,7 +96,7 @@ export function OrderForm({
   useEffect(() => {
     onResetReady?.(() => {
       reset({
-        wholesalerId: order?.wholesaler?.user?.id ?? "",
+        wholesalerId: order?.wholesaler?.id ?? "",
         productId: orderItem?.product?.id ?? "",
         quantity: Number(orderItem?.quantity) || (undefined as any),
         address: order?.deliveryAddress?.address ?? "",
@@ -100,18 +107,48 @@ export function OrderForm({
     // Deliberately only order?.id — we want a stable function ref per product
   }, [orderItem?.id, order?.id, isEditMode]);
 
+  console.log(formMode);
   const onSubmit = async (values: z.infer<typeof createOrderSchema>) => {
     if (!handleSubmitForm) return;
     const { productId, wholesalerId, address, quantity } = values;
+    const action = formMode?.toUpperCase();
     const sharedPayload: CreateOrderPayload = {
-      wholesalerId,
-      items: [
-        {
-          productId,
-          quantity,
-          unitPrice: Number(selectedProduct?.price) ?? 0,
-        },
-      ],
+      // wholesalerId,
+      ...(order?.id
+        ? {
+            item: {
+              productId,
+              quantity,
+              ...(order?.id && formMode ? { action } : {}),
+              ...(orderItem?.id && formMode === "update"
+                ? { itemId: orderItem?.id }
+                : {}),
+              // unitPrice: Number(selectedProduct?.price) ?? 0,
+            },
+          }
+        : {
+            wholesalerId,
+            items: [
+              {
+                productId,
+                quantity,
+                ...(order?.id && formMode ? { action } : {}),
+                ...(orderItem?.id && formMode === "update"
+                  ? { itemId: orderItem?.id }
+                  : {}),
+                // unitPrice: Number(selectedProduct?.price) ?? 0,
+              },
+            ],
+          }),
+      // item: {
+      //   productId,
+      //   quantity,
+      //   ...(order?.id && formMode ? { action } : {}),
+      //   ...(orderItem?.id && formMode === "update"
+      //     ? { itemId: orderItem?.id }
+      //     : {}),
+      //   // unitPrice: Number(selectedProduct?.price) ?? 0,
+      // },
       deliveryAddress: {
         address,
       },
@@ -119,7 +156,7 @@ export function OrderForm({
 
     if (order?.id) {
       if (!isEditable) return;
-      await handleSubmitForm({ payload: sharedPayload, id: order?.id });
+      await handleSubmitForm(sharedPayload);
       return;
     }
     console.log(sharedPayload);
@@ -128,7 +165,7 @@ export function OrderForm({
 
   useEffect(() => {
     reset({
-      wholesalerId: order?.wholesaler?.user?.id ?? "",
+      wholesalerId: order?.wholesaler?.id ?? "",
       productId: orderItem?.product?.id ?? "",
       quantity: Number(orderItem?.quantity) || (undefined as any),
       address: order?.deliveryAddress?.address ?? "",
@@ -175,7 +212,7 @@ export function OrderForm({
                     )}
                   </div>
                   <Select
-                    disabled={!isEditable}
+                    disabled={!isEditable || formMode !== "create"}
                     isOpen={wholesalerIdDropdownOpen}
                     setIsOpen={setWholesalerIdDropdownOpen}
                     options={

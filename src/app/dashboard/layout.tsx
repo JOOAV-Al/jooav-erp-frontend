@@ -52,7 +52,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       ? "Order Management"
       : pathname.startsWith("/dashboard/fulfilled-orders")
       ? "Order Management"
-      : "Home";
+      : "Dashboard";
   };
   return (
     <div className="flex min-h-screen overflow-hidden">
@@ -75,7 +75,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
           <div
             className={`flex flex-col flex-1 overflow-auto mt-3 mr-3 ${
               isCollapsed ? "" : "rounded-t-2xl"
-            } bg-white ${
+            } ${isHomePage ? "bg-background" : "bg-white"} ${
               isSidebarHidden
                 ? "md:ml-0"
                 : isCollapsed

@@ -1,5 +1,6 @@
 import { BulkMutationResponse, DefaultBulkMutationData } from "@/interfaces/general";
 import { clsx, type ClassValue } from "clsx"
+import { format } from "date-fns";
 import parsePhoneNumberFromString from "libphonenumber-js";
 import { toast } from "sonner";
 import { twMerge } from "tailwind-merge"
@@ -83,7 +84,18 @@ export function toProperCase(text: string): string {
     .replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
+export const formatCurrency = (value: string | number) => {
+  const num = typeof value === "string" ? parseFloat(value) : value;
+  return new Intl.NumberFormat("en-NG").format(num);
+};
 
+export const formatOrderDate = (dateStr: string) => {
+  try {
+    return format(new Date(dateStr), "dd/MM/yyyy. h:mmaaa");
+  } catch {
+    return dateStr;
+  }
+};
 
 export const getItemStatusStyles = (status = "") => {
   switch (status?.toUpperCase()) {
@@ -148,11 +160,41 @@ export const getOrderStatusStyles = (status = "") => {
         styles: "table-tag border-border-main bg-tag-draft text-body-passive",
         text: "Archived",
       };
+    case "PENDING_PAYMENT":
+      return {
+        styles: "table-tag border-border-main bg-tag-draft text-body-passive",
+        text: "Initiated",
+      };
     default:
       return {
         styles: "table-tag border-border-main bg-tag-draft text-body-passive",
         text: "Draft",
       };
+  }
+};
+
+
+export const getUserTagStyles = (value: string = "ADMIN") => {
+  if (value === "SUPER_ADMIN") {
+    return {
+      styles: `border-border-brand-stroke bg-tag-added text-brand-primary`,
+      text: `S. admin`,
+    };
+  } else if (value === "PROCUREMENT_OFFICER") {
+    return {
+      styles: `border-border-accent bg-tag-queue text-brand-signal`,
+      text: `Procurement`,
+    };
+  } else if (value === "WHOLESALER") {
+    return {
+      styles: `border-border-main bg-tag-active text-success-500`,
+      text: `Wholesaler`,
+    };
+  } else {
+    return {
+      styles: `border-border-main bg-tag-draft text-body-passive`,
+      text: `Admin`,
+    };
   }
 };
 

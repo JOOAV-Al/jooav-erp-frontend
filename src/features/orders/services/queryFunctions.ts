@@ -16,7 +16,7 @@ export async function fetchOrders (params: GeneralFetchingParams): Promise<Pagin
   return response.data
 }
 
-export async function fetchOrderDetails ({orderNumber}: {orderNumber: string}): Promise<Order> {
+export async function fetchOrderDetails ({orderNumber}: {orderNumber: string}): Promise<{data: Order}> {
   const response = await api.get(`/orders/${orderNumber}`, { noToast: true } as CustomAxiosRequestConfig)
   return response.data
 }

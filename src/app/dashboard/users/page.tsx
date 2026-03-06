@@ -25,7 +25,7 @@ import { ImageIcon, Wheat } from "lucide-react";
 import DrawerBoxContent from "@/components/general/DrawerBoxContent";
 import CopyLinkBox from "@/components/general/CopyLinkBox";
 import Image from "next/image";
-import { normalizePhone } from "@/lib/utils";
+import { getUserTagStyles, normalizePhone } from "@/lib/utils";
 
 const UserPage = () => {
   const [page, setPage] = useState<number>(1);
@@ -101,30 +101,6 @@ const UserPage = () => {
       label: "Archived",
     },
   ];
-
-  const getTagStyles = (value: string = "ADMIN") => {
-    if (value === "SUPER_ADMIN") {
-      return {
-        styles: `border-border-brand-stroke bg-tag-added text-brand-primary`,
-        text: `S. admin`,
-      };
-    } else if (value === "PROCUREMENT_OFFICER") {
-      return {
-        styles: `border-border-accent bg-tag-queue text-brand-signal`,
-        text: `Procurement`,
-      };
-    } else if (value === "WHOLESALER") {
-      return {
-        styles: `border-border-main bg-tag-active text-success-500`,
-        text: `Wholesaler`,
-      };
-    } else {
-      return {
-        styles: `border-border-main bg-tag-draft text-body-passive`,
-        text: `Admin`,
-      };
-    }
-  };
 
   return (
     <div className="flex flex-col gap-5">
@@ -267,28 +243,28 @@ const UserPage = () => {
               key: "phone",
               label: "Phone no.",
             },
-            {
-              key: "role",
-              label: "Role",
-              render: (item) => (
-                <TableTag
-                  className={`${getTagStyles(item?.role)?.styles}`}
-                  text={getTagStyles(item?.role)?.text}
-                />
-              ),
-            },
             // {
             //   key: "role",
-            //   label: <div className="flex justify-end">Role</div>,
+            //   label: "Role",
             //   render: (item) => (
-            //     <div className="flex justify-end">
-            //       <TableTag
-            //         className={`${getTagStyles(item?.role)?.styles}`}
-            //         text={getTagStyles(item?.role)?.text}
-            //       />
-            //     </div>
+            //     <TableTag
+            //       className={`${getUserTagStyles(item?.role)?.styles}`}
+            //       text={getUserTagStyles(item?.role)?.text}
+            //     />
             //   ),
             // },
+            {
+              key: "role",
+              label: <div className="flex justify-end">Role</div>,
+              render: (item) => (
+                <div className="flex justify-end">
+                  <TableTag
+                    className={`${getUserTagStyles(item?.role)?.styles}`}
+                    text={getUserTagStyles(item?.role)?.text}
+                  />
+                </div>
+              ),
+            },
           ]}
           page={page}
           pageSize={20}

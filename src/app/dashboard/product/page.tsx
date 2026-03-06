@@ -102,6 +102,7 @@ const ProductPage = () => {
 
   // ── Handlers ─────────────────────────────────────────────────────────────────
   const handleCreate = async (values: any) => {
+    console.log(values)
     if (selectedProduct) {
       await updateProduct(values);
     } else {

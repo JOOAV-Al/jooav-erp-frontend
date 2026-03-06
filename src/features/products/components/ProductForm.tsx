@@ -187,7 +187,7 @@ export function ProductForm({
         const draft = await readDraft();
         if (draft) {
           reset({ ...EMPTY_VALUES, ...draft });
-          // Banner shows for 2 seconds then auto-hides
+          // Banner shows for 3 seconds then auto-hides
           setShowDraftBanner(true);
           bannerTimer.current = setTimeout(
             () => setShowDraftBanner(false),
@@ -234,6 +234,7 @@ export function ProductForm({
   };
 
   const onSubmit = async (values: z.infer<typeof createProductSchema>) => {
+    console.log(values)
     if (!handleSubmitForm) return;
     // Determine status based on which button was clicked
     const status = submitAction === "secondary" ? "LIVE" : "QUEUE";

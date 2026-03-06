@@ -1,4 +1,5 @@
-import { Menu } from "lucide-react";
+import LogoutButton from "@/features/auth/components/LogoutButton";
+import { LogOut, Menu } from "lucide-react";
 import React from "react";
 
 interface DashboardTopBarProps {
@@ -30,7 +31,7 @@ const DashboardTopBar = ({
         )}
         <h3 className="py-5 hidden smd:block">{pageHeading}</h3>
       </div>
-      <div className="size-9 rounded-full p-sm sidebar-link bg-storey-foreground"></div>
+      <LogoutButton />
     </div>
   );
 };

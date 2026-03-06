@@ -1,15 +1,26 @@
 import { ProductItem } from "@/features/products/types";
 import { UserItem } from "@/features/users/types";
 
-export type OrderStatus = "DRAFT" | "CONFIRMED" | "IN_PROGRESS" | "ASSIGNED" | "COMPLETED" | "CANCELLED"
+export type OrderStatus = "DRAFT" | "CONFIRMED" | "IN_PROGRESS" | "ASSIGNED" | "COMPLETED" | "CANCELLED" | "PENDING_PAYMENT"
 export type OrderAssignmentStatus = "UNASSIGNED" | "ACTIVE" | "BLOCKED" | "PENDING_APPROVAL" | "DEACTIVATED"
 export interface CreateOrderPayload {
   wholesalerId?: string;
   items?: {
+    //We can use this action key during edit or even in creation the initial order since we are always creating one item on an order at a time.
+    action?: string
+    itemId?: string;
     productId: string;
     quantity: number;
-    unitPrice: number;
+    unitPrice?: number;
   }[];
+  item?: {
+    //We can use this action key during edit or even in creation the initial order since we are always creating one item on an order at a time.
+    action?: string
+    itemId?: string;
+    productId: string;
+    quantity: number;
+    unitPrice?: number;
+  };
   deliveryAddress?: {
     city?: string;
     state?: string;
@@ -53,6 +64,13 @@ export interface OrderItemProduct {
     name: string;
   }
 }
+
+export interface OrderVirtualAccount {
+  bankCode: string;
+  bankName: string;
+  accountName: string;
+  accountNumber: string;
+};
 export interface OrderItem {
   id: string;
   productId: string;
@@ -84,21 +102,22 @@ export interface Order {
     contactName: string;
     contactPhone: string;
   };
-  virtualAccounts: {
-    bankCode: string;
-    bankName: string;
-    accountName: string;
-    accountNumber: string;
-  };
+  virtualAccounts: OrderVirtualAccount[];
   wholesaler: {
     id: string;
-    user: {
-      id: string;
-      firstName: string;
-      lastName: string;
-      email: string;
-    }
+    firstName: string;
+    lastName: string;
+    email: string;
   };
+  // wholesaler: {
+  //   id: string;
+  //   user: {
+  //     id: string;
+  //     firstName: string;
+  //     lastName: string;
+  //     email: string;
+  //   }
+  // };
   customerNotes: string;
   assignmentNotes: string;
   assignmentResponseReason: string;
@@ -113,8 +132,6 @@ export interface Order {
   orderDate: string | null;
   submittedAt: string;
 }
-
-
 export interface OrderStatsItem {
   totalOrders: number;
   summary: {

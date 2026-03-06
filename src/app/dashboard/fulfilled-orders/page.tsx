@@ -1,30 +1,18 @@
 "use client";
-
-import DashboardDrawer from "@/components/general/DashboardDrawer";
-import OrderForm from "@/features/orders/components/OrderForm";
 import {
-  useCreateOrder,
   useDeleteOrder,
   useDeleteMultipleOrders,
   useGetOrders,
   useGetOrdersStats,
-  useUpdateOrder,
   useUpdateOrderItemStatus,
 } from "@/features/orders/services/orders.api";
 import React, { useRef, useState } from "react";
 import { Order, OrderItem } from "@/features/orders/types";
 import FilterContainer from "@/components/filters/FilterContainer";
 import { useDebounce } from "@/hooks/useDebounce";
-import StatsContainer from "@/components/general/StatsContainer";
-import FormDropdown from "@/components/general/FormDropdown";
-import StatsSkeleton from "@/components/general/StatsSkeleton";
-import DrawerBoxContent from "@/components/general/DrawerBoxContent";
-import TableTag from "@/components/general/TableTag";
-import { useGetProducts } from "@/features/products/services/products.api";
 import { useGetUsers } from "@/features/users/services/users.api";
 import OrdersGroupedTable from "@/features/orders/components/OrdersGroupedTable";
 import SearchBox from "@/components/filters/SearchBox";
-import { getItemStatusStyles, getOrderStatusStyles } from "@/lib/utils";
 import SortFilter from "@/components/filters/SortFilter";
 
 const FulfilledOrdersPage = () => {
@@ -43,8 +31,6 @@ const FulfilledOrdersPage = () => {
   const debouncedQuery = useDebounce(query);
   const ordersFormResetRef = useRef<(() => void) | null>(null);
 
-  const { mutateAsync: updateOrder, isPending: updating } = useUpdateOrder();
-  const { mutateAsync: createOrder, isPending: creating } = useCreateOrder();
   const { mutateAsync: deleteOrder, isPending: deleting } = useDeleteOrder();
   const { mutateAsync: updateItemStatus, isPending: updatingItem } =
     useUpdateOrderItemStatus();
@@ -67,23 +53,6 @@ const FulfilledOrdersPage = () => {
   const { data: officers } = useGetUsers({ role: "PROCUREMENT_OFFICER" });
 
   const orders: Order[] = data?.data?.orders ?? [];
-
-  const handleCreate = async (values: any) => {
-      console.log(values);
-    if (selectedOrder) {
-      console.log(values);
-      await updateOrder(values);
-      setOpen(false);
-    } else {
-      console.log(values)
-      const res = await createOrder(values);
-      if (res.data.status === "success") {
-        setShowPaymentScreen(true);
-      }
-    }
-    setSelectedOrder(undefined);
-    setSelectedOrderItem(undefined);
-  };
 
   const handleUpdateOrderItemStatus = async (
     status: string,
