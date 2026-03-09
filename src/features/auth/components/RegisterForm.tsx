@@ -20,7 +20,7 @@ import { useDispatch } from "react-redux";
 import { setCredentials } from "@/redux/slices/authSlice";
 import PasswordInput from "@/features/auth/components/PasswordInput";
 import FieldIcon from "@/components/general/FieldIcon";
-import { Mail, UserRoundPen, UserRoundPlus, Phone, Lock } from "lucide-react";
+import { Mail, UserRoundPen, UserRoundPlus, Phone, Lock, TypeOutline } from "lucide-react";
 import CustomUsernameIcon from "@/components/icons/CustomUsernameIcon";
 
 const registerSchema = z.object({
@@ -152,6 +152,8 @@ export function RegisterForm() {
               )}
             />
 
+          
+
             {/* USERNAME */}
             <Controller
               control={control}
@@ -170,7 +172,7 @@ export function RegisterForm() {
                     type="text"
                     placeholder="Enter username"
                     aria-invalid={fieldState.invalid}
-                    leftIcon={<CustomUsernameIcon className="h-5 w-5 text-gray-400" />}
+                    leftIcon={<FieldIcon Icon={TypeOutline}/>}
                   />
                 </Field>
               )}
