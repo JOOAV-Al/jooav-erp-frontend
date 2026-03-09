@@ -171,7 +171,7 @@ axiosInstance.interceptors.response.use(
 
         // Call refresh endpoint
         const refreshResponse = await axios.post<RefreshTokenResponse>(
-          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/admin/auth/refresh`,
+          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/auth/refresh`,
           { refreshToken },
           { 
             withCredentials: true,
@@ -309,7 +309,7 @@ export const refreshAccessToken = async (): Promise<boolean> => {
     }
 
     const response = await axios.post<RefreshTokenResponse>(
-      `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/admin/auth/refresh`,
+      `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/auth/refresh`,
       { refreshToken },
       { withCredentials: true }
     );
@@ -337,7 +337,7 @@ export const isAuthenticated = (): boolean => {
 export const logout = (): void => {
   clearAuthTokens();
   // Optional: call backend logout endpoint
-  // api.post("/admin/auth/logout", {}, { noToast: true, noAuth: true });
+  // api.post("/auth/logout", {}, { noToast: true, noAuth: true });
 };
 
 export default axiosInstance;

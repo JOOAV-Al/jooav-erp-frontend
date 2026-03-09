@@ -1,26 +1,37 @@
-import { Role } from "@/lib/rbac/roles";
+export type UserRole = "CUSTOMER" | "WHOLESALER";
 
 export interface User {
   id: string;
   email: string;
-  address: string;
   username: string;
   firstName: string;
   lastName: string;
   phone: string;
-  emailVerified: boolean;
-  status: string;
   avatar: string | null;
-  role: Role;
-  assignedRegions: [];
-  permissions: {
-    canManageManufacturers: boolean,
-    canApproveSMEs: boolean,
-    canManageSubAdmins: boolean,
-    canAccessAnalytics: boolean,
-    canModifySystemConfig: boolean
-  },
-  lastLogin: string;
+  role: UserRole;
+  status: string;
+  emailVerified: boolean;
+  lastLogin: string | null;
+  passwordChangedAt: string | null;
   createdAt: string;
   updatedAt: string;
-};
+  profile?: {
+    id: string;
+    userId: string;
+    address: string | null;
+    city: string | null;
+    state: string | null;
+    country: string | null;
+    createdAt: string;
+    updatedAt: string;
+  };
+  wholesalerProfile?: {
+    id: string;
+    userId: string;
+    regionId: string | null;
+    totalOrders: number;
+    totalSpent: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+}

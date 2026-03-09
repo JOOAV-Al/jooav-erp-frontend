@@ -123,6 +123,7 @@
   --9rem: 9rem;
   --10rem: 10rem;
   --12-5rem: 12.5rem;
+  --3-3125rem: 3.3125rem; /* 53px */
   --weight-500: 500;
   --weight-600: 600;
   --weight-700: 700;
@@ -209,6 +210,8 @@
   --text-tag-base: var(--gray-600);
   --text-tag-primary: var(--blue-500);
   --text-tag-secondary: var(--cosmic-latte-500);
+
+  --tag-draft: hsla(0, 0%, 97%, 1);
 }
 
 /* Semantic Typography Tokens */
@@ -316,6 +319,9 @@
   --sp-pg-sm: var(--8rem);
   --sp-pg-md: var(--10rem);
   --sp-pg-lg: var(--12-5rem);
+
+  /* Special pill height */
+  --spacing-pill: var(--3-3125rem);
 
   /* Margins (from designer) */
   --m-null: var(--0rem);
@@ -464,8 +470,12 @@
   --color-cosmic-latte-700: var(--cosmic-latte-700);
   --color-cosmic-latte-800: var(--cosmic-latte-800);
 
+  --color-tag-draft: var(--tag-draft);
+  --color-nominal-background: var(--nominal-background);
+
   /* Semantic UI Colors */
   --color-background: var(--nominal-background);
+  --color-heading: var(--text-heading-color);
   --color-foreground: var(--text-body-color);
   --color-card: var(--nominal-card-background);
   --color-card-foreground: var(--text-body-color);
@@ -612,6 +622,9 @@
   --box-shadow-md: var(--shadow-md);
   --box-shadow-lg: var(--shadow-lg);
   --box-shadow-xl: var(--shadow-xl);
+
+  /* ===== SPECIAL HEIGHTS ===== */
+  --spacing-pill: var(--spacing-pill);
 }
 
 /* ============================================
@@ -623,7 +636,7 @@
     @apply border-border outline-ring/50;
   }
   .auth-card {
-    @apply p-xl rounded-3xl mx-auto w-full max-w-[clamp(270px,80vw,370px)] mdl:max-w-[clamp(370px,60vw,420px)] 2xl:max-w-[clamp(420px,60vw,720px)] bg-card;
+    @apply p-xl rounded-3xl mx-auto w-full max-w-[420px] bg-card;
   }
 
     html {

@@ -2,21 +2,16 @@
 "use client";
 import { useEffect } from "react";
 import {
-  CreditCard,
   Home,
-  LibraryBig,
-  NotebookPen,
-  PencilRuler,
-  Table,
-  TabletSmartphone,
-  X,
+  ShoppingBag,
+  PackageSearch,
+  CreditCard,
+  UserCircle,
   Settings,
   LogOut,
   PanelRightOpen,
   PanelRightClose,
-  MessageCircleMoreIcon,
-  ChartLineIcon,
-  // Router,
+  X,
 } from "lucide-react";
 import SidebarLink from "./SidebarLink";
 // import AuthLogo from "@/components/authentication/AuthLogo";
@@ -64,30 +59,24 @@ export default function Sidebar({
 
   const links = [
     {
-      label: "Timetable",
-      href: "/dashboard/timetable",
-      icon: Table,
+      label: "Marketplace",
+      href: "/dashboard/marketplace",
+      icon: ShoppingBag,
     },
     {
-      label: "Learning Materials",
-      href: "/dashboard/learning-materials",
-      icon: LibraryBig,
+      label: "My Orders",
+      href: "/dashboard/orders",
+      icon: PackageSearch,
     },
     {
-      label: "Assignments",
-      href: "/dashboard/assignments",
-      icon: NotebookPen,
-    },
-    { label: "Exams", href: "/exams", icon: PencilRuler },
-    {
-      label: "Results",
-      href: "/dashboard/results",
-      icon: TabletSmartphone,
-    },
-    {
-      label: "School Fees",
-      href: "/dashboard/school-fees",
+      label: "Payments",
+      href: "/dashboard/payments",
       icon: CreditCard,
+    },
+    {
+      label: "Profile",
+      href: "/dashboard/profile",
+      icon: UserCircle,
     },
   ];
 
@@ -222,9 +211,8 @@ export default function Sidebar({
                 <div className="h-10 w-10 hover:bg-gray-100 hover:p-2 rounded-full flex justify-center items-center">
                   <LogOut
                     onClick={() => {
-                      // Cookies.remove("authToken");
                       dispatch(logout());
-                      router.push(`/${user?.role.toLowerCase()}/signin`);
+                      router.push("/login");
                     }}
                     className="cursor-pointer text-[#667085] hover:text-red-500 font-semibold"
                     size={24}

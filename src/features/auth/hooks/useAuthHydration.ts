@@ -12,7 +12,7 @@ export const useAuthHydration = () => {
   useEffect(() => {
     const hydrate = async () => {
       try {
-        const res = await api.get("/admin/auth/me");
+        const res = await api.get("/auth/profile");
 
         dispatch(
           setCredentials({
