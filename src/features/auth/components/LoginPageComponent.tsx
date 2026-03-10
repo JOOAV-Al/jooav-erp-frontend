@@ -1,15 +1,16 @@
-import ForgotPasswordForm from "@/features/auth/components/ForgotPasswordForm";
-import LoginForm from "@/features/auth/components/LoginForm";
-import React, { useState } from "react";
+"use client";
+
+import { LoginForm } from "@/features/auth/components/LoginForm";
+import { ForgotPasswordForm } from "@/features/auth/components/ForgotPasswordForm";
+import { useState } from "react";
 
 const LoginPageComponent = () => {
-  const [showForgetPassword, setShowForgetPassword] = useState<boolean>(false);
-  const toggleForm = () =>
-    setShowForgetPassword((showForgetPassword) => !showForgetPassword);
-  return showForgetPassword ? (
-    <ForgotPasswordForm toggleForm={toggleForm} />
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+
+  return showForgotPassword ? (
+    <ForgotPasswordForm toggleForm={() => setShowForgotPassword(false)} />
   ) : (
-    <LoginForm toggleForm={toggleForm} />
+    <LoginForm toggleForgotPassword={() => setShowForgotPassword(true)} />
   );
 };
 

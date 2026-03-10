@@ -1,29 +1,38 @@
 import { api, CustomAxiosRequestConfig } from "@/lib/api/axiosInstance";
+import { RegisterPayload } from "@/features/auth/types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 export const useLogin = () => {
   return useMutation({
     mutationFn: (payload: { email: string; password: string }) =>
-      api.post("/admin/auth/login", payload, {noAuth: true} as CustomAxiosRequestConfig),
+      api.post("/auth/login", payload, { noAuth: true } as CustomAxiosRequestConfig),
   });
 };
+
+export const useRegister = () => {
+  return useMutation({
+    mutationFn: (payload: RegisterPayload) =>
+      api.post("/auth/register", payload, { noAuth: true } as CustomAxiosRequestConfig),
+  });
+};
+
 export const useRefreshToken = () => {
   return useMutation({
-    mutationFn: (payload: {refreshToken: string }) =>
-      api.post("/admin/auth/refresh", payload, { noAuth: true, noToast: true } as CustomAxiosRequestConfig),
+    mutationFn: (payload: { refreshToken: string }) =>
+      api.post("/auth/refresh", payload, { noAuth: true, noToast: true } as CustomAxiosRequestConfig),
   });
 };
 
 export const useLogout = () => {
   return useMutation({
-    mutationFn: () => api.post("/admin/auth/logout", { noToast: true } as CustomAxiosRequestConfig),
+    mutationFn: () => api.post("/auth/logout", { noToast: true } as CustomAxiosRequestConfig),
   });
 };
 
 export const useFetchCurrentUser = () => {
   return useQuery({
-    queryKey: ["admin-auth-me"],
-    queryFn: () => api.get("/admin/auth/me", { noToast: true } as CustomAxiosRequestConfig),
+    queryKey: ["auth-me"],
+    queryFn: () => api.get("/auth/profile", { noToast: true } as CustomAxiosRequestConfig),
     retry: 2,
   });
 };
