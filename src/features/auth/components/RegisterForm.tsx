@@ -152,8 +152,6 @@ export function RegisterForm() {
               )}
             />
 
-          
-
             {/* USERNAME */}
             <Controller
               control={control}
