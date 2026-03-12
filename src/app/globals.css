@@ -534,6 +534,10 @@
 
   --color-tag-draft: var(--tag-draft);
   --color-nominal-background: var(--nominal-background);
+  /* storey-foreground — rgba(247,247,247,1) — used as product card bg */
+  --color-storey-foreground: rgba(247, 247, 247, 1);
+  /* border-main maps to the standard border token */
+  --color-border-main: var(--border-main);
 
   /* Semantic UI Colors */
   --color-background: var(--nominal-background);

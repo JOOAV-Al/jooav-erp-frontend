@@ -10,7 +10,7 @@ const LoginPageComponent = () => {
   return showForgotPassword ? (
     <ForgotPasswordForm toggleForm={() => setShowForgotPassword(false)} />
   ) : (
-    <LoginForm toggleForgotPassword={() => setShowForgotPassword(true)} />
+    <LoginForm toggleForm={() => setShowForgotPassword(true)} />
   );
 };
 
