@@ -13,6 +13,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import CartItem from "./CartItem";
+import { useState } from "react";
 
 interface CartDrawerProps {
   open: boolean;
@@ -22,6 +23,7 @@ interface CartDrawerProps {
 export default function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
   const router = useRouter();
   const dispatch = useDispatch();
+  const [checkoutUrl, setCheckoutUrl] = useState<string | undefined>("");
   const items = useSelector((state: RootState) => state.cart.items);
 
   const handleCheckout = () => {

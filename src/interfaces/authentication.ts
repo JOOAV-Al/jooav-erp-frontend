@@ -25,13 +25,37 @@ export interface User {
     createdAt: string;
     updatedAt: string;
   };
-  wholesalerProfile?: {
+  wholesalerProfile: {
     id: string;
     userId: string;
     regionId: string | null;
+    draftCart: string | null
+    userAddress: string[]
     totalOrders: number;
     totalSpent: string;
     createdAt: string;
     updatedAt: string;
   };
+  procurementOfficerProfile?: {
+    id: string;
+    email: string;
+    username: string;
+    firstName: string;
+    lastName: string;
+    phone: string;
+    avatar: string | null;
+    role: UserRole;
+    status: string;
+  }
+  adminProfile?: {
+    id: string;
+    email: string;
+    username: string;
+    firstName: string;
+    lastName: string;
+    phone: string;
+    avatar: string | null;
+    role: UserRole;
+    status: string;
+  }
 }

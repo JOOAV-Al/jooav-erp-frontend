@@ -35,8 +35,8 @@ export default function SearchBar({
     <form onSubmit={handleSubmit} className={cn("relative w-full", className)}>
       {/* Left icon — same position as auth Input leftIcon */}
       <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-        <div className="p-3 flex items-center justify-center">
-          <Search className="h-4 w-4 text-body-passive" strokeWidth={2} />
+        <div className="p-2 h-6 w-6 flex items-center justify-center">
+          <Search className="h-5 w-5 text-outline-passive" strokeWidth={2} />
         </div>
       </div>
 
@@ -48,16 +48,16 @@ export default function SearchBar({
         placeholder={placeholder}
         className={cn(
           // Matches auth Input base
-          "w-full min-w-0 h-[48px] bg-white border border-transparent",
+          "w-full min-w-0 h-[48px] bg-storey-foreground border-[1.5px] border-border-main",
           "py-md outline-none leading-normal tracking-[0.04em] text-body font-medium text-sm",
           "placeholder:text-card-body placeholder:text-body-passive",
           // Icon padding
-          "pl-12 pr-main",
-          // Auth Input shadow
-          "shadow-input focus-visible:shadow-input",
+          "pl-11 pr-main",
+          // Auth Input shadow - shadow-input
+          "focus-visible:shadow-input",
           "transition-[color,box-shadow] focus-visible:bg-background",
           // Only difference: full pill radius (vs rounded-md on auth inputs)
-          "rounded-full"
+          "rounded-3xl",
         )}
       />
     </form>

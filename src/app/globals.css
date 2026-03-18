@@ -159,8 +159,8 @@
 /* Semantic Color Tokens */
 :root {
   /* Borders */
-  --border-accent: hsl(0 0 100%);
-  --border-main: hsl(0 0 100%);
+  --border-accent: hsla(45, 16%, 80%, 1);
+  --border-main: hsla(0, 0%, 93%, 1);
   --border-brand-stroke: hsla(216, 82%, 78%, 1);
   --border-primary: hsl(0 0 100%);
   --border-ring: hsl(0 0 100%);
@@ -302,11 +302,11 @@
 :root {
   /* Padding */
   --p-0: var(--0rem);
-  --p-1: var(--0rem);
+  --p-1: var(--0-125rem);
   --p-2: var(--0-1875rem);
   --p-3: var(--0-25rem);
-  --p-4: var(--0-375rem);
-  --p-5: var(--0-5rem);
+  --p-4: var(--0-3125rem);
+  --p-5: var(--0-375rem);
   --p-sm: var(--0-5rem);
   --p-md: var(--0-75rem);
   --p-lg: var(--0-875rem);
@@ -411,7 +411,7 @@
     0px 3px 2px 0px rgba(6, 16, 30, 0.08);
 
   --shadow-button-neutral:
-    0px 0px 0px 2px rgba(0, 0, 0, 0.15), 0px 3px 2px 0px rgba(6, 16, 30, 0.08);
+    0px 0px 0px 2px rgba(0, 0, 0, 0.05), 0px 3px 2px 0px rgba(6, 16, 10, 0.08);
   --shadow-button-neutral-hover:
     0px 2px 1px 0px rgba(0, 0, 0, 0.1),
     0px 0px 2px 2px rgba(246, 249, 254, 0.25);
@@ -653,11 +653,17 @@
   --font-mono: var(--font-geist-mono);
   --font-garantpro: var(--font-garantpro);
 
-  --font-weight-light: var(--weight-lite);
+  /* --font-weight-light: var(--weight-lite);
   --font-weight-normal: var(--weight-normal);
   --font-weight-medium: var(--weight-normal);
   --font-weight-semibold: var(--weight-heavy);
-  --font-weight-bold: var(--weight-heavy);
+  --font-weight-bold: var(--weight-heavy); */
+
+  --font-weight-light: var(--weight-lite);
+  --font-weight-normal: var(--weight-normal);
+  --font-weight-medium: var(--weight-medium);
+  --font-weight-semibold: var(--weight-semibold);
+  --font-weight-bold: var(--weight-integer);
 
   --line-height-none: 1;
   --line-height-tight: 1.1;
