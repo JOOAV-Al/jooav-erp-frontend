@@ -21,6 +21,7 @@ export interface ProductCardData {
 interface ProductCardProps {
   product: ProductCardData;
   className?: string;
+  href?: string;
 }
 
 function formatPrice(amount: number, currency = "NGN") {
@@ -35,6 +36,7 @@ export default function ProductCard({ product, className }: ProductCardProps) {
   const dispatch = useDispatch();
 
   const handleAddToCart = (e: React.MouseEvent) => {
+    //TODO: Use real draft cart
     e.preventDefault();
     e.stopPropagation();
     dispatch(
@@ -48,7 +50,7 @@ export default function ProductCard({ product, className }: ProductCardProps) {
         size: product.size,
         type: product.type,
         currency: product.currency ?? "NGN",
-      })
+      }),
     );
   };
 
@@ -56,21 +58,27 @@ export default function ProductCard({ product, className }: ProductCardProps) {
     <Link
       href={`/dashboard/marketplace/product/${product.id}`}
       className={cn(
-        "group relative flex flex-col rounded-xl bg-storey-foreground",
-        "border border-transparent hover:border-border-main transition-all duration-200",
+        "group relative flex flex-col gap-5",
+        "hover:border hover:border-border-main hover:rounded-t-2xl transition-all duration-200",
         "overflow-hidden cursor-pointer",
-        className
+        className,
       )}
     >
       {/* Image area */}
-      <div className="relative w-full aspect-square overflow-hidden rounded-xl">
-        <Image
-          src={product.image}
-          alt={product.name}
-          fill
-          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-          className="object-contain p-3 group-hover:scale-105 transition-transform duration-200"
-        />
+      <div className="relative w-full aspect-square overflow-hidden rounded-t-2xl bg-storey-foreground">
+        <div className="flex items-center justify-center h-full">
+          <div className="max-w-66 w-full h-47 flex justify-center">
+            <Image
+              src={product.image}
+              alt={product.name}
+              // fill
+              width={160}
+              height={160}
+              // sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+              className="object-contain p-3 group-hover:scale-105 transition-transform duration-200"
+            />
+          </div>
+        </div>
 
         {/* Cart icon — appears on hover */}
         <button
@@ -83,7 +91,7 @@ export default function ProductCard({ product, className }: ProductCardProps) {
             "opacity-0 group-hover:opacity-100",
             "translate-y-2 group-hover:translate-y-0",
             "transition-all duration-200",
-            "hover:bg-primary hover:text-white"
+            "hover:bg-primary hover:text-white cursor-pointer",
           )}
         >
           <ShoppingCart className="h-4 w-4" strokeWidth={2} />
@@ -91,16 +99,18 @@ export default function ProductCard({ product, className }: ProductCardProps) {
       </div>
 
       {/* Info */}
-      <div className="px-4 pt-2 pb-4 flex flex-col gap-0.5">
-        <p className="text-sm font-semibold text-body leading-snug line-clamp-2">
-          {product.name}
-        </p>
-        {product.variant && (
-          <p className="text-xs text-body-passive font-medium">{product.variant}</p>
-        )}
-        <p className="text-sm font-bold text-heading mt-1">
-          {formatPrice(product.price, product.currency)}
-        </p>
+      <div className="px-main pt-5 pb-main flex flex-col gap-5">
+        <div className="flex flex-col gap-3">
+          <p className="text-base font-medium leading-[1.5] tracking-[0.03em] text-body line-clamp-1">
+            {product.name}
+          </p>
+          {product.variant && (
+            <p className="text-sm leading-[1.5] tracking-[0.04em] text-body-passive font-medium">
+              {product.variant}
+            </p>
+          )}
+        </div>
+        <h3>{formatPrice(product.price, product.currency)}</h3>
       </div>
     </Link>
   );

@@ -33,6 +33,7 @@ export interface RegisterResponse {
 export interface AuthState {
   user: User | null;
   token: string | null;
+  cartDraftNumber: string | null;
   isAuthenticated: boolean;
   isUserLoading: boolean;
 }

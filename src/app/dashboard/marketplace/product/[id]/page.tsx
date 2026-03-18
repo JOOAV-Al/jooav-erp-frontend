@@ -1,15 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { ChevronLeft, ShoppingCart, ShoppingBag } from "lucide-react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "@/redux/slices/cartSlice";
-import { useFetchProduct } from "@/features/marketplace/services/marketplace.api";
+import {
+  useCreateDraftOrder,
+  useFetchProduct,
+  useGetOrderDetails,
+  useInitiateOrderPayment,
+  useReInitiateOrderPayment,
+  useUpdateDraftOrder,
+} from "@/features/marketplace/services/marketplace.api";
 import { Button } from "@/components/ui/button";
 import ProductDetailSkeleton from "@/features/marketplace/components/ProductDetailSkeleton";
+import { RootState } from "@/redux/store";
+import {
+  CreateOrderPayload,
+  Order,
+  Product,
+} from "@/features/marketplace/types";
+import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
 
 function formatPrice(amount: number, currency = "NGN") {
   return new Intl.NumberFormat("en-NG", {
@@ -20,27 +35,48 @@ function formatPrice(amount: number, currency = "NGN") {
 }
 
 export default function ProductDetailPage() {
+  const auth = useSelector((state: RootState) => state.auth);
+  const isAuthenticated = auth.isAuthenticated;
+  const user = auth.user;
+  const draftCart = auth.cartDraftNumber;
+
+  const router = useRouter();
   const { id } = useParams<{ id: string }>();
   const dispatch = useDispatch();
-  const { data: response, isLoading } = useFetchProduct(id);
+  const cart = useSelector((state: RootState) => state.cart.items);
 
+  const { data } = useGetOrderDetails({ orderNumber: draftCart ?? "" });
+  const { data: response, isLoading, refetch } = useFetchProduct(id);
   // Support both { data: Product } and plain Product shapes
   const product = response?.data ?? response;
+  const userDraftCart = data?.data;
+
+  // const { mutateAsync: createDraftOrder, isPending: creating } =
+  //   useCreateDraftOrder();
+  const { mutateAsync: updateDraftOrder, isPending: updating } =
+    useUpdateDraftOrder();
+  const { mutateAsync: initiatePayment, isPending: initiatingPayment } =
+    useInitiateOrderPayment();
+  const { mutateAsync: reInitiatePayment, isPending: reInitiatingPayment } =
+    useReInitiateOrderPayment();
 
   const [activeImage, setActiveImage] = useState(0);
-  const [qty, setQty] = useState(1);
+  const [qty, setQty] = useState(
+    userDraftCart?.items?.find((i) => i?.product?.id === product?.id)
+      ?.quantity ?? 1,
+  );
 
   if (isLoading) return <ProductDetailSkeleton />;
 
   if (!product) {
     return (
       <div className="py-24 text-center text-muted-foreground">
-        <p>Product not found.</p>
+        <h3>Product not found.</h3>
         <Link
           href="/dashboard/marketplace"
-          className="text-primary text-sm mt-2 inline-block"
+          className="inline-flex items-center h-8.5 font-medium text-[15px] leading-[1.2] tracking-[0.04em] text-body hover:text-primary mb-8 transition-colors border border-border-main table-tag bg-storey-foreground p-md rounded-md outline-none"
         >
-          ← Back to marketplace
+          Back to marketplace
         </Link>
       </div>
     );
@@ -63,37 +99,89 @@ export default function ProductDetailPage() {
     product.packType?.name,
   ].filter(Boolean) as string[];
 
-  const handleAddToCart = () => {
-    dispatch(
-      addToCart({
-        id: product.id,
-        productId: product.id,
-        name: product.name,
-        image: product.thumbnail || images[0],
-        price: discountedPrice,
-        qty,
-        size: product.packSize?.name,
-        type: product.packType?.name,
-        currency: "NGN",
-      })
-    );
+  const handleAddToCart = async (item: Product, action: string) => {
+    //If authenticated, save cart as draft and update
+    const itemToSave = {
+      id: product.id,
+      productId: product.id,
+      name: product.name,
+      image: product.thumbnail || images[0],
+      price: discountedPrice,
+      qty,
+      size: product.packSize?.name,
+      type: product.packType?.name,
+      currency: "NGN",
+    };
+    if (isAuthenticated) {
+      const existingItem = userDraftCart?.items?.find(
+        (i) => i?.product?.id === item?.id,
+      );
+      if (existingItem && action === "ADD") {
+        toast("Product already in cart");
+        return;
+      }
+
+      const payload: CreateOrderPayload = {
+        item: {
+          action,
+          productId: item?.id,
+          quantity: qty,
+          ...(action === "UPDATE"
+            ? {
+                itemId: existingItem?.id,
+              }
+            : {}),
+        },
+      };
+
+      // "add" or "update" — PATCH /orders/:id
+      const res = await updateDraftOrder({
+        payload,
+        id: user?.wholesalerProfile?.draftCart ?? "",
+      });
+      if (res.data.status === "success") {
+        if (action === "ADD") {
+          dispatch(addToCart(itemToSave));
+        }
+        refetch();
+      }
+    } else {
+      // Else, save to local storage then retrieve and save as draft after login
+      localStorage.setItem("tempCartItem", JSON.stringify(itemToSave));
+      router.push("/login?fromCart=true");
+    }
   };
 
+  const handleBuyNow = () => {
+    //Adds the item to the users draft cart and proceed to the checkout page with the product added to the card
+  };
+
+  const handleQuantityChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setQty(Math.max(1, Number(e.target.value)));
+    const itemExists = userDraftCart?.items?.some(
+      (i) => i?.product?.id === product?.id,
+    );
+    //TODO: Wire a debounce to wait for the user to stop inputting then decide to call endpoint
+
+
+    
+    if (itemExists) {
+      handleAddToCart(product, "UPDATE");
+    }
+  };
   return (
-    <div className="max-w-5xl mx-auto py-8 px-4">
+    <div className="max-w-full mx-auto py-8 px-4">
       {/* Back — plain text link, no border */}
       <Link
         href="/dashboard/marketplace"
-        className="inline-flex items-center gap-0.5 text-sm text-body-passive hover:text-body mb-8 transition-colors border-0 shadow-none bg-transparent p-0 outline-none"
+        className="inline-flex items-center h-8.5 font-medium text-[15px] leading-[1.2] tracking-[0.04em] text-body hover:text-primary mb-2 transition-colors border border-border-main table-tag bg-storey-foreground p-md rounded-md outline-none"
       >
-        <ChevronLeft className="h-4 w-4" strokeWidth={2} />
         Back
       </Link>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
-
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-main items-start py-main">
         {/* ── LEFT: image gallery ───────────────────────────── */}
-        <div className="flex flex-col gap-4">
+        <div className="md:col-span-3 flex flex-col gap-4">
           {/* Main image */}
           <div className="relative aspect-square w-full rounded-2xl bg-storey-foreground overflow-hidden border border-gray-200">
             <Image
@@ -101,7 +189,7 @@ export default function ProductDetailPage() {
               alt={product.name}
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
-              className="object-contain p-6"
+              className="object-contain p-6 md:p-12 lg:p-16"
               priority
             />
           </div>
@@ -111,18 +199,19 @@ export default function ProductDetailPage() {
             {images.map((img: string, i: number) => (
               <button
                 key={i}
-                onClick={() => setActiveImage(i)}
-                className={`relative aspect-square w-full rounded-xl overflow-hidden border-2 transition-all duration-150 bg-storey-foreground ${
+                // onClick={() => setActiveImage(i)}
+                className={`relative aspect-square w-full rounded-xl overflow-hidden border-2 transition-all duration-150 bg-storey-foreground 
+                  ${
                   i === activeImage
-                    ? "border-primary"
-                    : "border-transparent hover:border-gray-200"
+                    ? ""
+                    : ""
                 }`}
               >
                 <Image
                   src={img}
                   alt={`${product.name} view ${i + 1}`}
                   fill
-                  className="object-contain p-2"
+                  className="object-contain p-6 lg:p-8"
                 />
               </button>
             ))}
@@ -130,97 +219,103 @@ export default function ProductDetailPage() {
         </div>
 
         {/* ── RIGHT: product info ───────────────────────────── */}
-        <div className="flex flex-col">
-          {/* Product name */}
-          <h1 className="text-2xl font-bold text-heading leading-snug mb-3">
-            {product.name}
-          </h1>
+        <div className="md:col-span-2 flex flex-col gap-sm py-main">
+          <div className="flex flex-col gap-md py-5 px-lg">
+            {/* Product name */}
+            <h2 className="text-body font-semibold">{product.name}</h2>
 
-          {/* Description */}
-          {product.description && (
-            <p className="text-sm text-body-passive leading-relaxed mb-4">
-              {product.description}
-            </p>
-          )}
-
-          {/* Meta tags — only render when at least one exists */}
-          {metaTags.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-5">
-              {metaTags.map((tag) => (
-                <span
-                  key={tag}
-                  className="px-3 py-1 rounded-full bg-storey-foreground border border-gray-200 text-xs text-body font-medium"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
-
-          {/* Quantity selector */}
-          <div className="flex items-center justify-between border border-gray-200 rounded-xl px-4 py-3 mb-6">
-            <span className="text-sm font-semibold text-body">Quantity</span>
-            <input
-              type="number"
-              min={1}
-              max={product.quantity ?? 999}
-              value={qty}
-              onChange={(e) => setQty(Math.max(1, Number(e.target.value)))}
-              className="w-20 text-right text-sm font-semibold text-body bg-transparent outline-none focus:outline-none border-none
-                         [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-            />
-          </div>
-
-          {/* Price */}
-          <div className="mb-5">
-            <p className="text-2xl font-bold text-heading">
-              {formatPrice(discountedPrice * qty)}
-            </p>
-            {Number(product.discount) > 0 && (
-              <p className="text-sm text-body-passive line-through mt-0.5">
-                {formatPrice(price * qty)}
+            {/* Description */}
+            {product.description && (
+              <p className="text-sm text-body-passive leading-[1.5] tracking-[0.04em]">
+                {product.description}
               </p>
             )}
-          </div>
 
-          {/* CTA buttons */}
-          <div className="flex flex-col gap-3 mb-5">
-            <Button size="lg" className="w-full gap-2" onClick={handleAddToCart}>
-              <ShoppingBag className="h-4 w-4" strokeWidth={2} />
-              Buy now
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="w-full gap-2"
-              onClick={handleAddToCart}
-            >
-              <ShoppingCart className="h-4 w-4" strokeWidth={2} />
-              Add to cart
-            </Button>
-          </div>
+            {/* Meta tags — only render when at least one exists */}
+            {/* {metaTags.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-5">
+                {metaTags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="px-3 py-1 rounded-full bg-storey-foreground border border-gray-200 text-xs text-body font-medium"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )} */}
 
-          {/* Legal — inside a storey-foreground card (matches Figma) */}
-          <div className="rounded-xl bg-storey-foreground border border-gray-200 px-4 py-3">
-            <p className="text-xs text-body-passive leading-relaxed">
-              By using{" "}
-              <Link href="/" className="font-semibold underline">
-                jooav.com
-              </Link>
-              , you agree to our{" "}
-              <Link href="/terms" className="font-semibold underline">
-                Terms
-              </Link>{" "}
-              and{" "}
-              <Link href="/terms" className="font-semibold underline">
-                Condition of use
-              </Link>{" "}
-              and{" "}
-              <Link href="/privacy" className="underline">
-                Privacy policy
-              </Link>
-              .
-            </p>
+            {/* Quantity selector */}
+            <div className="flex items-center justify-between">
+              <p className="text-xl font-semibold text-body tracking-[0.01em] leading-[1.2]">
+                Quantity
+              </p>
+              <div>
+                <Input
+                  type="number"
+                  placeholder="20"
+                  min={1}
+                  value={qty}
+                  onChange={handleQuantityChange}
+                  className="w-21 h-10.5 text-xl font-semibold text-body leading-[1.2] tracking-[0.01em]"
+                />
+              </div>
+            </div>
+
+            {/* Price */}
+            <div className="flex py-main mt-19">
+              <h2 className="font-semibold text-body">
+                {formatPrice(price * qty)}
+                {/* {formatPrice(discountedPrice * qty)} */}
+              </h2>
+              {/* {Number(product.discount) > 0 && (
+                <p className="text-sm text-body-passive line-through mt-0.5">
+                  {formatPrice(price * qty)}
+                </p>
+              )} */}
+            </div>
+
+            {/* CTA buttons */}
+            <div className="flex flex-col gap-main">
+              <Button
+                className="w-full gap-4 tracking-[0.02em]"
+                onClick={handleBuyNow}
+              >
+                <ShoppingBag className="h-5 w-5" />
+                Buy now
+              </Button>
+              <Button
+                variant="neutral"
+                className="w-full gap-4 text-primary tracking-[0.02em]"
+                onClick={() => handleAddToCart(product, "ADD")}
+              >
+                <ShoppingCart className="h-5 w-5" />
+                Add to cart
+              </Button>
+            </div>
+
+            {/* Legal — inside a storey-foreground card (matches Figma) */}
+            <div className="rounded-xl bg-storey-foreground p-main">
+              <p className="text-sm font-medium text-body-passive leading-[1.5] tracking-[0.04em]">
+                By using{" "}
+                <span className="text-heading">
+                  jooav.com
+                </span>
+                , you agree to our{" "}
+                <Link href="/terms" className="text-heading underline">
+                  Terms
+                </Link>{" "}
+                and{" "}
+                <Link href="/terms" className="text-heading underline">
+                  Condition of use
+                </Link>{" "}
+                and{" "}
+                <Link href="/privacy" className="underline">
+                  Privacy policy
+                </Link>
+                .
+              </p>
+            </div>
           </div>
         </div>
       </div>

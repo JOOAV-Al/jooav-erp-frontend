@@ -2,6 +2,7 @@
 
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+import Link from "next/link";
 
 const MarketplaceDashboardHome = () => {
   const user = useSelector((state: RootState) => state.auth.user);
@@ -38,9 +39,12 @@ const MarketplaceDashboardHome = () => {
         <h2 className="font-semibold text-base mb-4">Recent Activity</h2>
         <p className="text-sm text-muted-foreground">
           No recent activity yet. Head to the{" "}
-          <a href="/dashboard/marketplace" className="text-primary underline">
+          <Link
+            href="/dashboard/marketplace"
+            className="text-primary underline"
+          >
             Marketplace
-          </a>{" "}
+          </Link>{" "}
           to start browsing products.
         </p>
       </div>

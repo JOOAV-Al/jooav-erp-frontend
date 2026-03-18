@@ -29,7 +29,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           className={cn(
             // Base styles
             "w-full min-w-0 h-11.25 rounded-md bg-white border border-transparent",
-            "py-md text-base outline-none leading-20",
+            "py-md text-base outline-none",
             "placeholder:text-card-body placeholder:text-body",
             "border border-transparent",
 

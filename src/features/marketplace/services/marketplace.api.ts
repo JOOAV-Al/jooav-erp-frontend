@@ -1,6 +1,9 @@
 import { api, CustomAxiosRequestConfig } from "@/lib/api/axiosInstance";
 import { useQuery } from "@tanstack/react-query";
-import type { ProductFilters, ProductsResponse, CategoriesResponse } from "@/features/marketplace/types";
+import type { ProductFilters, ProductsResponse, CategoriesResponse, Order, CreateOrderPayload, Category } from "@/features/marketplace/types";
+import { useInvalidatingMutation } from "@/lib/api/useInvalidatingMutations";
+import { ConfirmationData, GeneralFetchingParams, MutationResponse } from "@/interfaces/general";
+import { fetchCategoryDetails, fetchOrderDetails, fetchOrders } from "@/features/marketplace/services/queryFunctions";
 
 // ── Build query string from filters (omit empty values) ────────────────
 
@@ -69,5 +72,71 @@ export const useFetchCategories = () => {
       return res.data ?? res;
     },
     staleTime: 10 * 60 * 1000, // categories don't change often
+  });
+};
+
+export const useGetCategoryDetails = ({id}: {id: string}) => {
+  return useQuery({
+    queryKey: ["category-details", id],
+    queryFn: () => fetchCategoryDetails({id}),
+    retry: 2,
+  });
+};
+
+
+export const useGetOrders = (params: GeneralFetchingParams) => {
+  const {search, status, sortOrder, page, limit} = params
+  return useQuery({
+    queryKey: ["all-orders", search, status, sortOrder, page, limit],
+    queryFn: () => fetchOrders(params),
+    retry: 2,
+  });
+};
+
+export const useGetOrderDetails = ({orderNumber}: {orderNumber: string}) => {
+  return useQuery({
+    queryKey: ["order-details", orderNumber],
+    queryFn: () => fetchOrderDetails({orderNumber}),
+    retry: 2,
+  });
+};
+
+export const useCreateDraftOrder = () => {
+  return useInvalidatingMutation({
+    mutationFn: (payload: CreateOrderPayload) =>
+      api.post<MutationResponse<{order: Order}>>("/orders", payload), 
+    invalidateQueries: [["orders-stats"], ["order-details"]]
+  });
+};
+
+export const useUpdateDraftOrder = () => {
+  return useInvalidatingMutation({
+    mutationFn: ({payload, id}: {payload: CreateOrderPayload, id: string}) =>
+      api.patch<MutationResponse<{order: Order}>>(`/orders/${id}`, payload), 
+    invalidateQueries: [["orders-stats"], ["order-details"]]
+  });
+};
+
+// Initiates payment for an order — generates virtual account
+export const useInitiateOrderPayment = () => {
+  return useInvalidatingMutation({
+    mutationFn: ({ orderNumber }: { orderNumber: string }) =>
+      api.post<MutationResponse<{order: Order, checkoutUrl: string; paymentExpiresAt: string;}>>(`/orders/${orderNumber}/initiate-payment`, {}, {noToast: true} as CustomAxiosRequestConfig),
+    invalidateQueries: [["order-details"], ["orders-stats"]],
+  });
+};
+export const useReInitiateOrderPayment = () => {
+  return useInvalidatingMutation({
+    mutationFn: ({ orderNumber }: { orderNumber: string }) =>
+      api.post<MutationResponse<{order: Order, checkoutUrl: string; paymentExpiresAt: string;}>>(`/orders/${orderNumber}/reinitiate-payment`, {}, {noToast: true} as CustomAxiosRequestConfig),
+    invalidateQueries: [["order-details"], ["orders-stats"]],
+  });
+};
+
+export const useConfirmOrderPayment = () => {
+  return useInvalidatingMutation({
+    mutationFn: ({ orderNumber }: { orderNumber: string }) =>
+      api.post<MutationResponse<ConfirmationData>>(`/orders/${orderNumber}/verify-payment`,),
+    invalidateQueries: [["all-orders"], ["order-details"], ["orders-stats"]],
   });
 };
