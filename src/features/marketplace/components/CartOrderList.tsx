@@ -25,11 +25,11 @@ const CartOrderList = ({
   isPending,
 }: CartOrderListProps) => {
   // console.log(order);
-  // const { data, isPending } = useGetOrderDetails({
-  //   orderNumber: orderNumber ?? "",
-  // });
-  const items = order?.items ?? [];
-  // const dynamicOrder = data?.data;
+  const { data, isPending: isDynamicPending } = useGetOrderDetails({
+    orderNumber: orderNumber ?? "",
+  });
+  const dynamicOrder = data?.data;
+  const items = dynamicOrder?.items ?? order?.items ?? [];
 
   // const wholesaler =
   //   (dynamicOrder?.wholesaler?.firstName ?? "") +
@@ -46,7 +46,7 @@ const CartOrderList = ({
   //       .join(", ")
   //   : "—";
 
-  if (isPending) {
+  if (isPending || isDynamicPending) {
     return (
       <div className="flex flex-col flex-1 gap-main justify-center items-center h-50">
         <OrderCardSkeleton itemCount={3} />
@@ -57,9 +57,7 @@ const CartOrderList = ({
 
   return (
     <div className="flex flex-col flex-1 gap-5 py-main">
-      {isPending ? (
-        <OrderCardSkeleton />
-      ) : order?.items && order?.items?.length > 0 ? (
+      {order?.items && order?.items?.length > 0 ? (
         <>
           {/* ── Items list ─────────────────────────────────────────────────────── */}
           <div className="flex flex-col py-sm gap-6 overflow-hidden">
