@@ -9,8 +9,11 @@ export interface GeneralFetchingParams {
   manufacturerId?: string;
   sortBy?: string;
   sortOrder?: string;
+  priceSort?: string;
   brandId?: string;
   categoryId?: string;
+  categoryIds?: string;
+  subcategoryIds?: string;
   variant?: string;
   isActive?: boolean;
   includeRelations?: boolean;

@@ -13,15 +13,23 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useRegister } from "@/features/auth/services/auth.api";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import AuthCardHeader from "@/features/auth/components/AuthCardHeader";
 import Cookies from "js-cookie";
 import { useDispatch } from "react-redux";
 import { setCredentials } from "@/redux/slices/authSlice";
 import PasswordInput from "@/features/auth/components/PasswordInput";
 import FieldIcon from "@/components/general/FieldIcon";
-import { Mail, UserRoundPen, UserRoundPlus, Phone, Lock, TypeOutline } from "lucide-react";
+import {
+  Mail,
+  UserRoundPen,
+  UserRoundPlus,
+  Phone,
+  Lock,
+  TypeOutline,
+} from "lucide-react";
 import CustomUsernameIcon from "@/components/icons/CustomUsernameIcon";
+import { useUpdateDraftOrder } from "@/features/marketplace/services/marketplace.api";
 
 const registerSchema = z.object({
   firstName: z.string().min(1, "Required"),
@@ -32,9 +40,42 @@ const registerSchema = z.object({
   password: z.string().min(8, "Must be 8 characters"),
 });
 
+type TempCartValue = {
+  productId: string;
+  quantity: number;
+  id?: string;
+  name?: string;
+  price?: number;
+  size?: string;
+  type?: string;
+  currency?: string;
+};
+
+const safeParseTempCart = (): TempCartValue | null => {
+  if (typeof window === "undefined") return null;
+  const stored = localStorage.getItem("tempCartItem");
+  if (!stored) return null;
+  try {
+    const parsed = JSON.parse(stored);
+    if (
+      parsed &&
+      typeof parsed === "object" &&
+      typeof parsed.productId === "string" &&
+      Number(parsed.quantity) > 0
+    ) {
+      return parsed as TempCartValue;
+    }
+  } catch {
+    // invalid JSON
+  }
+  return null;
+};
+
 export function RegisterForm() {
   const router = useRouter();
   const dispatch = useDispatch();
+  const searchparams = useSearchParams();
+  const fromCart = searchparams.get("fromCart");
 
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
@@ -52,6 +93,8 @@ export function RegisterForm() {
   const { handleSubmit, control } = form;
 
   const { mutateAsync: register, isPending } = useRegister();
+  const { mutateAsync: updateDraftOrder, isPending: updating } =
+    useUpdateDraftOrder();
 
   const onSubmit = async (values: z.infer<typeof registerSchema>) => {
     const { data } = await register(values);
@@ -60,10 +103,32 @@ export function RegisterForm() {
       setCredentials({
         user: data.data.user,
         token: data.data.accessToken,
-      })
+      }),
     );
 
     Cookies.set("refreshToken", data.data.refreshToken);
+
+    const tempCartItem = safeParseTempCart();
+    const draftCartId = data.data.user?.wholesalerProfile?.draftCart;
+    if (tempCartItem && draftCartId && fromCart === "true") {
+      try {
+        const payload = {
+          item: {
+            action: "ADD",
+            productId: tempCartItem.productId,
+            quantity: tempCartItem.quantity,
+          },
+        };
+        const res = await updateDraftOrder({ payload, id: draftCartId });
+        if (res?.data?.status === "success") {
+          localStorage.removeItem("tempCartItem");
+        }
+      } catch (error) {
+        // optional: toast error, but continue to redirect
+        console.error("Failed to restore temp cart item:", error);
+        localStorage.removeItem("tempCartItem");
+      }
+    }
 
     router.push("/dashboard");
   };
@@ -170,7 +235,7 @@ export function RegisterForm() {
                     type="text"
                     placeholder="Enter username"
                     aria-invalid={fieldState.invalid}
-                    leftIcon={<FieldIcon Icon={TypeOutline}/>}
+                    leftIcon={<FieldIcon Icon={TypeOutline} />}
                   />
                 </Field>
               )}
@@ -183,9 +248,7 @@ export function RegisterForm() {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <div className="flex gap-3 items-center">
-                    <FieldLabel htmlFor="phone">
-                      WhatsApp number
-                    </FieldLabel>
+                    <FieldLabel htmlFor="phone">WhatsApp number</FieldLabel>
                     {fieldState.error && (
                       <FieldError>: {fieldState.error.message}</FieldError>
                     )}
@@ -202,7 +265,7 @@ export function RegisterForm() {
               )}
             />
 
-             {/* PASSWORD */}
+            {/* PASSWORD */}
             <Controller
               control={control}
               name="password"
@@ -228,8 +291,16 @@ export function RegisterForm() {
 
           <div className="mt-auto">
             {/* SUBMIT */}
-            <Button type="submit" className="w-full mt-7" disabled={isPending}>
-              {isPending ? "Creating account..." : "Create account"}
+            <Button
+              type="submit"
+              className="w-full mt-7"
+              disabled={isPending || updating}
+            >
+              {isPending
+                ? "Creating account..."
+                : updating
+                  ? "Updating cart"
+                  : "Create account"}
             </Button>
           </div>
         </form>

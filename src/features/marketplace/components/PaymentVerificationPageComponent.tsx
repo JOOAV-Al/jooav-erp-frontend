@@ -1,18 +1,18 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import Spinner from "@/components/general/Spinner";
 import { useConfirmOrderPayment } from "@/features/marketplace/services/marketplace.api";
 
 export default function PaymentVerificationPageComponent() {
   const params = useSearchParams();
+  const router = useRouter();
   const paymentReference = params.get("paymentReference");
   const [paymentMessage, setPaymentMessage] = useState("Verifying payment");
 
   const { mutateAsync: confirmPayment } = useConfirmOrderPayment();
 
-  //TODO: Replace wildcard with app domain
   useEffect(() => {
     const verify = async () => {
       if (!paymentReference) return;
@@ -26,24 +26,11 @@ export default function PaymentVerificationPageComponent() {
         } else {
           setPaymentMessage(res.data?.data?.message ?? "Payment Failed");
         }
-        // notify parent window (your app)
-        window.parent.postMessage(
-          {
-            type: "PAYMENT_SUCCESS",
-            orderNumber: paymentReference,
-          },
-          "*",
-        );
+        router.push(`/dashboard`);
       } catch (err) {
         console.error(err);
         setPaymentMessage("Payment Failed. An error occurred");
-
-        window.parent.postMessage(
-          {
-            type: "PAYMENT_FAILED",
-          },
-          "*",
-        );
+        router.push(`/dashboard`);
       }
     };
 

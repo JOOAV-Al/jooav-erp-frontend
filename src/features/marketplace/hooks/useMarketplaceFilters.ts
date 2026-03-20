@@ -45,7 +45,7 @@ export function useMarketplaceFilters() {
   // Committed filters are what actually drive the API query.
   // Filters are staged locally until the user submits (search) or immediately
   // applied (category, status, etc.).
-  const [committedFilters, setCommittedFilters] = useState<ProductFilters>({ ...DEFAULT_PRODUCT_FILTERS });
+  const [committedFilters, setCommittedFilters] = useState<ProductFilters>({ ...DEFAULT_PRODUCT_FILTERS, status: "LIVE" });
 
   // ── Data ─────────────────────────────────────────────────────────────
 

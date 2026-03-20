@@ -3,9 +3,22 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "@/redux/slices/cartSlice";
 import { cn } from "@/lib/utils";
+import { RootState } from "@/redux/store";
+import {
+  useGetOrderDetails,
+  useUpdateDraftOrder,
+} from "@/features/marketplace/services/marketplace.api";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import {
+  CreateOrderPayload,
+  Order,
+  Product,
+} from "@/features/marketplace/types";
+import Spinner from "@/components/general/Spinner";
 
 export interface ProductCardData {
   id: string;
@@ -22,6 +35,8 @@ interface ProductCardProps {
   product: ProductCardData;
   className?: string;
   href?: string;
+  userDraftCart?: Order;
+  refetch?: () => void;
 }
 
 function formatPrice(amount: number, currency = "NGN") {
@@ -32,26 +47,71 @@ function formatPrice(amount: number, currency = "NGN") {
   }).format(amount);
 }
 
-export default function ProductCard({ product, className }: ProductCardProps) {
-  const dispatch = useDispatch();
+export default function ProductCard({
+  product,
+  className,
+  userDraftCart,
+  refetch,
+}: ProductCardProps) {
+  const auth = useSelector((state: RootState) => state.auth);
+  const isAuthenticated = auth.isAuthenticated;
+  const user = auth.user;
+  // const draftCart = auth.cartDraftNumber;
+  // const dispatch = useDispatch();
+  const router = useRouter();
+  // const { data, refetch } = useGetOrderDetails({
+  //   orderNumber: draftCart ?? "",
+  // });
+  // const userDraftCart = data?.data;
+  const existingItem = userDraftCart?.items?.find(
+    (i) => i?.product?.id === product?.id,
+  );
 
-  const handleAddToCart = (e: React.MouseEvent) => {
-    //TODO: Use real draft cart
-    e.preventDefault();
-    e.stopPropagation();
-    dispatch(
-      addToCart({
-        id: product.id,
-        productId: product.id,
-        name: product.name,
-        image: product.image,
-        price: product.price,
-        qty: 1,
-        size: product.size,
-        type: product.type,
-        currency: product.currency ?? "NGN",
-      }),
-    );
+  const { mutateAsync: updateDraftOrder, isPending: updating } =
+    useUpdateDraftOrder();
+
+  const handleAddToCart = async () => {
+    const itemToSave = {
+      id: product.id,
+      productId: product.id,
+      name: product.name,
+      price: product?.price,
+      quantity: 10,
+      size: product?.size,
+      type: product?.type,
+      currency: "NGN",
+    };
+
+    //If authenticated, save cart as draft and update
+    if (isAuthenticated) {
+      const existingItem = userDraftCart?.items?.find(
+        (i) => i?.product?.id === product?.id,
+      );
+      if (existingItem) {
+        toast("Product already in cart");
+        return;
+      }
+
+      const payload: CreateOrderPayload = {
+        item: {
+          action: "ADD",
+          productId: product?.id,
+          quantity: 10,
+        },
+      };
+
+      const res = await updateDraftOrder({
+        payload,
+        id: user?.wholesalerProfile?.draftCart ?? "",
+      });
+      if (res.data.status === "success") {
+        refetch?.();
+      }
+    } else {
+      // Else, save to local storage then retrieve and save as draft after login
+      localStorage.setItem("tempCartItem", JSON.stringify(itemToSave));
+      router.push("/login?fromCart=true");
+    }
   };
 
   return (
@@ -82,7 +142,11 @@ export default function ProductCard({ product, className }: ProductCardProps) {
 
         {/* Cart icon — appears on hover */}
         <button
-          onClick={handleAddToCart}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            handleAddToCart();
+          }}
           aria-label="Add to cart"
           className={cn(
             "absolute bottom-2 right-2 z-10",
@@ -92,9 +156,14 @@ export default function ProductCard({ product, className }: ProductCardProps) {
             "translate-y-2 group-hover:translate-y-0",
             "transition-all duration-200",
             "hover:bg-primary hover:text-white cursor-pointer",
+            `${existingItem ? "bg-primary text-white" : ""}`,
           )}
         >
-          <ShoppingCart className="h-4 w-4" strokeWidth={2} />
+          {updating ? (
+            <Spinner />
+          ) : (
+            <ShoppingCart className="h-4 w-4" strokeWidth={2} />
+          )}
         </button>
       </div>
 

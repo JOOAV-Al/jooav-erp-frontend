@@ -5,39 +5,13 @@ import { useState, useEffect } from "react";
 
 const PaymentScreen = ({
   checkoutUrl,
-  setOpen,
-  refetch,
-  setFormView,
 }: {
   checkoutUrl?: string;
-  setOpen?: (open: boolean) => void;
-  refetch?: () => void;
-  setFormView?: (view: "order-list" | "payment") => void;
 }) => {
   const [iframeLoading, setIframeLoading] = useState(true);
 
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      if (event.data?.type === "PAYMENT_SUCCESS") {
-        setTimeout(() => {
-          setOpen?.(false);
-        }, 2000);
-        refetch?.();
-      }
-      if (event.data?.type === "PAYMENT_FAILED") {
-        // setTimeout(() => {
-        //   setOpen?.(false);
-        // }, 2000);
-        setFormView?.("order-list");
-        refetch?.();
-      }
-    };
-
-    window.addEventListener("message", handleMessage);
-
-    return () => window.removeEventListener("message", handleMessage);
-  }, [setOpen]);
-
+  // console.log(iframeLoading)
+  // console.log(checkoutUrl)
   return (
     <div className="relative w-full h-full rounded-lg border flex flex-col pb-6">
       {/* Loader */}
@@ -50,7 +24,7 @@ const PaymentScreen = ({
       <iframe
         src={checkoutUrl}
         title="Monnify Checkout"
-        className="w-full flex-1 border-none"
+        className="w-full border-none min-h-[80vh]"
         onLoad={() => setIframeLoading(false)}
       />
     </div>

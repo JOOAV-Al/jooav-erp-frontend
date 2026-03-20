@@ -29,7 +29,7 @@ const OrderCardSkeleton = ({ itemCount = 2, loading }: { itemCount?: number, loa
           <div className="w-[65px] h-[65px] rounded-lg bg-gray-200" />
           <div className="flex-1 flex flex-col gap-2">
             <div className="h-4 w-40 bg-gray-200 rounded" />
-            <div className="h-3 w-72 bg-gray-100 rounded" />
+            <div className="h-3 w-52 bg-gray-100 rounded" />
           </div>
         </div>
       ))}

@@ -59,14 +59,39 @@ function DropdownMenuGroup({
   )
 }
 
+// function DropdownMenuItem({
+//   className,
+//   inset,
+//   variant = "default",
+//   ...props
+// }: React.ComponentProps<typeof DropdownMenuPrimitive.Item> & {
+//   inset?: boolean
+//   variant?: "default" | "destructive"
+// }) {
+//   return (
+//     <DropdownMenuPrimitive.Item
+//       data-slot="dropdown-menu-item"
+//       data-inset={inset}
+//       data-variant={variant}
+//       className={cn(
+//         "relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 data-[variant=destructive]:focus:text-destructive dark:data-[variant=destructive]:focus:bg-destructive/20 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-muted-foreground data-[variant=destructive]:*:[svg]:text-destructive!",
+//         className
+//       )}
+//       {...props}
+//     />
+//   )
+// }
+
 function DropdownMenuItem({
   className,
   inset,
   variant = "default",
+  useSelectShadow = true,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Item> & {
-  inset?: boolean
-  variant?: "default" | "destructive"
+  inset?: boolean;
+  variant?: "default" | "destructive";
+  useSelectShadow?: boolean;
 }) {
   return (
     <DropdownMenuPrimitive.Item
@@ -74,12 +99,12 @@ function DropdownMenuItem({
       data-inset={inset}
       data-variant={variant}
       className={cn(
-        "relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 data-[variant=destructive]:focus:text-destructive dark:data-[variant=destructive]:focus:bg-destructive/20 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-muted-foreground data-[variant=destructive]:*:[svg]:text-destructive!",
-        className
+        `focus:bg-storey-foreground cursor-pointer focus:text-body-passive data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 dark:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:text-destructive! [&_svg:not([class*='text-'])]:text-body-passive relative flex items-center gap-2 text-body-passive! font-medium rounded-main p-sm text-[15px] outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 data-inset:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-storey-foreground hover:text-body! ${useSelectShadow ? "select-option text-[15px]" : "text-[13px] hover:scale-105 "} h-6.5`,
+        className,
       )}
       {...props}
     />
-  )
+  );
 }
 
 function DropdownMenuCheckboxItem({
