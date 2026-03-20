@@ -239,7 +239,10 @@ export default function MarketplaceNavbar() {
             {!hideCheckout && (
               <Button
                 className="w-full gap-4 tracking-[0.02em]"
-                onClick={() => router.push("/dashboard/marketplace/checkout")}
+                onClick={() => {
+                  setOpen(false)
+                  router.push("/dashboard/marketplace/checkout");
+                }}
               >
                 Checkout
               </Button>
@@ -247,7 +250,10 @@ export default function MarketplaceNavbar() {
             <Button
               variant="neutral"
               className="w-full gap-4 text-body tracking-[0.02em]"
-              onClick={() => router.push("/dashboard/marketplace")}
+              onClick={() => {
+                setOpen(false)
+                router.push("/dashboard/marketplace");
+              }}
             >
               Continue shopping
             </Button>

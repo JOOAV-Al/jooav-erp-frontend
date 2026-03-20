@@ -349,17 +349,19 @@ export default function ProductDetailPageComponent() {
               <Button
                 className="w-full gap-4 tracking-[0.02em]"
                 onClick={handleBuyNow}
+                disabled={updating}
               >
                 <ShoppingBag className="h-5 w-5" />
-                Buy now
+                {updating ? "Updating cart..." : "Buy now"}
               </Button>
               <Button
                 variant="neutral"
                 className="w-full gap-4 text-primary tracking-[0.02em]"
                 onClick={() => handleAddToCart(product, "ADD")}
+                disabled={updating}
               >
                 <ShoppingCart className="h-5 w-5" />
-                Add to cart
+                {updating ? "Updating cart..." : "Add to cart"}
               </Button>
             </div>
 
