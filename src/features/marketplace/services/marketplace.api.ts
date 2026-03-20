@@ -17,6 +17,9 @@ function buildProductsQueryString(filters: Partial<ProductFilters>): string {
   if (filters.categoryId) params.set("categoryId", filters.categoryId);
   if (filters.variant) params.set("variant", filters.variant);
   if (filters.status) params.set("status", filters.status);
+  if (filters.categoryIds) params.set("categoryIds", filters.categoryIds);
+  if (filters.subcategoryIds) params.set("subcategoryIds", filters.subcategoryIds);
+  if (filters.priceSort) params.set("priceSort", filters.priceSort);
   params.set("includeRelations", String(filters.includeRelations ?? true));
 
   return params.toString();

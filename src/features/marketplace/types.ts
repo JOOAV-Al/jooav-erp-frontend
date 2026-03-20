@@ -95,6 +95,9 @@ export interface ProductFilters {
   variant: string;
   status: ProductStatus | "";
   includeRelations: boolean;
+  priceSort?: string;
+  categoryIds?: string;
+  subcategoryIds?: string;
 }
 
 export const DEFAULT_PRODUCT_FILTERS: ProductFilters = {
