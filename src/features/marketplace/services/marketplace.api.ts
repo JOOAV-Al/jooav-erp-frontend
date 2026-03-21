@@ -101,6 +101,7 @@ export const useGetOrderDetails = ({orderNumber}: {orderNumber: string}) => {
     queryKey: ["order-details", orderNumber],
     queryFn: () => fetchOrderDetails({orderNumber}),
     retry: 2,
+    enabled: !!orderNumber,
   });
 };
 
@@ -123,15 +124,15 @@ export const useUpdateDraftOrder = () => {
 // Initiates payment for an order — generates virtual account
 export const useInitiateOrderPayment = () => {
   return useInvalidatingMutation({
-    mutationFn: ({ orderNumber }: { orderNumber: string }) =>
-      api.post<MutationResponse<{order: Order, checkoutUrl: string; paymentExpiresAt: string;}>>(`/orders/${orderNumber}/initiate-payment`, {}, {noToast: true} as CustomAxiosRequestConfig),
+    mutationFn: ({ orderNumber, deliveryAddress }: { orderNumber: string; deliveryAddress?: { address: string; city?: string; state?: string } }) =>
+      api.post<MutationResponse<{order: Order, checkoutUrl: string; paymentExpiresAt: string;}>>(`/orders/${orderNumber}/initiate-payment`, { deliveryAddress }, {noToast: true} as CustomAxiosRequestConfig),
     invalidateQueries: [["order-details"], ["orders-stats"]],
   });
 };
 export const useReInitiateOrderPayment = () => {
   return useInvalidatingMutation({
-    mutationFn: ({ orderNumber }: { orderNumber: string }) =>
-      api.post<MutationResponse<{order: Order, checkoutUrl: string; paymentExpiresAt: string;}>>(`/orders/${orderNumber}/reinitiate-payment`, {}, {noToast: true} as CustomAxiosRequestConfig),
+    mutationFn: ({ orderNumber, deliveryAddress }: { orderNumber: string; deliveryAddress?: { address: string; city?: string; state?: string } }) =>
+      api.post<MutationResponse<{order: Order, checkoutUrl: string; paymentExpiresAt: string;}>>(`/orders/${orderNumber}/reinitiate-payment`, { deliveryAddress }, {noToast: true} as CustomAxiosRequestConfig),
     invalidateQueries: [["order-details"], ["orders-stats"]],
   });
 };

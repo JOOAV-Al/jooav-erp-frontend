@@ -15,6 +15,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import EmptyState from "@/components/general/EmptyState";
 import { useRouter } from "next/navigation";
+import { Spinner } from "@/components/ui/spinner";
 
 // "All categories" sentinel
 const ALL_SLUG = "__all__";
@@ -66,6 +67,7 @@ export default function MarketplacePageComponent() {
   return (
     <div className="flex flex-col">
       {/* Hero */}
+
       <div className="flex flex-col gap-sm pt-2xl pb-lg">
         <div className="flex flex-col items-center text-center gap-md py-xl">
           <h1 className="text-[32px] font-semibold leading-[1.2] tracking-[0.01em]">

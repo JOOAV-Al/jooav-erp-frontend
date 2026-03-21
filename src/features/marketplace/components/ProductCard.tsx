@@ -1,24 +1,25 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import Link from "next/link";
-import { ShoppingCart } from "lucide-react";
-import { useDispatch, useSelector } from "react-redux";
-import { addToCart } from "@/redux/slices/cartSlice";
-import { cn } from "@/lib/utils";
-import { RootState } from "@/redux/store";
+import Image from 'next/image';
+import Link from 'next/link';
+import { ShoppingCart } from 'lucide-react';
+import { useDispatch, useSelector } from 'react-redux';
+import { addToCart } from '@/redux/slices/cartSlice';
+import { cn } from '@/lib/utils';
+import { RootState } from '@/redux/store';
 import {
   useGetOrderDetails,
   useUpdateDraftOrder,
-} from "@/features/marketplace/services/marketplace.api";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+} from '@/features/marketplace/services/marketplace.api';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import {
   CreateOrderPayload,
   Order,
   Product,
-} from "@/features/marketplace/types";
-import Spinner from "@/components/general/Spinner";
+} from '@/features/marketplace/types';
+import { Spinner } from '@/components/ui/spinner';
+// import Spinner from "@/components/general/Spinner";
 
 export interface ProductCardData {
   id: string;
@@ -39,9 +40,9 @@ interface ProductCardProps {
   refetch?: () => void;
 }
 
-function formatPrice(amount: number, currency = "NGN") {
-  return new Intl.NumberFormat("en-NG", {
-    style: "currency",
+function formatPrice(amount: number, currency = 'NGN') {
+  return new Intl.NumberFormat('en-NG', {
+    style: 'currency',
     currency,
     minimumFractionDigits: 0,
   }).format(amount);
@@ -56,7 +57,7 @@ export default function ProductCard({
   const auth = useSelector((state: RootState) => state.auth);
   const isAuthenticated = auth.isAuthenticated;
   const user = auth.user;
-  // const draftCart = auth.cartDraftNumber;
+  const draftCart = auth.cartDraftNumber;
   // const dispatch = useDispatch();
   const router = useRouter();
   // const { data, refetch } = useGetOrderDetails({
@@ -64,7 +65,7 @@ export default function ProductCard({
   // });
   // const userDraftCart = data?.data;
   const existingItem = userDraftCart?.items?.find(
-    (i) => i?.product?.id === product?.id,
+    i => i?.product?.id === product?.id,
   );
 
   const { mutateAsync: updateDraftOrder, isPending: updating } =
@@ -79,22 +80,22 @@ export default function ProductCard({
       quantity: 10,
       size: product?.size,
       type: product?.type,
-      currency: "NGN",
+      currency: 'NGN',
     };
 
     //If authenticated, save cart as draft and update
     if (isAuthenticated) {
       const existingItem = userDraftCart?.items?.find(
-        (i) => i?.product?.id === product?.id,
+        i => i?.product?.id === product?.id,
       );
       if (existingItem) {
-        toast("Product already in cart");
+        toast('Product already in cart');
         return;
       }
 
       const payload: CreateOrderPayload = {
         item: {
-          action: "ADD",
+          action: 'ADD',
           productId: product?.id,
           quantity: 10,
         },
@@ -102,15 +103,15 @@ export default function ProductCard({
 
       const res = await updateDraftOrder({
         payload,
-        id: user?.wholesalerProfile?.draftCart ?? "",
+        id: draftCart ?? '',
       });
-      if (res.data.status === "success") {
+      if (res.data.status === 'success') {
         refetch?.();
       }
     } else {
       // Else, save to local storage then retrieve and save as draft after login
-      localStorage.setItem("tempCartItem", JSON.stringify(itemToSave));
-      router.push("/login?fromCart=true");
+      localStorage.setItem('tempCartItem', JSON.stringify(itemToSave));
+      router.push('/login?fromCart=true');
     }
   };
 
@@ -118,9 +119,9 @@ export default function ProductCard({
     <Link
       href={`/dashboard/marketplace/product/${product.id}`}
       className={cn(
-        "group relative flex flex-col gap-5",
-        "hover:border hover:border-border-main hover:rounded-t-2xl transition-all duration-200",
-        "overflow-hidden cursor-pointer",
+        'group relative flex flex-col gap-5',
+        'hover:border hover:border-border-main hover:rounded-t-2xl transition-all duration-200',
+        'overflow-hidden cursor-pointer',
         className,
       )}
     >
@@ -142,21 +143,21 @@ export default function ProductCard({
 
         {/* Cart icon — appears on hover */}
         <button
-          onClick={(e) => {
+          onClick={e => {
             e.preventDefault();
             e.stopPropagation();
             handleAddToCart();
           }}
           aria-label="Add to cart"
           className={cn(
-            "absolute bottom-2 right-2 z-10",
-            "h-8 w-8 rounded-full bg-white shadow-card",
-            "flex items-center justify-center",
-            "opacity-0 group-hover:opacity-100",
-            "translate-y-2 group-hover:translate-y-0",
-            "transition-all duration-200",
-            "hover:bg-primary hover:text-white cursor-pointer",
-            `${existingItem ? "bg-primary text-white" : ""}`,
+            'absolute bottom-2 right-2 z-10',
+            'h-8 w-8 rounded-full bg-white shadow-card',
+            'flex items-center justify-center',
+            'opacity-0 group-hover:opacity-100',
+            'translate-y-2 group-hover:translate-y-0',
+            'transition-all duration-200',
+            'hover:bg-primary hover:text-white cursor-pointer',
+            `${existingItem ? 'bg-primary text-white' : ''}`,
           )}
         >
           {updating ? (

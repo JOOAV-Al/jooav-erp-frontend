@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { Checkbox } from "@/components/ui/checkbox";
-import { ChevronDown, MoreHorizontal, Trash2 } from "lucide-react";
-import Image from "next/image";
-import { Order, OrderItem } from "@/features/marketplace/types";
-import TableTag from "@/components/general/TableTag";
-import Spinner from "@/components/general/Spinner";
+import React, { useState } from 'react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { ChevronDown, MoreHorizontal, Trash2 } from 'lucide-react';
+import Image from 'next/image';
+import { Order, OrderItem } from '@/features/marketplace/types';
+import TableTag from '@/components/general/TableTag';
+// import Spinner from "@/components/general/Spinner";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu';
 import {
   cn,
   enumToTitleCase,
@@ -21,17 +21,18 @@ import {
   getItemStatusStyles,
   getOrderAssignmentStatusStyles,
   getOrderStatusStyles,
-} from "@/lib/utils";
-import { format } from "date-fns";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
+} from '@/lib/utils';
+import { format } from 'date-fns';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
+import { Spinner } from '@/components/ui/spinner';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 export const InitialsAvatar = ({ name }: { name: string }) => {
-  const parts = name?.trim().split(" ") ?? [];
+  const parts = name?.trim().split(' ') ?? [];
   const initials =
-    parts.length >= 2 ? `${parts[0][0]}${parts[1][0]}` : (parts[0]?.[0] ?? "?");
+    parts.length >= 2 ? `${parts[0][0]}${parts[1][0]}` : (parts[0]?.[0] ?? '?');
   return (
     <div className="w-[26px] h-[26px] flex-shrink-0 flex justify-center items-center rounded-full bg-tag-added border border-border-main text-[13px] font-semibold tracking-[0.05em] text-brand-primary uppercase">
       {initials}
@@ -81,22 +82,22 @@ export function OrderCard({
   refetch,
 }: OrderCardProps) {
   const user = useSelector((state: RootState) => state.auth.user);
-  const hideAssignmentStatuses = ["DRAFT", "PENDING_PAYMENT"];
-  const responseStatuses = ["PENDING_ACCEPTANCE", "REASSIGNED"];
+  const hideAssignmentStatuses = ['DRAFT', 'PENDING_PAYMENT'];
+  const responseStatuses = ['PENDING_ACCEPTANCE', 'REASSIGNED'];
   const isProcurement = false;
   const isThreeHeaderColumns =
     isProcurement || hideAssignmentStatuses.includes(order?.status);
   const needsResponse = responseStatuses.includes(order?.assignmentStatus);
   const shouldShowActions = isProcurement
-    ? order?.status !== "COMPLETED" && order?.assignmentStatus === "ACCEPTED"
+    ? order?.status !== 'COMPLETED' && order?.assignmentStatus === 'ACCEPTED'
     : hideAssignmentStatuses?.includes(order?.status) ||
-        order?.status === "COMPLETED"
+        order?.status === 'COMPLETED'
       ? false
       : showActions;
   const [selectedOfficer, setSelectedOfficer] = useState<any | undefined>(() =>
-    officers?.find((o) => o.id === order?.assignedProcurementOfficerId || ""),
+    officers?.find(o => o.id === order?.assignedProcurementOfficerId || ''),
   );
-  const [operatingId, setOperatingId] = useState<string | undefined>("");
+  const [operatingId, setOperatingId] = useState<string | undefined>('');
 
   const items = order.items ?? [];
 
@@ -105,19 +106,19 @@ export function OrderCard({
         order.deliveryAddress.address,
         order.deliveryAddress.city,
         order.deliveryAddress.state,
-        "Nigeria",
+        'Nigeria',
       ]
         .filter(Boolean)
-        .join(", ")
-    : "—";
+        .join(', ')
+    : '—';
 
   const wholesaler =
-    (order.wholesaler?.firstName ?? "") +
-    " " +
-    (order.wholesaler?.lastName ?? "");
+    (order.wholesaler?.firstName ?? '') +
+    ' ' +
+    (order.wholesaler?.lastName ?? '');
 
   const orderStatusStyles = getOrderStatusStyles(order.status);
-  const acceptedAssignment = getOrderAssignmentStatusStyles("ACCEPTED");
+  const acceptedAssignment = getOrderAssignmentStatusStyles('ACCEPTED');
 
   const displayOfficerName = selectedOfficer
     ? `${selectedOfficer.firstName} ${selectedOfficer.lastName}`
@@ -178,7 +179,7 @@ export function OrderCard({
 
       {/* ── Item rows ──────────────────────────────────────────────────────── */}
       <div>
-        {items.map((item) => {
+        {items.map(item => {
           const itemStatusStyles = getItemStatusStyles(item.status);
           const productName = item.product.name;
           const isSelected = selectedItemIds?.has(item.id);
@@ -188,19 +189,19 @@ export function OrderCard({
               key={item.id}
               onClick={() => onOrderItemClick?.(item, order)}
               className={`
-                flex items-start gap-main px-main py-md ml-4 ${isProcurement ? "" : "cursor-pointer"} transition-colors hover:rounded-xl
-                ${isSelected ? "bg-storey-foreground shadow-input rounded-xl" : "hover:bg-storey-foreground"}
+                flex items-start gap-main px-main py-md ml-4 ${isProcurement ? '' : 'cursor-pointer'} transition-colors hover:rounded-xl
+                ${isSelected ? 'bg-storey-foreground shadow-input rounded-xl' : 'hover:bg-storey-foreground'}
               `}
             >
               {/* Checkbox */}
               {withCheckbox && (
                 <div
                   className="flex-shrink-0 mt-0.5"
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={e => e.stopPropagation()}
                 >
                   <Checkbox
                     checked={isSelected}
-                    onCheckedChange={(checked) =>
+                    onCheckedChange={checked =>
                       onSelectItem?.(order, item.id, !!checked)
                     }
                     aria-label={`Select ${productName}`}
@@ -211,7 +212,7 @@ export function OrderCard({
               {/* Thumbnail */}
               <div className="flex-shrink-0 w-[65px] h-[65px] rounded-lg border border-border-main overflow-hidden bg-storey-foreground flex items-center justify-center">
                 {(item as any)?.product?.thumbnail &&
-                (item as any)?.product?.thumbnail?.startsWith("https://") ? (
+                (item as any)?.product?.thumbnail?.startsWith('https://') ? (
                   <Image
                     src={(item as any)?.product?.thumbnail}
                     alt={productName}
@@ -233,12 +234,12 @@ export function OrderCard({
                     <h5>{productName}</h5>
 
                     {actionLoading && operatingId === item.id ? (
-                      <Spinner className="size-4" />
+                      <Spinner />
                     ) : (
                       <div
                         className="flex-shrink-0"
                         onClick={() => {
-                          setOperatingId(item?.id ?? "");
+                          setOperatingId(item?.id ?? '');
                           onRemoveItem?.(item);
                         }}
                       >
@@ -253,25 +254,25 @@ export function OrderCard({
 
                 <div className="flex justify-between items-center gap-[8px] py-3">
                   <span className="font-family-mono text-[12px] text-body-passive tracking-[0.08em] leading-[1.2]">
-                    QTY:{" "}
+                    QTY:{' '}
                     <span className="text-body font-garantpro font-semibold text-[13px] tracking-[0.05em]">
                       {item.quantity}
                     </span>
                   </span>
                   <span className="font-family-mono text-[12px] lg:place-self-center text-body-passive tracking-[0.08em] leading-[1.2]">
-                    SIZE:{" "}
+                    SIZE:{' '}
                     <span className="text-body font-garantpro font-semibold text-[13px] tracking-[0.05em]">
-                      {item?.product?.packSize?.name ?? "—"}
+                      {item?.product?.packSize?.name ?? '—'}
                     </span>
                   </span>
                   <span className="font-family-mono text-[12px] lg:place-self-center text-body-passive tracking-[0.08em] leading-[1.2]">
-                    TYPE:{" "}
+                    TYPE:{' '}
                     <span className="text-body font-garantpro font-semibold text-[13px] tracking-[0.05em]">
-                      {item?.product?.packType?.name ?? "—"}
+                      {item?.product?.packType?.name ?? '—'}
                     </span>
                   </span>
                   <span className="font-family-mono text-[12px] text-body-passive tracking-[0.08em] leading-[1.2] lg:ml-auto">
-                    PRICE:{" ₦"}
+                    PRICE:{' ₦'}
                     <span className="ml-1 text-body font-garantpro font-semibold text-[13px] tracking-[0.05em]">
                       {formatCurrency(item.unitPrice ?? item.lineTotal ?? 0)}
                     </span>

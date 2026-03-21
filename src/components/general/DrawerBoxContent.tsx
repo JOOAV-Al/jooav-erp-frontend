@@ -1,8 +1,9 @@
-import { RightDrawerClose } from "@/components/general/right-drawer";
-import Spinner from "@/components/general/Spinner";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { X } from "lucide-react";
-import React from "react";
+import { RightDrawerClose } from '@/components/general/right-drawer';
+// import Spinner from "@/components/general/Spinner";
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Spinner } from '@/components/ui/spinner';
+import { X } from 'lucide-react';
+import React from 'react';
 
 export interface DrawerBoxContentProps {
   heading?: string;
@@ -21,8 +22,8 @@ const DrawerBoxContent = ({
   actionDropdown,
   statusTag,
   loading,
-  fillHeight=false,
-  showClose=false,
+  fillHeight = false,
+  showClose = false,
 }: DrawerBoxContentProps) => {
   return (
     <div className="flex flex-col flex-1 min-h-0 mt-0">
@@ -30,7 +31,7 @@ const DrawerBoxContent = ({
       <div className="px-xl pt-main shrink-0 flex justify-between items-center gap-5 pb-main">
         <div className={`flex flex-col gap-5 ${description && `py-sm`}`}>
           <div className="flex gap-[8px] items-center">
-            <h4 className="leading-[1.2] tracking-[0.01em]">{heading ?? ""}</h4>
+            <h4 className="leading-[1.2] tracking-[0.01em]">{heading ?? ''}</h4>
             {statusTag && <div>{statusTag}</div>}
           </div>
           {description && (
