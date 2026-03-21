@@ -6,8 +6,8 @@ import { useSelector } from "react-redux";
 import { useGetOrderDetails } from "@/features/marketplace/services/marketplace.api";
 import { RootState } from "@/redux/store";
 import EmptyState from "@/components/general/EmptyState";
-import PaymentScreen from "@/features/marketplace/components/PaymentScreen";
-import Spinner from "@/components/general/Spinner";
+import { Spinner } from "@/components/ui/spinner";
+import { useEffect } from "react";
 
 export default function CompletePaymentPage() {
   const params = useSearchParams();
@@ -31,7 +31,14 @@ export default function CompletePaymentPage() {
     return hasValidCheckout;
   };
 
-  // console.log(initiatedOrder?.checkoutUrl)
+  useEffect(() => {
+    if (
+      initiatedOrder?.checkoutUrl &&
+      hasValidCheckoutUrl(initiatedOrder.checkoutUrl)
+    ) {
+      window.location.href = initiatedOrder.checkoutUrl;
+    }
+  }, [initiatedOrder]);
 
   if (isPending)
     return (
@@ -46,7 +53,7 @@ export default function CompletePaymentPage() {
     !hasValidCheckoutUrl(initiatedOrder?.checkoutUrl)
   ) {
     return (
-      <div className="py-24 flex flex-col gap-main">
+      <div className="py-24 flex flex-col gap-main max-w-7xl mx-auto px-4">
         <Link
           href="/dashboard/marketplace"
           className="inline-flex items-center h-8.5 font-medium text-[15px] leading-[1.2] tracking-[0.04em] text-body hover:text-primary mb-2 transition-colors border border-border-main table-tag bg-storey-foreground p-md rounded-md outline-none"
@@ -62,22 +69,22 @@ export default function CompletePaymentPage() {
   }
 
   return (
-    <div className="max-w-full mx-auto py-8 px-4 flex flex-col flex-1">
-      {/* Back — plain text link, no border */}
-      <Link
-        href="/dashboard/marketplace"
-        className="inline-flex items-center w-fit h-8.5 font-medium text-[15px] leading-[1.2] tracking-[0.04em] text-body hover:text-primary mb-2 transition-colors border border-border-main table-tag bg-storey-foreground p-md rounded-md outline-none"
-      >
-        Back
-      </Link>
-      <div className="py-sm">
-        <h4>Complete Payment</h4>
+    <div className="max-w-7xl mx-auto py-8 px-4 flex flex-col items-center justify-center min-h-[60vh] gap-4">
+      <Spinner className="size-8" />
+      <div className="text-center">
+        <h4 className="mb-2">Redirecting to Payment Gateway</h4>
+        <p className="text-body-muted">
+          Please wait while we securely take you to the Monnify checkout page.
+        </p>
       </div>
 
-      <div className="flex-1">
-        {initiatedOrder?.checkoutUrl && (
-          <PaymentScreen checkoutUrl={initiatedOrder?.checkoutUrl} />
-        )}
+      <div className="mt-8">
+        <Link
+          href="/dashboard/marketplace"
+          className="text-sm text-body-muted hover:text-primary transition-colors underline underline-offset-4"
+        >
+          Cancel and go back to Marketplace
+        </Link>
       </div>
     </div>
   );

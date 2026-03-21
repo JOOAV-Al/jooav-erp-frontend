@@ -32,7 +32,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { format } from "date-fns";
 import { updateCartNumber } from "@/redux/slices/authSlice";
 import EmptyState from "@/components/general/EmptyState";
-import Spinner from "@/components/general/Spinner";
+import { Spinner } from "@/components/ui/spinner";
+// import Spinner from "@/components/general/Spinner";
 
 function formatPrice(amount: number, currency = "NGN") {
   return new Intl.NumberFormat("en-NG", {
@@ -111,13 +112,16 @@ export default function CheckoutSummaryPage() {
     }
 
     // Expired or never initiated — call initiate-payment endpoint
+    const deliveryAddress = editAddress ? { address: editAddress } : undefined;
     const res =
       userDraftCart?.status === "DRAFT"
         ? await initiatePayment({
             orderNumber: draftCart ?? "",
+            deliveryAddress,
           })
         : await reInitiatePayment({
             orderNumber: draftCart ?? "",
+            deliveryAddress,
           });
 
     if (res.data.status === "success") {
@@ -237,12 +241,12 @@ export default function CheckoutSummaryPage() {
                       />
                     </div>
                     <p className="text-body font-medium text-[14px] leading-[1.5] tracking-[0.04em]">
-                      {userDraftCart?.orderNumber}
+                      {editAddress ?? "-"}
                     </p>
                   </div>
                 ) : (
                   <div className="flex flex-col gap-6">
-                    <p className="py-2 leading-[1.2] tracking-[0.08em] text-body-passive">
+                    <p className="py-2 leading-[1.2] tracking-[0.04em] text-body-passive text-[0.875rem]">
                       Delivery address:
                     </p>
 
@@ -250,10 +254,11 @@ export default function CheckoutSummaryPage() {
                       cols={3}
                       value={editAddress}
                       onChange={(e) => setEditAddress(e.target.value)}
+                      placeholder="Street no., Street name, City, State"
                     />
 
                     <p className="text-body font-medium text-[14px] leading-[1.5] tracking-[0.04em]">
-                      {userDraftCart?.orderNumber}
+                      {editAddress ?? "-"}
                     </p>
                   </div>
                 )}
@@ -292,15 +297,21 @@ export default function CheckoutSummaryPage() {
                 {formatPrice(Number(userDraftCart?.totalAmount) ?? 0)}
               </h2>
             </div>
-
             <Button
               className="w-full gap-4 tracking-[0.02em]"
               onClick={handleProceedToPayment}
               disabled={paymentLoading}
             >
-              <ShoppingBag className="h-5 w-5" />
-              {paymentLoading ? "Processing..." : "Proceed to payment"}
-              {paymentLoading && <Spinner />}
+              {paymentLoading ? (
+                <div className="flex items-center">
+                  <Spinner /> <div>Processing...</div>
+                </div>
+              ) : (
+                <div className="flex items-center">Proceed to payment</div>
+              )}
+
+              {/* {paymentLoading ? <Spinner /> : <ShoppingBag className="h-5 w-5" />}
+              {paymentLoading ? "Processing..." : "Proceed to payment"} */}
             </Button>
           </div>
         </div>
