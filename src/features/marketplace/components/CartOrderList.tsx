@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import AppImage from "@/components/general/AppImage";
 import { Order, OrderItem } from "@/features/marketplace/types";
 import {
   formatCurrency,
@@ -73,22 +73,13 @@ const CartOrderList = ({
                 >
                   {/* Thumbnail */}
                   <div className="p-main flex-shrink-0 w-[104px] h-[104px] rounded-lg border-[1.5px] border-border-main overflow-hidden bg-storey-foreground flex items-center justify-center">
-                    {(item as any)?.product?.thumbnail &&
-                    (item as any)?.product?.thumbnail?.startsWith(
-                      "https://",
-                    ) ? (
-                      <Image
-                        src={(item as any)?.product?.thumbnail}
-                        alt={item?.product?.name}
-                        width={104}
-                        height={104}
-                        className="object-cover w-full h-full"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-storey-foreground flex items-center justify-center text-[10px] text-body-passive font-family-mono">
-                        IMG
-                      </div>
-                    )}
+                    <AppImage
+                      src={(item as any)?.product?.thumbnail}
+                      alt={item?.product?.name}
+                      width={104}
+                      height={104}
+                      className="object-cover w-full h-full"
+                    />
                   </div>
 
                   {/* Info */}

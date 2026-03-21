@@ -17,7 +17,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="flex flex-col min-h-screen bg-white py-3">
       <MarketplaceNavbar />
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6">
+      <main className="flex-1 max-w-app w-full mx-auto px-4 sm:px-6 py-6">
         {children}
       </main>
     </div>

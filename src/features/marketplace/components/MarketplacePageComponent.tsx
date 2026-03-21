@@ -110,7 +110,7 @@ export default function MarketplacePageComponent() {
           ))}
         </div>
       ) : products.length === 0 ? (
-        <div className="py-24 ">
+        <div className="flex flex-col items-center justify-center py-24">
           <EmptyState
             header="No products found"
             description="Try a different search or category."

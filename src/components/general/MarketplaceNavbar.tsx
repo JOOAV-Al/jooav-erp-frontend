@@ -97,7 +97,7 @@ export default function MarketplaceNavbar() {
   return (
     <>
       <header className="w-full border-b bg-white sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-18">
+        <div className="max-w-app mx-auto px-4 sm:px-6 flex items-center justify-between h-18">
           <div className="flex items-center gap-lg">
             {/* Logo */}
 
