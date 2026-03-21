@@ -166,7 +166,7 @@ export default function ProductCard({
       {/* Info */}
       <div className="px-main pt-5 pb-main flex flex-col gap-5">
         <div className="flex flex-col gap-3">
-          <p className="text-base font-medium leading-[1.5] tracking-[0.03em] text-body line-clamp-1">
+          <p className="text-base font-medium leading-[1.5] tracking-[0.03em] text-body line-clamp-2">
             {product.name}
           </p>
           {product.variant && (

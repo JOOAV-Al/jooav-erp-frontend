@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -57,9 +57,9 @@ export default function CheckoutSummaryPage() {
     orderNumber: draftCart ?? "",
   });
   const userDraftCart = data?.data;
-  const [editAddress, setEditAddress] = useState(
-    userDraftCart?.deliveryAddress?.address || "",
-  );
+  const [editAddress, setEditAddress] = useState<string | null>(null);
+  const displayAddress =
+    editAddress ?? userDraftCart?.deliveryAddress?.address ?? "";
 
   const { mutateAsync: updateDraftOrder, isPending: updating } =
     useUpdateDraftOrder();
@@ -112,7 +112,9 @@ export default function CheckoutSummaryPage() {
     }
 
     // Expired or never initiated — call initiate-payment endpoint
-    const deliveryAddress = editAddress ? { address: editAddress } : undefined;
+    const deliveryAddress = displayAddress
+      ? { address: displayAddress }
+      : undefined;
     const res =
       userDraftCart?.status === "DRAFT"
         ? await initiatePayment({
@@ -171,7 +173,7 @@ export default function CheckoutSummaryPage() {
         Back
       </Link>
 
-      <div className="py-sm">
+      <div className="py-md mdx:py-sm">
         <h2>Order checkout</h2>
       </div>
 
@@ -183,7 +185,7 @@ export default function CheckoutSummaryPage() {
       )}
       </> */}
 
-      <div className="grid grid-cols-1 mdxl:grid-cols-5 gap-main items-start py-main">
+      <div className="grid grid-cols-1 mdxl:grid-cols-5 gap-16 items-start py-main">
         {/* ── LEFT: checkout ───────────────────────────── */}
         <div className="mdxl:col-span-3 flex flex-col gap-main py-md">
           {/*order card */}
@@ -202,7 +204,7 @@ export default function CheckoutSummaryPage() {
         <div className="mdxl:col-span-2 flex flex-col gap-sm py-main">
           <div className="flex flex-col gap-[16px] pt-lg pb-main px-main bg-storey-foreground rounded-2xl w-full">
             {/* One */}
-            <div className="py-sm px-5">
+            <div className="hidden mdx:block py-sm px-5">
               <h3>Order checkout</h3>
             </div>
 
@@ -241,7 +243,7 @@ export default function CheckoutSummaryPage() {
                       />
                     </div>
                     <p className="text-body font-medium text-[14px] leading-[1.5] tracking-[0.04em]">
-                      {editAddress ?? "-"}
+                      {displayAddress || "-"}
                     </p>
                   </div>
                 ) : (
@@ -252,13 +254,13 @@ export default function CheckoutSummaryPage() {
 
                     <Textarea
                       cols={3}
-                      value={editAddress}
+                      value={displayAddress}
                       onChange={(e) => setEditAddress(e.target.value)}
                       placeholder="Street no., Street name, City, State"
                     />
 
                     <p className="text-body font-medium text-[14px] leading-[1.5] tracking-[0.04em]">
-                      {editAddress ?? "-"}
+                      {displayAddress || "-"}
                     </p>
                   </div>
                 )}
