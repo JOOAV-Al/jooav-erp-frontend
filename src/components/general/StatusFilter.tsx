@@ -1,0 +1,212 @@
+"use client";
+
+import React, { useState } from "react";
+import { CloudUpload, ListPlus, PenLine, Table2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+interface StatusFilterProps {
+  value?: string;
+  onChange?: (value: string) => void;
+  isProducts?: boolean;
+  isManufacturers?: boolean;
+  isOrders?: boolean;
+}
+
+const StatusFilter: React.FC<StatusFilterProps> = ({
+  value = "",
+  onChange,
+  isProducts,
+  isManufacturers,
+  isOrders,
+}) => {
+  const [status, setStatus] = useState<string>(value);
+
+  const handleToggle = (newValue: string) => {
+    setStatus(newValue);
+    onChange?.(newValue);
+  };
+
+  return (
+    <div className="flex items-center flex-wrap gap-6">
+      <Button
+        size={"filter"}
+        variant={"filter"}
+        onClick={() => handleToggle("")}
+        className={`
+          ${status === "" ? "bg-storey-foreground text-body" : ""}
+        `}
+      >
+        {!isOrders && <Table2 strokeWidth={2} className="w-3.5 h-3.5 text-outline-passive" />}
+        All
+      </Button>
+      {isProducts && (
+        <>
+          <Button
+            size={"filter"}
+            variant={"filter"}
+            onClick={() => handleToggle("DRAFT")}
+            className={`
+          ${status === "DRAFT" ? "bg-storey-foreground text-body" : ""}
+        `}
+          >
+            <PenLine
+              strokeWidth={2}
+              className="w-3.5 h-3.5 text-outline-passive"
+            />
+            Draft
+          </Button>
+
+          <Button
+            onClick={() => handleToggle("QUEUE")}
+            size={"filter"}
+            variant={"filter"}
+            className={`
+          ${status === "QUEUE" ? "bg-storey-foreground text-body" : ""}
+        `}
+          >
+            <ListPlus
+              strokeWidth={2}
+              className="w-3.5 h-3.5 text-outline-passive"
+            />
+            Queue
+          </Button>
+          <Button
+            onClick={() => handleToggle("LIVE")}
+            size={"filter"}
+            variant={"filter"}
+            className={`
+          ${status === "LIVE" ? "bg-storey-foreground text-body hover:bg-storey-foreground" : ""}
+        `}
+          >
+            <CloudUpload
+              strokeWidth={2}
+              className="w-3.5 h-3.5 text-outline-passive"
+            />
+            Live
+          </Button>
+        </>
+      )}
+
+      {isManufacturers && (
+        <>
+          <Button
+            size={"filter"}
+            variant={"filter"}
+            onClick={() => handleToggle("PENDING_APPROVAL")}
+            className={`
+          ${status === "PENDING_APPROVAL" ? "bg-storey-foreground text-body" : ""}
+        `}
+          >
+            <PenLine
+              strokeWidth={2}
+              className="w-3.5 h-3.5 text-outline-passive"
+            />
+            Pending
+          </Button>
+
+          <Button
+            onClick={() => handleToggle("ACTIVE")}
+            size={"filter"}
+            variant={"filter"}
+            className={`
+          ${status === "ACTIVE" ? "bg-storey-foreground text-body" : ""}
+        `}
+          >
+            <ListPlus
+              strokeWidth={2}
+              className="w-3.5 h-3.5 text-outline-passive"
+            />
+            Active
+          </Button>
+          <Button
+            onClick={() => handleToggle("SUSPENDED")}
+            size={"filter"}
+            variant={"filter"}
+            className={`
+          ${status === "SUSPENDED" ? "bg-storey-foreground text-body hover:bg-storey-foreground" : ""}
+        `}
+          >
+            <CloudUpload
+              strokeWidth={2}
+              className="w-3.5 h-3.5 text-outline-passive"
+            />
+            Suspended
+          </Button>
+          <Button
+            onClick={() => handleToggle("INACTIVE")}
+            size={"filter"}
+            variant={"filter"}
+            className={`
+          ${status === "INACTIVE" ? "bg-storey-foreground text-body hover:bg-storey-foreground" : ""}
+        `}
+          >
+            <CloudUpload
+              strokeWidth={2}
+              className="w-3.5 h-3.5 text-outline-passive"
+            />
+            Inactive
+          </Button>
+        </>
+      )}
+
+      {isOrders && (
+        <>
+          <Button
+            onClick={() => handleToggle("DRAFT")}
+            size={"filter"}
+            variant={"filter"}
+            className={`
+          ${status === "DRAFT" ? "bg-storey-foreground text-body hover:bg-storey-foreground" : ""}
+        `}
+          >
+            Draft
+          </Button>
+          <Button
+            onClick={() => handleToggle("ASSIGNED")}
+            size={"filter"}
+            variant={"filter"}
+            className={`
+          ${status === "ASSIGNED" ? "bg-storey-foreground text-body hover:bg-storey-foreground" : ""}
+        `}
+          >
+            Assigned
+          </Button>
+          <Button
+            size={"filter"}
+            variant={"filter"}
+            onClick={() => handleToggle("COMPLETED")}
+            className={`
+          ${status === "COMPLETED" ? "bg-storey-foreground text-body" : ""}
+        `}
+          >
+            Completed
+          </Button>
+
+          <Button
+            onClick={() => handleToggle("IN_PROGRESS")}
+            size={"filter"}
+            variant={"filter"}
+            className={`
+          ${status === "IN_PROGRESS" ? "bg-storey-foreground text-body" : ""}
+        `}
+          >
+            In Progress
+          </Button>
+
+          <Button
+            onClick={() => handleToggle("CANCELLED")}
+            size={"filter"}
+            variant={"filter"}
+            className={`
+          ${status === "CANCELLED" ? "bg-storey-foreground text-body hover:bg-storey-foreground" : ""}
+        `}
+          >
+            Cancelled
+          </Button>
+        </>
+      )}
+    </div>
+  );
+};
+
+export default StatusFilter;

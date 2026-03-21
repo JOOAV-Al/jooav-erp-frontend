@@ -82,15 +82,15 @@ export const formatOrderDate = (dateStr: string) => {
 
 export const getItemStatusStyles = (status = "") => {
   switch (status?.toUpperCase()) {
-    // case "COMPLETED":
     case "DELIVERED":
+    case "COMPLETED":
       return {
-        styles:
-          "table-tag border-border-accent bg-tag-added text-brand-primary!",
+        styles: "table-tag border-border-accent bg-tag-added text-brand-primary!",
         text: "Completed",
       };
     case "SHIPPED":
     case "SOURCING":
+    case "IN_PROGRESS":
       return {
         styles: "table-tag border-border-accent bg-tag-queue text-brand-signal",
         text: "In Progress",
@@ -100,15 +100,15 @@ export const getItemStatusStyles = (status = "") => {
         styles: "table-tag border-border-accent bg-tag-queue text-destructive",
         text: "Pending",
       };
-    case "PAID":
-      return {
-        styles: "table-tag border-border-accent bg-tag-queue text-destructive",
-        text: "Paid",
-      };
+    // case "PAID":
+    //   return {
+    //     styles: "table-tag border-border-accent bg-tag-added text-brand-primary!",
+    //     text: "Paid",
+    //   };
     default:
       return {
         styles: "table-tag border-border-accent bg-[#F7F7F7] text-body",
-        text: "Cancelled",
+        text: status || "Cancelled",
       };
   }
 };
@@ -147,8 +147,8 @@ export const getOrderStatusStyles = (status = "") => {
       };
     case "PENDING_PAYMENT":
       return {
-        styles: "table-tag border-border-main bg-tag-draft text-body-passive",
-        text: "Initiated",
+        styles: "table-tag border-border-accent bg-tag-queue text-brand-signal",
+        text: "Pending",
       };
     default:
       return {

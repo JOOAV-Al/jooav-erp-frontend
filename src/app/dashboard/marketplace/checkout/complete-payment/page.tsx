@@ -53,7 +53,7 @@ export default function CompletePaymentPage() {
     !hasValidCheckoutUrl(initiatedOrder?.checkoutUrl)
   ) {
     return (
-      <div className="py-24 flex flex-col gap-main max-w-7xl mx-auto px-4">
+      <div className="py-24 flex flex-col gap-main max-w-app mx-auto px-4">
         <Link
           href="/dashboard/marketplace"
           className="inline-flex items-center h-8.5 font-medium text-[15px] leading-[1.2] tracking-[0.04em] text-body hover:text-primary mb-2 transition-colors border border-border-main table-tag bg-storey-foreground p-md rounded-md outline-none"
@@ -69,7 +69,7 @@ export default function CompletePaymentPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto py-8 px-4 flex flex-col items-center justify-center min-h-[60vh] gap-4">
+    <div className="max-w-app mx-auto py-8 px-4 flex flex-col items-center justify-center min-h-[60vh] gap-4">
       <Spinner className="size-8" />
       <div className="text-center">
         <h4 className="mb-2">Redirecting to Payment Gateway</h4>

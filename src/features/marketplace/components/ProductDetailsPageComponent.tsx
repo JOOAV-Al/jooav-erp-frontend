@@ -1,7 +1,7 @@
 "use client";
 
 import { ChangeEvent, useEffect, useRef, useState } from "react";
-import Image from "next/image";
+import AppImage from "@/components/general/AppImage";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { ShoppingCart, ShoppingBag } from "lucide-react";
@@ -257,7 +257,7 @@ export default function ProductDetailPageComponent() {
         <div className="md:col-span-3 flex flex-col gap-4">
           {/* Main image */}
           <div className="relative aspect-square w-full rounded-2xl bg-storey-foreground overflow-hidden border border-gray-200">
-            <Image
+            <AppImage
               src={images[activeImage] ?? ""}
               alt={product.name}
               fill
@@ -276,7 +276,7 @@ export default function ProductDetailPageComponent() {
                 className={`relative aspect-square w-full rounded-xl overflow-hidden border-2 transition-all duration-150 bg-storey-foreground 
                   ${i === activeImage ? "" : ""}`}
               >
-                <Image
+                <AppImage
                   src={img}
                   alt={`${product.name} view ${i + 1}`}
                   fill

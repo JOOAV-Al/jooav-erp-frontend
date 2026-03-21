@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import AppImage from "@/components/general/AppImage";
 import { Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -35,7 +35,7 @@ export default function CartItem({ item, onRemove, className }: CartItemProps) {
     <div className={cn("flex items-start gap-3 py-3 border-b border-border-main last:border-0", className)}>
       {/* Thumbnail */}
       <div className="relative h-16 w-16 shrink-0 rounded-lg overflow-hidden bg-storey-foreground">
-        <Image
+        <AppImage
           src={item.image}
           alt={item.name}
           fill

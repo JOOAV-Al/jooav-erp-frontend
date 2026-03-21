@@ -40,7 +40,11 @@ export default function MarketplaceNavbar() {
   const isAuthenticated = auth.isAuthenticated;
   const user = auth.user;
   const orderNumber = auth.cartDraftNumber ?? "";
-  const { data, refetch: refetchDraft, isPending: draftCartPending } = useGetOrderDetails({
+  const {
+    data,
+    refetch: refetchDraft,
+    isPending: draftCartPending,
+  } = useGetOrderDetails({
     orderNumber: orderNumber ?? "",
   });
   const userDraftOrder = data?.data;
@@ -87,17 +91,23 @@ export default function MarketplaceNavbar() {
       label: "Inventory",
     },
     {
+      label: "Orders",
+      action: () => router.push("/dashboard/marketplace/order-processing"),
+    },
+    {
       action: handleLogout,
       label: "Logout",
     },
   ];
 
   const hideCheckout =
-    updating || draftCartPending || (userDraftOrder?.items && userDraftOrder?.items?.length <= 0);
+    updating ||
+    draftCartPending ||
+    (userDraftOrder?.items && userDraftOrder?.items?.length <= 0);
   return (
     <>
       <header className="w-full border-b bg-white sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-18">
+        <div className="max-w-app mx-auto px-4 sm:px-6 flex items-center justify-between h-18">
           <div className="flex items-center gap-lg">
             {/* Logo */}
 
@@ -240,7 +250,7 @@ export default function MarketplaceNavbar() {
               <Button
                 className="w-full gap-4 tracking-[0.02em]"
                 onClick={() => {
-                  setOpen(false)
+                  setOpen(false);
                   router.push("/dashboard/marketplace/checkout");
                 }}
               >
@@ -251,7 +261,7 @@ export default function MarketplaceNavbar() {
               variant="neutral"
               className="w-full gap-4 text-body tracking-[0.02em]"
               onClick={() => {
-                setOpen(false)
+                setOpen(false);
                 router.push("/dashboard/marketplace");
               }}
             >

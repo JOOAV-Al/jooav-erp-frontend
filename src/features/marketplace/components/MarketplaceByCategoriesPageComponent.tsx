@@ -29,7 +29,7 @@ export default function MarketplaceByCategoriesPageComponent() {
     categoryId,
     priceSort: priceRange,
     subcategoryIds: subcategories.join(",") || undefined,
-    status: "LIVE"
+    status: "LIVE",
   });
   const products = data?.data || [];
 
@@ -52,6 +52,10 @@ export default function MarketplaceByCategoriesPageComponent() {
     setSubcategories((prev) =>
       prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id],
     );
+  };
+
+  const handlePriceToggle = (val: string) => {
+    setPriceRange((prev) => (prev === val ? "" : val));
   };
 
   const handleClearFilters = () => {
@@ -84,31 +88,34 @@ export default function MarketplaceByCategoriesPageComponent() {
               <p className="text-body-passive text-xs leading-[1.2] tracking-[0.08em] font-mono uppercase">
                 Price
               </p>
-              <RadioGroup
-                defaultValue=""
-                value={priceRange}
-                onValueChange={setPriceRange}
-                className="gap-5"
-              >
+              <div className="flex flex-col gap-5">
                 <div className="flex items-center gap-6 px-sm py-5">
-                  <RadioGroupItem value="asc" id="asc" />
+                  <Checkbox
+                    id="asc"
+                    checked={priceRange === "asc"}
+                    onCheckedChange={() => handlePriceToggle("asc")}
+                  />
                   <Label
-                    className="font-medium text-body text-[15px] leading-[1.2] tracking-[0.04em]"
+                    className="font-medium text-body text-[15px] leading-[1.2] tracking-[0.04em] cursor-pointer"
                     htmlFor="asc"
                   >
                     Lowest to Highest
                   </Label>
                 </div>
                 <div className="flex items-center gap-6 px-sm py-5">
-                  <RadioGroupItem value="desc" id="desc" />
+                  <Checkbox
+                    id="desc"
+                    checked={priceRange === "desc"}
+                    onCheckedChange={() => handlePriceToggle("desc")}
+                  />
                   <Label
-                    className="font-medium text-body text-[15px] leading-[1.2] tracking-[0.04em]"
+                    className="font-medium text-body text-[15px] leading-[1.2] tracking-[0.04em] cursor-pointer"
                     htmlFor="desc"
                   >
                     Highest to Lowest
                   </Label>
                 </div>
-              </RadioGroup>
+              </div>
             </div>
 
             <div className="flex flex-col gap-main">
@@ -150,13 +157,13 @@ export default function MarketplaceByCategoriesPageComponent() {
 
         {/* Product grid */}
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {Array.from({ length: 10 }).map((_, i) => (
+          <div className="flex-1 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {Array.from({ length: 15 }).map((_, i) => (
               <ProductCardSkeleton key={i} />
             ))}
           </div>
         ) : products.length === 0 ? (
-          <div className="py-24 ">
+          <div className="flex-1 flex flex-col items-center justify-center py-24">
             <EmptyState
               header="No products found"
               description="Try a different search or category."
@@ -164,7 +171,7 @@ export default function MarketplaceByCategoriesPageComponent() {
           </div>
         ) : (
           <div
-            className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-[16px] py-sm transition-opacity ${
+            className={`flex-1 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-[16px] py-sm transition-opacity ${
               isFetching ? "opacity-60" : "opacity-100"
             }`}
           >

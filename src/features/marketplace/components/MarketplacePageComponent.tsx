@@ -68,9 +68,9 @@ export default function MarketplacePageComponent() {
     <div className="flex flex-col">
       {/* Hero */}
 
-      <div className="flex flex-col gap-sm pt-2xl pb-lg">
-        <div className="flex flex-col items-center text-center gap-md py-xl">
-          <h1 className="text-[32px] font-semibold leading-[1.2] tracking-[0.01em]">
+      <div className="flex flex-col gap-sm pt-lg mdx:pt-2xl pb-lg">
+        <div className="flex flex-col items-center text-center gap-md py-main mdx:py-xl">
+          <h1 className="text-[24px] mdx:text-[32px] font-semibold leading-[1.2] tracking-[0.01em]">
             <span className="text-brand-primary">
               Find FMCG Products with ease,
             </span>
@@ -110,7 +110,7 @@ export default function MarketplacePageComponent() {
           ))}
         </div>
       ) : products.length === 0 ? (
-        <div className="py-24 ">
+        <div className="flex flex-col items-center justify-center py-24">
           <EmptyState
             header="No products found"
             description="Try a different search or category."
@@ -118,7 +118,7 @@ export default function MarketplacePageComponent() {
         </div>
       ) : (
         <div
-          className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-[16px] py-sm transition-opacity ${
+          className={`grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-[16px] py-sm transition-opacity ${
             isFetching ? "opacity-60" : "opacity-100"
           }`}
         >

@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { ShoppingCart } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -13,6 +12,7 @@ import {
 } from '@/features/marketplace/services/marketplace.api';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import AppImage from '@/components/general/AppImage';
 import {
   CreateOrderPayload,
   Order,
@@ -47,6 +47,7 @@ function formatPrice(amount: number, currency = 'NGN') {
     minimumFractionDigits: 0,
   }).format(amount);
 }
+
 
 export default function ProductCard({
   product,
@@ -127,19 +128,13 @@ export default function ProductCard({
     >
       {/* Image area */}
       <div className="relative w-full aspect-square overflow-hidden rounded-t-2xl bg-storey-foreground">
-        <div className="flex items-center justify-center h-full">
-          <div className="max-w-66 w-full h-47 flex justify-center">
-            <Image
-              src={product.image}
-              alt={product.name}
-              // fill
-              width={160}
-              height={160}
-              // sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-              className="object-contain p-3 group-hover:scale-105 transition-transform duration-200"
-            />
-          </div>
-        </div>
+        <AppImage
+          src={product.image}
+          alt={product.name}
+          fill
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+          className="object-cover group-hover:scale-105 transition-transform duration-200"
+        />
 
         {/* Cart icon — appears on hover */}
         <button
@@ -171,7 +166,7 @@ export default function ProductCard({
       {/* Info */}
       <div className="px-main pt-5 pb-main flex flex-col gap-5">
         <div className="flex flex-col gap-3">
-          <p className="text-base font-medium leading-[1.5] tracking-[0.03em] text-body line-clamp-1">
+          <p className="text-base font-medium leading-[1.5] tracking-[0.03em] text-body line-clamp-2">
             {product.name}
           </p>
           {product.variant && (
