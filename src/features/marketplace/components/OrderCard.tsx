@@ -131,19 +131,19 @@ export function OrderCard({
     <div className="flex flex-col rounded-3xl border-[2px] border-border-main overflow-hidden px-main pt-main pb-sm gap-5 bg-white">
       {/* ── Order header ───────────────────────────────────────────────────── */}
       <div
-        className={`flex flex-col lg:flex-row justify-between gap-main px-md py-main border-b-2 border-border-main transition-colors`}
+        className={`flex items-center justify-between px-md py-main border-b-2 border-border-main transition-colors cursor-pointer overflow-hidden`}
         onClick={() => onOrderClick?.(order)}
       >
-        <div className="flex flex-col gap-2 w-full">
+        <div className="flex flex-col gap-2 max-w-[50%]">
           <span className="text-[12px] py-1 font-normal tracking-[0.08em] leading-[1.2] text-body-passive uppercase font-family-mono">
             Delivery Address:
           </span>
-          <span className="text-[14px] font-medium text-body leading-[1.5] tracking-[0.04em]">
+          <span className="text-[14px] font-medium text-body leading-[1.5] tracking-[0.04em] truncate">
             {address}
           </span>
         </div>
 
-        <div className="flex flex-wrap items-center gap-y-6 gap-x-main w-full">
+        <div className="flex items-center gap-x-6">
           <div className="flex flex-col gap-1 min-w-fit">
             <span className="text-[12px] py-1 font-normal tracking-[0.08em] leading-[1.2] text-body uppercase font-family-mono">
               order date

@@ -100,11 +100,11 @@ export const getItemStatusStyles = (status = "") => {
         styles: "table-tag border-border-accent bg-tag-queue text-destructive",
         text: "Pending",
       };
-    case "PAID":
-      return {
-        styles: "table-tag border-border-accent bg-tag-added text-brand-primary!",
-        text: "Paid",
-      };
+    // case "PAID":
+    //   return {
+    //     styles: "table-tag border-border-accent bg-tag-added text-brand-primary!",
+    //     text: "Paid",
+    //   };
     default:
       return {
         styles: "table-tag border-border-accent bg-[#F7F7F7] text-body",

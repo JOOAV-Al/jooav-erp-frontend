@@ -3,7 +3,6 @@
 import React, { useState, useMemo } from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { OrderCard } from "@/features/marketplace/components/OrderCard";
 import { useGetOrders } from "@/features/marketplace/services/marketplace.api";
 import { Order } from "@/features/marketplace/types";
@@ -89,7 +88,6 @@ const OrderProcessingPage = () => {
               leftIcon={<Search size={18} className="text-body-passive" />}
               className="h-10 bg-white min-w-[200px]"
             />
-            <Button className="whitespace-nowrap px-6!">Accept all</Button>
           </div>
         </div>
 
