@@ -3,7 +3,7 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, ShoppingCart, ShoppingBag, Edit3 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart, removeFromCart } from "@/redux/slices/cartSlice";
@@ -48,13 +48,16 @@ export default function CheckoutSummaryPage() {
   const isAuthenticated = auth.isAuthenticated;
   const user = auth.user;
   const draftCart = auth.cartDraftNumber;
+  const searchParams = useSearchParams();
+  const queryOrderNumber = searchParams.get("orderNumber");
+  const selectedOrderNumber = queryOrderNumber || draftCart;
 
   const router = useRouter();
   const dispatch = useDispatch();
   const [showEditAddress, setShowEditAddress] = useState(false);
 
   const { data, isPending, refetch } = useGetOrderDetails({
-    orderNumber: draftCart ?? "",
+    orderNumber: selectedOrderNumber ?? "",
   });
   const userDraftCart = data?.data;
   const [editAddress, setEditAddress] = useState<string | null>(null);
@@ -93,50 +96,66 @@ export default function CheckoutSummaryPage() {
 
   // ── Proceed to payment (primary on order-list) ────────────────────────────
   const handleProceedToPayment = async () => {
-    if (!draftCart) return;
+    if (!selectedOrderNumber) return;
+    if (!userDraftCart) return;
 
-    // Check if a previous checkout URL exists and is still valid
-    const now = new Date();
-    const expiresAt = userDraftCart?.paymentExpiresAt
-      ? new Date(userDraftCart?.paymentExpiresAt)
-      : null;
-    const isExpired = !expiresAt || expiresAt <= now;
-    const hasValidCheckout = !!userDraftCart?.checkoutUrl && !isExpired;
-
-    if (hasValidCheckout) {
-      // Still valid — skip re-initiation, route to payment page
-      router.push(
-        `/dashboard/marketplace/checkout/complete-payment?orderNumber=${draftCart}`,
-      );
-      return;
-    }
-
-    // Expired or never initiated — call initiate-payment endpoint
     const deliveryAddress = displayAddress
       ? { address: displayAddress }
       : undefined;
-    const res =
-      userDraftCart?.status === "DRAFT"
-        ? await initiatePayment({
-            orderNumber: draftCart ?? "",
-            deliveryAddress,
-          })
-        : await reInitiatePayment({
-            orderNumber: draftCart ?? "",
-            deliveryAddress,
-          });
 
-    if (res.data.status === "success") {
-      dispatch(
-        updateCartNumber({
-          orderNumber:
-            res.data.data?.order?.orderNumber ?? userDraftCart?.orderNumber,
-        }),
-      );
-      router.push(
-        `/dashboard/marketplace/checkout/complete-payment?orderNumber=${res.data.data?.order?.orderNumber}`,
-      );
-      refetch();
+    try {
+      let res;
+
+      if (userDraftCart.status === "DRAFT") {
+        const now = new Date();
+        const expiresAt = userDraftCart.paymentExpiresAt
+          ? new Date(userDraftCart.paymentExpiresAt)
+          : null;
+        const isExpired = !expiresAt || expiresAt <= now;
+        const hasValidCheckout = !!userDraftCart.checkoutUrl && !isExpired;
+
+        if (hasValidCheckout) {
+          router.push(
+            `/dashboard/marketplace/checkout/complete-payment?orderNumber=${selectedOrderNumber}`,
+          );
+          return;
+        }
+
+        res = await initiatePayment({
+          orderNumber: selectedOrderNumber,
+          deliveryAddress,
+        });
+      } else {
+        res = await reInitiatePayment({
+          orderNumber: selectedOrderNumber,
+          deliveryAddress,
+        });
+      }
+
+      if (res.data.status === "success") {
+        if (!queryOrderNumber) {
+          dispatch(
+            updateCartNumber({
+              orderNumber:
+                res.data.data?.order?.orderNumber ?? userDraftCart?.orderNumber,
+            }),
+          );
+        }
+        router.push(
+          `/dashboard/marketplace/checkout/complete-payment?orderNumber=${res.data.data?.order?.orderNumber}`,
+        );
+        refetch();
+      }
+    } catch (error) {
+      const status = (error as { response?: { status?: number } })?.response
+        ?.status;
+
+      if (status === 404) {
+        toast.error("Payment initialization failed. Please try again.");
+        return;
+      }
+
+      toast.error("Unable to proceed to payment. Please try again.");
     }
   };
 
