@@ -88,6 +88,13 @@ const OrderProcessingPage = () => {
     const availableOrders = allOrders ?? [];
 
     return availableOrders.filter((order: Order) => {
+      // Always exclude empty draft orders — these are leftover cart artifacts
+      if (
+        order.status === "DRAFT" &&
+        (!order.items || order.items.length === 0)
+      ) {
+        return false;
+      }
       const status = order.status;
       if (activeTab === "PENDING") {
         return ["CONFIRMED", "PENDING_PAYMENT"].includes(status);
