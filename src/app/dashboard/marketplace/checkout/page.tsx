@@ -1,15 +1,14 @@
 "use client";
 
-import { ChangeEvent, useEffect, useState } from "react";
-import Image from "next/image";
+import { useState } from "react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
-import { ChevronLeft, ShoppingCart, ShoppingBag, Edit3 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Edit3 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { addToCart, removeFromCart } from "@/redux/slices/cartSlice";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
-  useCreateDraftOrder,
-  useFetchProduct,
   useGetOrderDetails,
   useInitiateOrderPayment,
   useReInitiateOrderPayment,
@@ -18,23 +17,25 @@ import {
 import { Button } from "@/components/ui/button";
 import ProductDetailSkeleton from "@/features/marketplace/components/ProductDetailSkeleton";
 import { RootState } from "@/redux/store";
-import {
-  CreateOrderPayload,
-  Order,
-  OrderItem,
-  Product,
-} from "@/features/marketplace/types";
-import { toast } from "sonner";
-import { Input } from "@/components/ui/input";
-import OrdersGroupedTable from "@/features/marketplace/components/OrdersGroupedTable";
+import { CreateOrderPayload, OrderItem } from "@/features/marketplace/types";
 import OrderCard from "@/features/marketplace/components/OrderCard";
 import { Textarea } from "@/components/ui/textarea";
 import { format } from "date-fns";
 import { updateCartNumber } from "@/redux/slices/authSlice";
 import EmptyState from "@/components/general/EmptyState";
 import { Spinner } from "@/components/ui/spinner";
-// import Spinner from "@/components/general/Spinner";
 
+// ── Schema ─────────────────────────────────────────────────────────────────────
+const checkoutSchema = z.object({
+  deliveryAddress: z
+    .string()
+    .min(1, "Delivery address is required.")
+    .min(5, "Please enter a valid delivery address."),
+});
+
+type CheckoutFormValues = z.infer<typeof checkoutSchema>;
+
+// ── Helpers ─────────────────────────────────────────────────────────────────────
 function formatPrice(amount: number, currency = "NGN") {
   return new Intl.NumberFormat("en-NG", {
     style: "currency",
@@ -45,7 +46,6 @@ function formatPrice(amount: number, currency = "NGN") {
 
 export default function CheckoutSummaryPage() {
   const auth = useSelector((state: RootState) => state.auth);
-  const isAuthenticated = auth.isAuthenticated;
   const user = auth.user;
   const draftCart = auth.cartDraftNumber;
 
@@ -57,9 +57,20 @@ export default function CheckoutSummaryPage() {
     orderNumber: draftCart ?? "",
   });
   const userDraftCart = data?.data;
-  const [editAddress, setEditAddress] = useState<string | null>(null);
-  const displayAddress =
-    editAddress ?? userDraftCart?.deliveryAddress?.address ?? "";
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<CheckoutFormValues>({
+    resolver: zodResolver(checkoutSchema),
+    values: {
+      deliveryAddress: userDraftCart?.deliveryAddress?.address ?? "",
+    },
+  });
+
+  const deliveryAddress = watch("deliveryAddress");
 
   const { mutateAsync: updateDraftOrder, isPending: updating } =
     useUpdateDraftOrder();
@@ -81,18 +92,15 @@ export default function CheckoutSummaryPage() {
         itemId: item?.id,
       },
     };
-    const res = await updateDraftOrder({
+    await updateDraftOrder({
       payload,
       id: user?.wholesalerProfile?.draftCart ?? "",
     });
     refetch();
-    // if (res.data.status === "success") {
-    //     dispatch(removeFromCart(itemToSave));
-    // }
   };
 
-  // ── Proceed to payment (primary on order-list) ────────────────────────────
-  const handleProceedToPayment = async () => {
+  // ── Proceed to payment (validated) ────────────────────────────────────────
+  const onSubmit = async (values: CheckoutFormValues) => {
     if (!draftCart) return;
 
     // Check if a previous checkout URL exists and is still valid
@@ -104,26 +112,23 @@ export default function CheckoutSummaryPage() {
     const hasValidCheckout = !!userDraftCart?.checkoutUrl && !isExpired;
 
     if (hasValidCheckout) {
-      // Still valid — skip re-initiation, route to payment page
       router.push(
         `/dashboard/marketplace/checkout/complete-payment?orderNumber=${draftCart}`,
       );
       return;
     }
 
-    // Expired or never initiated — call initiate-payment endpoint
-    const deliveryAddress = displayAddress
-      ? { address: displayAddress }
-      : undefined;
+    const deliveryAddressPayload = { address: values.deliveryAddress };
+
     const res =
       userDraftCart?.status === "DRAFT"
         ? await initiatePayment({
             orderNumber: draftCart ?? "",
-            deliveryAddress,
+            deliveryAddress: deliveryAddressPayload,
           })
         : await reInitiatePayment({
             orderNumber: draftCart ?? "",
-            deliveryAddress,
+            deliveryAddress: deliveryAddressPayload,
           });
 
     if (res.data.status === "success") {
@@ -177,23 +182,13 @@ export default function CheckoutSummaryPage() {
         <h2>Order checkout</h2>
       </div>
 
-      {/* <>
-      {isPending ? (
-
-      ) : (
-
-      )}
-      </> */}
-
       <div className="grid grid-cols-1 mdxl:grid-cols-5 gap-16 items-start py-main">
-        {/* ── LEFT: checkout ───────────────────────────── */}
+        {/* ── LEFT: order card ───────────────────────────── */}
         <div className="mdxl:col-span-3 flex flex-col gap-main py-md">
-          {/*order card */}
           <OrderCard
             order={userDraftCart!}
             actionLoading={updating}
             onRemoveItem={handleRemoveItem}
-            // showActions={showActions}
             showStatus={false}
             withCheckbox={false}
             refetch={refetch}
@@ -202,13 +197,16 @@ export default function CheckoutSummaryPage() {
 
         {/* ── RIGHT: Summary ───────────────────────────── */}
         <div className="mdxl:col-span-2 flex flex-col gap-sm py-main">
-          <div className="flex flex-col gap-[16px] pt-lg pb-main px-main bg-storey-foreground rounded-2xl w-full">
-            {/* One */}
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="flex flex-col gap-[16px] pt-lg pb-main px-main bg-storey-foreground rounded-2xl w-full"
+          >
+            {/* Header */}
             <div className="hidden mdx:block py-sm px-5">
               <h3>Order checkout</h3>
             </div>
 
-            {/* Two */}
+            {/* Details */}
             <div className="flex flex-col gap-md px-5">
               <div className="flex justify-between">
                 <div className="flex flex-col gap-5">
@@ -229,8 +227,9 @@ export default function CheckoutSummaryPage() {
                 </div>
               </div>
 
+              {/* Delivery Address */}
               <div>
-                {!showEditAddress ? (
+                {!(showEditAddress || !deliveryAddress) ? (
                   <div className="flex flex-col gap-5">
                     <div className="flex justify-between items-center">
                       <p className="font-family-mono text-[12px] py-2 leading-[1.2] tracking-[0.08em] uppercase text-body-passive">
@@ -239,33 +238,34 @@ export default function CheckoutSummaryPage() {
                       <Edit3
                         onClick={() => setShowEditAddress(true)}
                         size={16}
-                        className="text-outline-passive"
+                        className="text-outline-passive cursor-pointer"
                       />
                     </div>
                     <p className="text-body font-medium text-[14px] leading-[1.5] tracking-[0.04em]">
-                      {displayAddress || "-"}
+                      {deliveryAddress || "-"}
                     </p>
                   </div>
                 ) : (
-                  <div className="flex flex-col gap-6">
+                  <div className="flex flex-col gap-2">
                     <p className="py-2 leading-[1.2] tracking-[0.04em] text-body-passive text-[0.875rem]">
-                      Delivery address:
+                      Delivery address: <span className="text-destructive">*</span>
                     </p>
-
                     <Textarea
                       cols={3}
-                      value={displayAddress}
-                      onChange={(e) => setEditAddress(e.target.value)}
+                      {...register("deliveryAddress")}
                       placeholder="Street no., Street name, City, State"
+                      className={errors.deliveryAddress ? "border-destructive" : ""}
                     />
-
-                    <p className="text-body font-medium text-[14px] leading-[1.5] tracking-[0.04em]">
-                      {displayAddress || "-"}
-                    </p>
+                    {errors.deliveryAddress && (
+                      <p className="text-destructive text-[12px] leading-[1.4]">
+                        {errors.deliveryAddress.message}
+                      </p>
+                    )}
                   </div>
                 )}
               </div>
 
+              {/* Dates */}
               <div className="flex justify-between">
                 <div className="flex flex-col gap-5">
                   <p className="font-family-mono text-[12px] py-2 leading-[1.2] tracking-[0.08em] uppercase text-body-passive">
@@ -290,7 +290,7 @@ export default function CheckoutSummaryPage() {
               </div>
             </div>
 
-            {/* three */}
+            {/* Total */}
             <div className="flex flex-col gap-[8px] px-5 py-main border-y border-border-main">
               <p className="font-family-mono text-[12px] py-2 leading-[1.2] tracking-[0.08em] uppercase text-body-passive">
                 Total
@@ -299,9 +299,10 @@ export default function CheckoutSummaryPage() {
                 {formatPrice(Number(userDraftCart?.totalAmount) ?? 0)}
               </h2>
             </div>
+
             <Button
+              type="submit"
               className="w-full gap-4 tracking-[0.02em]"
-              onClick={handleProceedToPayment}
               disabled={paymentLoading}
             >
               {paymentLoading ? (
@@ -311,11 +312,8 @@ export default function CheckoutSummaryPage() {
               ) : (
                 <div className="flex items-center">Proceed to payment</div>
               )}
-
-              {/* {paymentLoading ? <Spinner /> : <ShoppingBag className="h-5 w-5" />}
-              {paymentLoading ? "Processing..." : "Proceed to payment"} */}
             </Button>
-          </div>
+          </form>
         </div>
       </div>
     </div>
