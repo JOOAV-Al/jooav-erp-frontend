@@ -27,6 +27,13 @@ const OrderProcessingPage = () => {
   // Client-side filtering to group statuses under tabs
   const filteredOrders = useMemo(() => {
     return allOrders.filter((order: Order) => {
+      // Always exclude empty draft orders — these are leftover cart artifacts
+      if (
+        order.status === "DRAFT" &&
+        (!order.items || order.items.length === 0)
+      ) {
+        return false;
+      }
       const status = order.status;
       if (activeTab === "PENDING") {
         return ["DRAFT", "CONFIRMED", "PENDING_PAYMENT"].includes(status);
@@ -45,7 +52,8 @@ const OrderProcessingPage = () => {
     setActiveTab(value as TabType);
   };
 
-  const tabTriggerClass = "p-0! h-auto! bg-transparent! data-[state=active]:bg-transparent! shadow-none! data-[state=active]:shadow-none! border-none! rounded-none! font-normal text-body-passive data-[state=active]:text-heading data-[state=active]:font-bold text-base hover:bg-transparent!";
+  const tabTriggerClass =
+    "p-0! h-auto! bg-transparent! data-[state=active]:bg-transparent! shadow-none! data-[state=active]:shadow-none! border-none! rounded-none! font-normal text-body-passive data-[state=active]:text-heading data-[state=active]:font-bold text-base hover:bg-transparent!";
 
   return (
     <div className="flex flex-col gap-8 py-8 px-4 md:px-10 lg:px-20 max-w-app mx-auto min-h-screen">
@@ -60,22 +68,13 @@ const OrderProcessingPage = () => {
       >
         <div className="flex flex-col mdx:flex-row mdx:items-center justify-between gap-6">
           <TabsList className="h-auto! p-0! bg-transparent! border-none! gap-8 flex flex-wrap">
-            <TabsTrigger
-              value="PENDING"
-              className={tabTriggerClass}
-            >
+            <TabsTrigger value="PENDING" className={tabTriggerClass}>
               Pending
             </TabsTrigger>
-            <TabsTrigger
-              value="PROCESSING"
-              className={tabTriggerClass}
-            >
+            <TabsTrigger value="PROCESSING" className={tabTriggerClass}>
               Processing
             </TabsTrigger>
-            <TabsTrigger
-              value="FULFILLED"
-              className={tabTriggerClass}
-            >
+            <TabsTrigger value="FULFILLED" className={tabTriggerClass}>
               Fulfilled
             </TabsTrigger>
           </TabsList>
@@ -108,8 +107,8 @@ const OrderProcessingPage = () => {
             ))
           ) : (
             <div className="flex flex-col items-center justify-center py-20 bg-white">
-              <EmptyState 
-                header="No orders found" 
+              <EmptyState
+                header="No orders found"
                 description="There are currently no orders in this category."
               />
             </div>
