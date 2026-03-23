@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Suspense } from "react";
 import { Search } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
@@ -16,12 +17,11 @@ import EmptyState from "@/components/general/EmptyState";
 
 type TabType = "PENDING" | "PROCESSING" | "FULFILLED";
 
-const OrderProcessingPage = () => {
+function OrderProcessingContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const paymentReference = searchParams.get("paymentReference");
   const hasVerifiedRef = useRef<string | null>(null);
-
   const [activeTab, setActiveTab] = useState<TabType>("PENDING");
   const [searchQuery, setSearchQuery] = useState("");
   const [isVerifyingPayment, setIsVerifyingPayment] =
@@ -33,7 +33,7 @@ const OrderProcessingPage = () => {
 
   const { data, isLoading, refetch } = useGetOrders({
     page: 1,
-    limit: 100, // Fetch more for client-side filtering
+    limit: 100,
     search: searchQuery,
   });
   const { mutateAsync: confirmPayment } = useConfirmOrderPayment();
@@ -83,7 +83,6 @@ const OrderProcessingPage = () => {
     };
   }, [confirmPayment, paymentReference, refetch, router]);
 
-  // Client-side filtering to group statuses under tabs
   const filteredOrders = useMemo(() => {
     const availableOrders = allOrders ?? [];
 
@@ -140,7 +139,7 @@ const OrderProcessingPage = () => {
             </TabsTrigger>
           </TabsList>
 
-          <div className="flex items-center gap-4 w-full mdx:max-w-md">
+          <div className="flex items-center gap-4 ml-auto">
             <Input
               placeholder="Search"
               value={searchQuery}
@@ -185,6 +184,18 @@ const OrderProcessingPage = () => {
       </Tabs>
     </div>
   );
-};
+}
 
-export default OrderProcessingPage;
+export default function OrderProcessingPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex justify-center py-20">
+          <Spinner />
+        </div>
+      }
+    >
+      <OrderProcessingContent />
+    </Suspense>
+  );
+}
