@@ -137,15 +137,26 @@ export interface CategoriesResponse {
   timestamp: string;
 }
 
-
 //Orders
-export type OrderStatus = "DRAFT" | "CONFIRMED" | "IN_PROGRESS" | "ASSIGNED" | "COMPLETED" | "CANCELLED" | "PENDING_PAYMENT"
-export type OrderAssignmentStatus = "UNASSIGNED" | "REJECTED" | "REASSIGNED" | "PENDING_ACCEPTANCE" | "ACCEPTED"
+export type OrderStatus =
+  | "DRAFT"
+  | "CONFIRMED"
+  | "IN_PROGRESS"
+  | "ASSIGNED"
+  | "COMPLETED"
+  | "CANCELLED"
+  | "PENDING_PAYMENT";
+export type OrderAssignmentStatus =
+  | "UNASSIGNED"
+  | "REJECTED"
+  | "REASSIGNED"
+  | "PENDING_ACCEPTANCE"
+  | "ACCEPTED";
 export interface CreateOrderPayload {
   wholesalerId?: string;
   items?: {
     //We can use this action key during edit or even in creation the initial order since we are always creating one item on an order at a time.
-    action?: string
+    action?: string;
     itemId?: string;
     productId: string;
     quantity: number;
@@ -153,7 +164,7 @@ export interface CreateOrderPayload {
   }[];
   item?: {
     //We can use this action key during edit or even in creation the initial order since we are always creating one item on an order at a time.
-    action?: string
+    action?: string;
     itemId?: string;
     productId: string;
     quantity: number;
@@ -177,12 +188,12 @@ export interface OrderItem {
   unitPrice: string;
   lineTotal: string;
   status: string;
-  product: Product
+  product: Product;
 }
 export interface Order {
   id: string;
   orderNumber: string;
-  items: OrderItem[]
+  items: OrderItem[];
   wholesalerId: string;
   wholesalerBusinessName: string;
   assignedProcurementOfficer: User | null;
@@ -229,4 +240,28 @@ export interface Order {
   paymentExpiresAt: string | null;
   orderDate: string | null;
   submittedAt: string;
+}
+
+export interface OutOfStockReportPayload {
+  items: {
+    orderId: string;
+    orderItemId: string;
+  }[];
+}
+
+export interface OutOfStockReport {
+  id: string;
+  wholesalerId: string;
+  status: string;
+  resolvedAt: string | null;
+  resolvedBy: string | null;
+  createdAt: string;
+  updatedAt: string;
+  wholesaler: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string | null;
+  };
 }

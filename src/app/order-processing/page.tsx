@@ -1,10 +1,15 @@
 "use client";
 
-import React, { Suspense, useState, useMemo } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Suspense } from "react";
 import { Search } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { OrderCard } from "@/features/marketplace/components/OrderCard";
-import { useGetOrders } from "@/features/marketplace/services/marketplace.api";
+import {
+  useConfirmOrderPayment,
+  useGetOrders,
+} from "@/features/marketplace/services/marketplace.api";
 import { Order } from "@/features/marketplace/types";
 import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -13,19 +18,75 @@ import EmptyState from "@/components/general/EmptyState";
 type TabType = "PENDING" | "PROCESSING" | "FULFILLED";
 
 function OrderProcessingContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const paymentReference = searchParams.get("paymentReference");
+  const hasVerifiedRef = useRef<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>("PENDING");
   const [searchQuery, setSearchQuery] = useState("");
+  const [isVerifyingPayment, setIsVerifyingPayment] =
+    useState(!!paymentReference);
+  const [verificationMessage, setVerificationMessage] = useState(
+    "Verifying payment...",
+  );
+  const [isRefreshingOrders, setIsRefreshingOrders] = useState(false);
 
-  const { data, isLoading } = useGetOrders({
+  const { data, isLoading, refetch } = useGetOrders({
     page: 1,
     limit: 100,
     search: searchQuery,
   });
+  const { mutateAsync: confirmPayment } = useConfirmOrderPayment();
 
-  const allOrders = data?.data?.orders || [];
+  const allOrders = data?.data?.orders as Order[] | undefined;
+
+  useEffect(() => {
+    if (!paymentReference) return;
+
+    if (hasVerifiedRef.current === paymentReference) return;
+    hasVerifiedRef.current = paymentReference;
+
+    let isMounted = true;
+
+    const verifyAndRefresh = async () => {
+      setIsVerifyingPayment(true);
+      setVerificationMessage("Verifying payment...");
+
+      try {
+        await confirmPayment({ orderNumber: paymentReference });
+        if (!isMounted) return;
+
+        setVerificationMessage("Payment verified. Refreshing orders...");
+      } catch {
+        if (!isMounted) return;
+        setVerificationMessage(
+          "Could not verify payment. Refreshing orders...",
+        );
+      }
+
+      if (!isMounted) return;
+
+      setIsRefreshingOrders(true);
+      await refetch();
+
+      if (!isMounted) return;
+
+      setIsRefreshingOrders(false);
+      setIsVerifyingPayment(false);
+      router.replace("/order-processing");
+    };
+
+    verifyAndRefresh();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [confirmPayment, paymentReference, refetch, router]);
 
   const filteredOrders = useMemo(() => {
-    return allOrders.filter((order: Order) => {
+    const availableOrders = allOrders ?? [];
+
+    return availableOrders.filter((order: Order) => {
       // Always exclude empty draft orders — these are leftover cart artifacts
       if (
         order.status === "DRAFT" &&
@@ -35,7 +96,7 @@ function OrderProcessingContent() {
       }
       const status = order.status;
       if (activeTab === "PENDING") {
-        return ["DRAFT", "CONFIRMED", "PENDING_PAYMENT"].includes(status);
+        return ["CONFIRMED", "PENDING_PAYMENT"].includes(status);
       }
       if (activeTab === "PROCESSING") {
         return ["IN_PROGRESS", "ASSIGNED"].includes(status);
@@ -90,9 +151,16 @@ function OrderProcessingContent() {
         </div>
 
         <div className="mt-8 flex flex-col gap-8">
-          {isLoading ? (
+          {isLoading || isVerifyingPayment || isRefreshingOrders ? (
             <div className="flex justify-center py-20">
-              <Spinner />
+              <div className="flex items-center gap-4">
+                <Spinner />
+                {(isVerifyingPayment || isRefreshingOrders) && (
+                  <span className="text-sm text-body-passive">
+                    {verificationMessage}
+                  </span>
+                )}
+              </div>
             </div>
           ) : filteredOrders.length > 0 ? (
             filteredOrders.map((order: Order) => (

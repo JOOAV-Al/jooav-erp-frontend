@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Edit3 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
@@ -24,6 +24,7 @@ import { format } from "date-fns";
 import { updateCartNumber } from "@/redux/slices/authSlice";
 import EmptyState from "@/components/general/EmptyState";
 import { Spinner } from "@/components/ui/spinner";
+import { toast } from "sonner";
 
 // ── Schema ─────────────────────────────────────────────────────────────────────
 const checkoutSchema = z.object({
@@ -48,13 +49,16 @@ export default function CheckoutSummaryPage() {
   const auth = useSelector((state: RootState) => state.auth);
   const user = auth.user;
   const draftCart = auth.cartDraftNumber;
+  const searchParams = useSearchParams();
+  const queryOrderNumber = searchParams.get("orderNumber");
+  const selectedOrderNumber = queryOrderNumber || draftCart;
 
   const router = useRouter();
   const dispatch = useDispatch();
   const [showEditAddress, setShowEditAddress] = useState(false);
 
   const { data, isPending, refetch } = useGetOrderDetails({
-    orderNumber: draftCart ?? "",
+    orderNumber: selectedOrderNumber ?? "",
   });
   const userDraftCart = data?.data;
 
@@ -101,47 +105,64 @@ export default function CheckoutSummaryPage() {
 
   // ── Proceed to payment (validated) ────────────────────────────────────────
   const onSubmit = async (values: CheckoutFormValues) => {
-    if (!draftCart) return;
-
-    // Check if a previous checkout URL exists and is still valid
-    const now = new Date();
-    const expiresAt = userDraftCart?.paymentExpiresAt
-      ? new Date(userDraftCart?.paymentExpiresAt)
-      : null;
-    const isExpired = !expiresAt || expiresAt <= now;
-    const hasValidCheckout = !!userDraftCart?.checkoutUrl && !isExpired;
-
-    if (hasValidCheckout) {
-      router.push(
-        `/dashboard/marketplace/checkout/complete-payment?orderNumber=${draftCart}`,
-      );
-      return;
-    }
+    if (!selectedOrderNumber) return;
+    if (!userDraftCart) return;
 
     const deliveryAddressPayload = { address: values.deliveryAddress };
 
-    const res =
-      userDraftCart?.status === "DRAFT"
-        ? await initiatePayment({
-            orderNumber: draftCart ?? "",
-            deliveryAddress: deliveryAddressPayload,
-          })
-        : await reInitiatePayment({
-            orderNumber: draftCart ?? "",
-            deliveryAddress: deliveryAddressPayload,
-          });
+    try {
+      let res;
 
-    if (res.data.status === "success") {
-      dispatch(
-        updateCartNumber({
-          orderNumber:
-            res.data.data?.order?.orderNumber ?? userDraftCart?.orderNumber,
-        }),
-      );
-      router.push(
-        `/dashboard/marketplace/checkout/complete-payment?orderNumber=${res.data.data?.order?.orderNumber}`,
-      );
-      refetch();
+      if (userDraftCart.status === "DRAFT") {
+        const now = new Date();
+        const expiresAt = userDraftCart.paymentExpiresAt
+          ? new Date(userDraftCart.paymentExpiresAt)
+          : null;
+        const isExpired = !expiresAt || expiresAt <= now;
+        const hasValidCheckout = !!userDraftCart.checkoutUrl && !isExpired;
+
+        if (hasValidCheckout) {
+          router.push(
+            `/dashboard/marketplace/checkout/complete-payment?orderNumber=${selectedOrderNumber}`,
+          );
+          return;
+        }
+
+        res = await initiatePayment({
+          orderNumber: selectedOrderNumber,
+          deliveryAddress: deliveryAddressPayload,
+        });
+      } else {
+        res = await reInitiatePayment({
+          orderNumber: selectedOrderNumber,
+          deliveryAddress: deliveryAddressPayload,
+        });
+      }
+
+      if (res.data.status === "success") {
+        if (!queryOrderNumber) {
+          dispatch(
+            updateCartNumber({
+              orderNumber:
+                res.data.data?.order?.orderNumber ?? userDraftCart?.orderNumber,
+            }),
+          );
+        }
+        router.push(
+          `/dashboard/marketplace/checkout/complete-payment?orderNumber=${res.data.data?.order?.orderNumber}`,
+        );
+        refetch();
+      }
+    } catch (error) {
+      const status = (error as { response?: { status?: number } })?.response
+        ?.status;
+
+      if (status === 404) {
+        toast.error("Payment initialization failed. Please try again.");
+        return;
+      }
+
+      toast.error("Unable to proceed to payment. Please try again.");
     }
   };
 
@@ -248,13 +269,16 @@ export default function CheckoutSummaryPage() {
                 ) : (
                   <div className="flex flex-col gap-2">
                     <p className="py-2 leading-[1.2] tracking-[0.04em] text-body-passive text-[0.875rem]">
-                      Delivery address: <span className="text-destructive">*</span>
+                      Delivery address:{" "}
+                      <span className="text-destructive">*</span>
                     </p>
                     <Textarea
                       cols={3}
                       {...register("deliveryAddress")}
                       placeholder="Street no., Street name, City, State"
-                      className={errors.deliveryAddress ? "border-destructive" : ""}
+                      className={
+                        errors.deliveryAddress ? "border-destructive" : ""
+                      }
                     />
                     {errors.deliveryAddress && (
                       <p className="text-destructive text-[12px] leading-[1.4]">
