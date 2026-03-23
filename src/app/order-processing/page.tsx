@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { Suspense, useState, useMemo } from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { OrderCard } from "@/features/marketplace/components/OrderCard";
@@ -12,19 +12,18 @@ import EmptyState from "@/components/general/EmptyState";
 
 type TabType = "PENDING" | "PROCESSING" | "FULFILLED";
 
-const OrderProcessingPage = () => {
+function OrderProcessingContent() {
   const [activeTab, setActiveTab] = useState<TabType>("PENDING");
   const [searchQuery, setSearchQuery] = useState("");
 
   const { data, isLoading } = useGetOrders({
     page: 1,
-    limit: 100, // Fetch more for client-side filtering
+    limit: 100,
     search: searchQuery,
   });
 
   const allOrders = data?.data?.orders || [];
 
-  // Client-side filtering to group statuses under tabs
   const filteredOrders = useMemo(() => {
     return allOrders.filter((order: Order) => {
       // Always exclude empty draft orders — these are leftover cart artifacts
@@ -79,7 +78,7 @@ const OrderProcessingPage = () => {
             </TabsTrigger>
           </TabsList>
 
-          <div className="flex items-center gap-4 w-full mdx:max-w-md">
+          <div className="flex items-center gap-4 ml-auto">
             <Input
               placeholder="Search"
               value={searchQuery}
@@ -117,6 +116,18 @@ const OrderProcessingPage = () => {
       </Tabs>
     </div>
   );
-};
+}
 
-export default OrderProcessingPage;
+export default function OrderProcessingPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex justify-center py-20">
+          <Spinner />
+        </div>
+      }
+    >
+      <OrderProcessingContent />
+    </Suspense>
+  );
+}
