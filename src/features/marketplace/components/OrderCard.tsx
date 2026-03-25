@@ -15,6 +15,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import { usePathname } from "next/navigation";
 import { format } from "date-fns";
+import { useState } from "react";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -70,6 +71,9 @@ export function OrderCard({
   showFooter = true,
 }: OrderCardProps) {
   const pathname = usePathname();
+  const [reportingItemId, setReportingItemId] = useState("");
+  const [reorderingOrderNumber, setReorderingOrderNumber] = useState("");
+  const [removingItemId, setRemovingItemId] = useState("");
   const isInventory = pathname.includes("/dashboard/inventory");
   const showInitiatePayment = ["DRAFT", "PENDING_PAYMENT"].includes(
     order.status,
@@ -109,11 +113,16 @@ export function OrderCard({
             <Button
               variant="tag"
               size="tag"
-              className="px-lg!"
-              onClick={() => onReorder?.(order)}
+              className=""
+              onClick={() => {
+                setReorderingOrderNumber(order?.orderNumber);
+                onReorder?.(order);
+              }}
               disabled={isReordering}
             >
-              {isReordering && <Spinner />}
+              {isReordering && reorderingOrderNumber === order?.orderNumber && (
+                <Spinner />
+              )}
               {showInitiatePayment ? "Make payment" : "Reorder"}
             </Button>
           )}
@@ -206,7 +215,7 @@ export function OrderCard({
                     </div>
                     {onReportOutOfStock && (
                       <>
-                        {isReportPending ? (
+                        {isReportPending && reportingItemId === item?.id ? (
                           <Spinner />
                         ) : (
                           <button
@@ -215,9 +224,10 @@ export function OrderCard({
                             aria-label="Item notifications"
                             aria-busy={isReportPending}
                             disabled={isReportPending}
-                            onClick={() =>
-                              onReportOutOfStock?.(order.id, item.id)
-                            }
+                            onClick={() => {
+                              setReportingItemId(item?.id);
+                              onReportOutOfStock?.(order.id, item.id);
+                            }}
                           >
                             <BellRing className="h-4 w-4" />
                           </button>
@@ -228,18 +238,20 @@ export function OrderCard({
                     {/* Remove */}
                     {onRemoveItem && order.status === "DRAFT" && (
                       <>
-                        {isRemoving ? (
+                        {isRemoving && removingItemId === item?.id ? (
                           <Spinner />
                         ) : (
                           <div
                             className="flex-shrink-0"
                             onClick={() => {
+                              if (isRemoving) return;
+                              setRemovingItemId(item?.id);
                               onRemoveItem?.(item);
                             }}
                           >
                             <Trash2
                               size={20}
-                              className={`text-outline-passive cursor-pointer`}
+                              className={`${isRemoving ? "text-outline-passive/70" : "text-outline-passive"} cursor-pointer`}
                             />
                           </div>
                         )}

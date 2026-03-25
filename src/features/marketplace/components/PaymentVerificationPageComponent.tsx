@@ -46,7 +46,7 @@ export default function PaymentVerificationPageComponent() {
     <div className="flex flex-col bg-white! items-center gap-sm justify-center py-25">
       <PageSpinner />
       <h4>{paymentMessage}</h4>
-      {paymentMessage && <p className='font-medium leading-[1.5] tracking-[0.04em] text-body'>Redirecting to orders...</p>}
+      {paymentMessage && <p className='font-medium leading-[1.5] tracking-[0.02em] text-body'>Redirecting to orders...</p>}
     </div>
   );
 }
