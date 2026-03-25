@@ -112,7 +112,7 @@ export default function MarketplaceNavbar() {
         <div className="flex items-center justify-between h-18">
           <div className="flex items-center gap-lg">
             {/* Logo */}
-            <Link href="/dashboard" className="shrink-0">
+            <Link href="/marketplace" className="shrink-0">
               <Image
                 src="/auth/jooav-logo.svg"
                 alt="JOOAV"

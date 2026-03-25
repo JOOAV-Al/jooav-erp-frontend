@@ -65,7 +65,7 @@ export function ResetPasswordForm() {
         token: response?.data.token,
       })
     );
-    router.push("/dashboard");
+    router.push("/marketplace");
   };
 
   const watchedPassword = form.watch("password");
