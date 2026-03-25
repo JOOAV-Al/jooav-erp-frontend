@@ -130,7 +130,7 @@ export function RegisterForm() {
       }
     }
 
-    router.push("/dashboard");
+    router.push("/marketplace");
   };
 
   return (

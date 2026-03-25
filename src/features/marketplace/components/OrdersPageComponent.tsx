@@ -104,7 +104,7 @@ export default function OrderProcessingContent() {
               Fulfilled
             </TabsTrigger>
             <TabsTrigger value="PENDING_PAYMENT" className={tabTriggerClass}>
-              Initiated payment
+              Initiate payment
             </TabsTrigger>
           </TabsList>
           <SearchBox
