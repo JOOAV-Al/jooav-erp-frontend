@@ -84,18 +84,17 @@ const CartOrderList = ({
 
                   {/* Info */}
                   <div className="flex-1 flex flex-col gap-main min-w-0">
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between items-center gap-5">
                       <div className="flex items-center gap-5 flex-wrap">
-                        <h5>{item?.product?.name}</h5>
+                        <h5 className="line-clamp-1">{item?.product?.name}</h5>
                       </div>
 
-                      {/* Item status dropdown */}
                       <div
                         className="flex-shrink-0"
                         onClick={() => onRemoveItem?.(item)}
                       >
                         <Trash2
-                          size={20}
+                          size={16}
                           className={`text-outline-passive cursor-pointer`}
                         />
                       </div>
@@ -103,27 +102,27 @@ const CartOrderList = ({
 
                     <div className="flex flex-col gap-[8px]">
                       <div className="flex justify-between border-b border-border-main py-sm gap-main">
-                        <span className="font-family-mono text-[12px] text-body-passive tracking-[0.08em] leading-[1.2]">
+                        <span className="font-mono text-[12px] text-body-passive tracking-[0.08em] leading-[1.2]">
                           QTY:{" "}
                           <span className="text-body font-garantpro font-semibold text-[13px] tracking-[0.05em]">
                             {item.quantity}
                           </span>
                         </span>
-                        <span className="font-family-mono text-[12px] lg:place-self-center text-body-passive tracking-[0.08em] leading-[1.2]">
+                        <span className="font-mono text-[12px] lg:place-self-center text-body-passive tracking-[0.08em] leading-[1.2]">
                           SIZE:{" "}
                           <span className="text-body font-garantpro font-semibold text-[13px] tracking-[0.05em]">
                             {item?.product?.packSize?.name ?? "—"}
                           </span>
                         </span>
                       </div>
-                      <div className="flex py-sm gap-main">
-                        <span className="font-family-mono text-[12px] lg:place-self-center text-body-passive tracking-[0.08em] leading-[1.2]">
+                      <div className="flex justify-between py-sm gap-main">
+                        <span className="font-mono text-[12px] lg:place-self-center text-body-passive tracking-[0.08em] leading-[1.2]">
                           TYPE:{" "}
                           <span className="text-body font-garantpro font-semibold text-[13px] tracking-[0.05em]">
                             {item?.product?.packType?.name ?? "—"}
                           </span>
                         </span>
-                        <span className="font-family-mono text-[12px] text-body-passive tracking-[0.08em] leading-[1.2] lg:ml-auto">
+                        <span className="font-mono text-[12px] text-body-passive tracking-[0.08em] leading-[1.2] lg:ml-auto">
                           PRICE:{" ₦"}
                           <span className="ml-1 text-body font-garantpro font-semibold text-[13px] tracking-[0.05em]">
                             {formatCurrency(
@@ -141,7 +140,7 @@ const CartOrderList = ({
 
           {/* ── Total ──────────────────────────────────────────────────────────── */}
           {/* <div className="flex items-center justify-end gap-5 p-md border-y-[2px] border-border-main">
-            <span className="text-[13px] font-family-mono text-body uppercase tracking-[0.08]">
+            <span className="text-[13px] font-mono text-body uppercase tracking-[0.08]">
               Amount:
             </span>
             <div className="flex items-center gap-1">

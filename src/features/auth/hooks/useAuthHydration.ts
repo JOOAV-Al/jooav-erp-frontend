@@ -5,7 +5,7 @@ import { logout, setCredentials } from "@/redux/slices/authSlice";
 import Cookies from "js-cookie"
 import { useRouter } from "next/navigation";
 
-export const useAuthHydration = () => {
+export const useAuthHydration = ({isMarketPlace=false}: {isMarketPlace?: boolean}) => {
   const dispatch = useDispatch();
   const router = useRouter()
 
@@ -21,8 +21,10 @@ export const useAuthHydration = () => {
           })
         );
       } catch {
-        dispatch(logout());
-        router.push("/login")
+        if(!isMarketPlace) {
+          dispatch(logout());
+          router.push("/login")
+        }
       }
     };
 

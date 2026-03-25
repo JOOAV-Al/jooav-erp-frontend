@@ -130,7 +130,7 @@ export function LoginForm({
     if (isCustom) {
       handleCustomAction?.();
     } else {
-      router.push("/dashboard/marketplace");
+      router.push("/dashboard/orders");
     }
   };
 

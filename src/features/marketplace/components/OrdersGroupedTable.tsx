@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { MoreHorizontal, Trash2, X } from "lucide-react";
 import { Order, OrderItem } from "@/features/marketplace/types";
-import Spinner from "@/components/general/Spinner";
 import EmptyState from "@/components/general/EmptyState";
 import OrderCard from "@/features/marketplace/components/OrderCard";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -22,6 +21,10 @@ interface OrdersGroupedTableProps {
   onDelete?: (selectedOrders: Order[]) => void;
   deletingMultiple?: boolean;
   deletingMultipleStatus?: string;
+  onReportOutOfStock?: (orderId: string, itemId: string) => void;
+  isReportPending?: boolean;
+  onReorder?: (parentOrder: Order) => void;
+  isReordering?: boolean;
   onMarkItemComplete?: (item: OrderItem, parentOrder: Order) => void;
   onMarkItemPending?: (item: OrderItem, parentOrder: Order) => void;
   onMarkItemCancelled?: (item: OrderItem, parentOrder: Order) => void;
@@ -32,6 +35,7 @@ interface OrdersGroupedTableProps {
   emptyImage?: string;
   emptyCta?: string;
   onEmptyCta?: () => void;
+  showItemStatus?: boolean;
   refetch?: () => void;
 }
 
@@ -39,25 +43,23 @@ interface OrdersGroupedTableProps {
 
 function OrdersGroupedTable({
   orders,
-  officers,
   loading = false,
-  actionLoading = false,
-  showActions = false,
   onOrderClick,
   onOrderItemClick,
-  onDelete,
-  deletingMultiple = false,
+  // onDelete,
+  // deletingMultiple = false,
   deletingMultipleStatus,
-  onMarkItemComplete,
-  onMarkItemPending,
-  onMarkItemCancelled,
-  onMarkItemInProgress,
+  onReportOutOfStock,
+  isReportPending,
+  onReorder,
+  isReordering,
   onRemoveItem,
   emptyHeader = "No orders",
   emptyDescription = "No order records yet.",
   emptyImage = "/dashboard/import-csv.svg",
   emptyCta,
   onEmptyCta,
+  showItemStatus,
   refetch,
 }: OrdersGroupedTableProps) {
   const [selectedOrderIds, setSelectedOrderIds] = useState<Set<string>>(
@@ -107,7 +109,7 @@ function OrdersGroupedTable({
 
   if (loading) {
     return (
-      <div className="flex flex-col gap-main">
+      <div className="flex flex-col gap-main mt-3">
         {[1, 2, 3].map((_, i) => (
           <OrderCardSkeleton key={i} itemCount={i === 1 ? 3 : 1} />
         ))}
@@ -119,7 +121,7 @@ function OrdersGroupedTable({
 
   if (!orders.length) {
     return (
-      <div className="bg-white rounded-2xl border border-border-main p-8">
+      <div className="bg-white rounded-2xl p-8 mt-3">
         <EmptyState
           header={emptyHeader}
           description={emptyDescription}
@@ -139,20 +141,18 @@ function OrdersGroupedTable({
         <OrderCard
           key={order.id}
           order={order}
-          officers={officers}
-          actionLoading={actionLoading}
           selectedItemIds={selectedItemIds}
           onOrderClick={onOrderClick}
           onOrderItemClick={onOrderItemClick}
           onSelectItem={handleSelectItem}
-          onMarkItemComplete={onMarkItemComplete}
-          onMarkItemPending={onMarkItemPending}
-          onMarkItemCancelled={onMarkItemCancelled}
-          onMarkItemInProgress={onMarkItemInProgress}
+          showItemStatus={showItemStatus}
+          onReorder={onReorder}
+          onReportOutOfStock={onReportOutOfStock}
+          isReordering={isReordering}
+          isReportPending={isReportPending}
           onRemoveItem={onRemoveItem}
-          showActions={showActions}
-          withCheckbox={!noActionStatuses.includes(order?.status)}
-          refetch={refetch}
+          // withCheckbox={!noActionStatuses.includes(order?.status)}
+          withCheckbox={false}
         />
       ))}
 

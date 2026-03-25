@@ -7,7 +7,7 @@ import { RootState } from "@/redux/store";
 import { useSelector } from "react-redux";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
-  // useAuthHydration();
+  useAuthHydration({isMarketPlace: true});
   // const auth = useSelector((state: RootState) => state.auth);
 
   // if (auth.isUserLoading) {
@@ -15,11 +15,9 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   // }
 
   return (
-    <div className="flex flex-col min-h-screen bg-white py-3">
+    <div className="flex flex-col min-h-screen bg-white px-6 sm:px-main lg:px-layout py-main">
       <MarketplaceNavbar />
-      <main className="flex-1 max-w-app w-full mx-auto px-4 sm:px-6 py-6">
-        {children}
-      </main>
+      <main className="flex-1 w-full mx-auto py-6">{children}</main>
     </div>
   );
 };

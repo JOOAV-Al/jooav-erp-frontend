@@ -11,9 +11,10 @@ import {
   useGetOrders,
 } from "@/features/marketplace/services/marketplace.api";
 import { Order } from "@/features/marketplace/types";
-import { Spinner } from "@/components/ui/spinner";
+import { PageSpinner } from "@/components/ui/spinner";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import EmptyState from "@/components/general/EmptyState";
+import LoadingScreen from "@/layouts/LoadingScreen";
 
 type TabType = "PENDING" | "PROCESSING" | "FULFILLED";
 
@@ -73,7 +74,7 @@ function OrderProcessingContent() {
 
       setIsRefreshingOrders(false);
       setIsVerifyingPayment(false);
-      router.replace("/order-processing");
+      router.replace("/orders");
     };
 
     verifyAndRefresh();
@@ -154,7 +155,7 @@ function OrderProcessingContent() {
           {isLoading || isVerifyingPayment || isRefreshingOrders ? (
             <div className="flex justify-center py-20">
               <div className="flex items-center gap-4">
-                <Spinner />
+                <PageSpinner />
                 {(isVerifyingPayment || isRefreshingOrders) && (
                   <span className="text-sm text-body-passive">
                     {verificationMessage}
@@ -188,13 +189,7 @@ function OrderProcessingContent() {
 
 export default function OrderProcessingPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="flex justify-center py-20">
-          <Spinner />
-        </div>
-      }
-    >
+    <Suspense fallback={<LoadingScreen className="w-full min-h-screen" />}>
       <OrderProcessingContent />
     </Suspense>
   );

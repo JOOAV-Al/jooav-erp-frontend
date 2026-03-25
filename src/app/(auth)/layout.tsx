@@ -176,6 +176,7 @@
 
 "use client";
 
+import LoadingScreen from "@/layouts/LoadingScreen";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
@@ -341,7 +342,7 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<LoadingScreen className="w-full min-h-screen" />}>
       <AuthLayoutContent>{children}</AuthLayoutContent>
     </Suspense>
   );

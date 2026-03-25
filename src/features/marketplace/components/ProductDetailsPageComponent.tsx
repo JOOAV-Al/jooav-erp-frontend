@@ -21,6 +21,7 @@ import { RootState } from "@/redux/store";
 import { CreateOrderPayload, Product } from "@/features/marketplace/types";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 
 function formatPrice(amount: number, currency = "NGN") {
   return new Intl.NumberFormat("en-NG", {
@@ -46,13 +47,22 @@ export default function ProductDetailPageComponent() {
   const product = response?.data ?? response;
   const userDraftCart = data?.data;
 
-  const { mutateAsync: updateDraftOrder, isPending: updating } =
+  const { mutateAsync: updateCart, isPending: updatingCart } =
+    useUpdateDraftOrder();
+  const { mutateAsync: updateForBuyNow, isPending: buyingNow } =
     useUpdateDraftOrder();
 
   const [activeImage, setActiveImage] = useState(0);
-  const [qty, setQty] = useState(
-    userDraftCart?.items?.find((i) => i?.product?.id === product?.id)
-      ?.quantity ?? 10,
+  const MIN_QUANTITY = 10;
+  // const [qty, setQty] = useState(
+  //   userDraftCart?.items?.find((i) => i?.product?.id === product?.id)
+  //     ?.quantity ?? MIN_QUANTITY,
+  // );
+  const [qty, setQty] = useState<string>(
+    String(
+      userDraftCart?.items?.find((i) => i?.product?.id === product?.id)
+        ?.quantity ?? MIN_QUANTITY,
+    ),
   );
   const updateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
@@ -68,7 +78,7 @@ export default function ProductDetailPageComponent() {
       <div className="py-24 text-center text-muted-foreground">
         <h3>Product not found.</h3>
         <Link
-          href="/dashboard/marketplace"
+          href="/marketplace"
           className="inline-flex items-center h-8.5 font-medium text-[15px] leading-[1.2] tracking-[0.04em] text-body hover:text-primary mb-8 transition-colors border border-border-main table-tag bg-storey-foreground p-md rounded-md outline-none"
         >
           Back to marketplace
@@ -77,13 +87,11 @@ export default function ProductDetailPageComponent() {
     );
   }
 
-  const images: string[] = product.images?.length
-    ? product.images
-    : [product.thumbnail];
+  const images: string[] = product?.images || [];
   const price = Number(product.price);
   const discountedPrice =
-    product.discount && Number(product.discount) > 0
-      ? price * (1 - Number(product.discount) / 100)
+    product.discount && Number(product?.discount) > 0
+      ? price * (1 - Number(product?.discount) / 100)
       : price;
 
   // Collect non-empty meta tags
@@ -101,8 +109,8 @@ export default function ProductDetailPageComponent() {
       productId: product.id,
       name: product.name,
       image: product.thumbnail || images[0],
-      price: discountedPrice,
-      qty,
+      price,
+      qty: Number(qty),
       size: product.packSize?.name,
       type: product.packType?.name,
       currency: "NGN",
@@ -120,7 +128,7 @@ export default function ProductDetailPageComponent() {
         item: {
           action,
           productId: item?.id,
-          quantity: qty,
+          quantity: Number(qty),
           ...(action === "UPDATE"
             ? {
                 itemId: existingItem?.id,
@@ -130,7 +138,7 @@ export default function ProductDetailPageComponent() {
       };
 
       // "add" or "update" — PATCH /orders/:id
-      const res = await updateDraftOrder({
+      const res = await updateCart({
         payload,
         id: user?.wholesalerProfile?.draftCart ?? "",
       });
@@ -147,27 +155,25 @@ export default function ProductDetailPageComponent() {
     }
   };
 
-  // const handleQuantityChange = (e: ChangeEvent<HTMLInputElement>) => {
-  //   setQty(Math.max(1, Number(e.target.value)));
-  //   const itemExists = userDraftCart?.items?.some(
-  //     (i) => i?.product?.id === product?.id,
-  //   );
-  //   //TODO: Wire a debounce to wait for the user to stop inputting then decide to call endpoint
-
-  //   if (itemExists) {
-  //     handleAddToCart(product, "UPDATE");
-  //   }
-  // };
-
   const handleQuantityChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const nextQty = Math.max(1, Number(e.target.value) || 1);
-    setQty(nextQty);
-
+    const raw = e.target.value;
+    // Allow completely empty input so user can wipe and retype freely
+    if (raw === "" || /^\d+$/.test(raw)) {
+      setQty(raw);
+    }
     if (!draftCart || !userDraftCart || !product?.id) return;
 
     // Keep UI responsive; only update after typing stops
     if (updateTimerRef.current) clearTimeout(updateTimerRef.current);
     updateTimerRef.current = setTimeout(async () => {
+      const nextQty = Number(raw);
+
+      if (!raw || nextQty < MIN_QUANTITY) {
+        // setQty(String(MIN_QUANTITY));
+        toast(`Minimum quantity is ${MIN_QUANTITY}`);
+        return;
+      }
+
       const existing = userDraftCart.items?.find(
         (i) => i?.product?.id === product?.id,
       );
@@ -182,17 +188,13 @@ export default function ProductDetailPageComponent() {
         },
       };
 
-      try {
-        await updateDraftOrder({
-          payload,
-          id: user?.wholesalerProfile?.draftCart ?? draftCart,
-        });
-        refetch();
-      } catch (err) {
-        toast.error("Could not update cart quantity.");
-      }
-    }, 450);
-  };
+      await updateCart({
+        payload,
+        id: user?.wholesalerProfile?.draftCart ?? draftCart,
+      });
+      refetch();
+    }, 1600);
+  };;
 
   const handleBuyNow = async () => {
     if (!product || !qty) return;
@@ -221,32 +223,33 @@ export default function ProductDetailPageComponent() {
     const orderId = user?.wholesalerProfile?.draftCart ?? draftCart;
 
     if (existingItem && orderId) {
-      router.push(`/dashboard/marketplace/checkout?orderNumber=${orderId}`);
+      router.push(`/dashboard/checkout?orderNumber=${orderId}`);
       return;
     }
 
     if (orderId) {
-      await updateDraftOrder({
+      await updateForBuyNow({
         payload: {
           item: {
             action: "ADD",
             productId: product.id,
-            quantity: qty,
+            quantity: Number(qty),
           },
         },
         id: orderId,
       });
-      router.push(`/dashboard/marketplace/checkout?orderNumber=${orderId}`);
+      router.push(`/dashboard/checkout?orderNumber=${orderId}`);
       return;
     }
-
   };
+
+  console.log(images);
 
   return (
     <div className="max-w-full mx-auto py-8 px-4">
       {/* Back — plain text link, no border */}
       <Link
-        href="/dashboard/marketplace"
+        href="/marketplace"
         className="inline-flex items-center h-8.5 font-medium text-[15px] leading-[1.2] tracking-[0.04em] text-body hover:text-primary mb-2 transition-colors border border-border-main table-tag bg-storey-foreground p-md rounded-md outline-none"
       >
         Back
@@ -258,11 +261,11 @@ export default function ProductDetailPageComponent() {
           {/* Main image */}
           <div className="relative aspect-square w-full rounded-2xl bg-storey-foreground overflow-hidden border border-gray-200">
             <AppImage
-              src={images[activeImage] ?? ""}
+              src={images?.[activeImage] ?? ""}
               alt={product.name}
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
-              className="object-contain p-6 md:p-12 lg:p-16"
+              className="object-contain"
               priority
             />
           </div>
@@ -272,7 +275,7 @@ export default function ProductDetailPageComponent() {
             {images.map((img: string, i: number) => (
               <button
                 key={i}
-                // onClick={() => setActiveImage(i)}
+                onClick={() => setActiveImage(i)}
                 className={`relative aspect-square w-full rounded-xl overflow-hidden border-2 transition-all duration-150 bg-storey-foreground 
                   ${i === activeImage ? "" : ""}`}
               >
@@ -280,7 +283,7 @@ export default function ProductDetailPageComponent() {
                   src={img}
                   alt={`${product.name} view ${i + 1}`}
                   fill
-                  className="object-contain p-6 lg:p-8"
+                  className="object-contain"
                 />
               </button>
             ))}
@@ -323,10 +326,10 @@ export default function ProductDetailPageComponent() {
                 <Input
                   type="number"
                   placeholder="20"
-                  min={1}
+                  // min={undefined}
                   value={qty}
                   onChange={handleQuantityChange}
-                  className="w-21 h-10.5 text-xl font-semibold text-body leading-[1.2] tracking-[0.01em]"
+                  className="w-21 h-10.5 text-xl font-semibold text-body leading-[1.2] tracking-[0.01em] placeholder:text-outline-passive"
                 />
               </div>
             </div>
@@ -334,7 +337,7 @@ export default function ProductDetailPageComponent() {
             {/* Price */}
             <div className="flex py-main mt-19">
               <h2 className="font-semibold text-body">
-                {formatPrice(price * qty)}
+                {formatPrice(price * Number(qty))}
                 {/* {formatPrice(discountedPrice * qty)} */}
               </h2>
               {/* {Number(product.discount) > 0 && (
@@ -349,19 +352,33 @@ export default function ProductDetailPageComponent() {
               <Button
                 className="w-full gap-4 tracking-[0.02em]"
                 onClick={handleBuyNow}
-                disabled={updating}
+                disabled={buyingNow || updatingCart}
               >
-                <ShoppingBag className="h-5 w-5" />
-                {updating ? "Updating cart..." : "Buy now"}
+                {buyingNow ? (
+                  <>
+                    <Spinner color="white" /> Updating cart...
+                  </>
+                ) : (
+                  <>
+                    <ShoppingBag className="h-5 w-5" /> Buy now
+                  </>
+                )}
               </Button>
               <Button
                 variant="neutral"
                 className="w-full gap-4 text-primary tracking-[0.02em]"
                 onClick={() => handleAddToCart(product, "ADD")}
-                disabled={updating}
+                disabled={updatingCart || buyingNow}
               >
-                <ShoppingCart className="h-5 w-5" />
-                {updating ? "Updating cart..." : "Add to cart"}
+                {updatingCart ? (
+                  <>
+                    <Spinner /> Updating cart...
+                  </>
+                ) : (
+                  <>
+                    <ShoppingCart className="h-5 w-5" /> Add to cart
+                  </>
+                )}
               </Button>
             </div>
 
