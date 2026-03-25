@@ -19,7 +19,6 @@ import {
   Product,
 } from '@/features/marketplace/types';
 import { Spinner } from '@/components/ui/spinner';
-// import Spinner from "@/components/general/Spinner";
 
 export interface ProductCardData {
   id: string;
@@ -118,7 +117,7 @@ export default function ProductCard({
 
   return (
     <Link
-      href={`/dashboard/marketplace/product/${product.id}`}
+      href={`/marketplace/product/${product.id}`}
       className={cn(
         'group relative flex flex-col gap-5',
         'hover:border hover:border-border-main hover:rounded-t-2xl transition-all duration-200',
@@ -156,7 +155,7 @@ export default function ProductCard({
           )}
         >
           {updating ? (
-            <Spinner />
+            <Spinner className='hover:text-white' />
           ) : (
             <ShoppingCart className="h-4 w-4" strokeWidth={2} />
           )}

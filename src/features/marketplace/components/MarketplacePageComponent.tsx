@@ -3,6 +3,7 @@
 import { useMarketplaceFilters } from "@/features/marketplace/hooks/useMarketplaceFilters";
 import {
   useFetchCategories,
+  useFetchProducts,
   useGetOrderDetails,
 } from "@/features/marketplace/services/marketplace.api";
 import SearchBar from "@/features/marketplace/components/SearchBar";
@@ -15,7 +16,9 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import EmptyState from "@/components/general/EmptyState";
 import { useRouter } from "next/navigation";
-import { Spinner } from "@/components/ui/spinner";
+import { cn } from "@/lib/utils";
+import { useState } from "react";
+import { useDebounce } from "@/hooks/useDebounce";
 
 // "All categories" sentinel
 const ALL_SLUG = "__all__";
@@ -23,14 +26,27 @@ const ALL_SLUG = "__all__";
 export default function MarketplacePageComponent() {
   const auth = useSelector((state: RootState) => state.auth);
   const router = useRouter();
-  const {
-    products,
-    isLoading,
-    isFetching,
-    handleSearch,
-    committedFilters,
-    handleCategorySelect,
-  } = useMarketplaceFilters();
+    const [page, setPage] = useState<number>(1);
+    const [query, setQuery] = useState<string>("");
+    const debouncedQuery = useDebounce(query)
+  // const {
+  //   products,
+  //   isLoading,
+  //   isFetching,
+  //   handleSearch,
+  //   committedFilters,
+  //   handleCategorySelect,
+  // } = useMarketplaceFilters();
+    const {
+      data: productsData,
+      isLoading,
+      isFetching,
+    } = useFetchProducts({
+      search: debouncedQuery,
+      page,
+      status: "LIVE"
+    });
+    const products = productsData?.data ?? [];
 
   const { data: categoriesData, isLoading: categoriesLoading } =
     useFetchCategories();
@@ -41,28 +57,28 @@ export default function MarketplacePageComponent() {
   });
   const userDraftCart = data?.data;
 
-  const cartTotal = useSelector((state: RootState) =>
-    state.cart.items.reduce((sum, i) => sum + i.qty, 0),
-  );
+  // const cartTotal = useSelector((state: RootState) =>
+  //   state.cart.items.reduce((sum, i) => sum + i.qty, 0),
+  // );
 
   // Build category tab list from API
   const categories = [
-    { label: "Find by categories", slug: ALL_SLUG },
+    // { label: "Find by categories", slug: ALL_SLUG },
     ...(categoriesData?.data?.map((c) => ({ label: c.name, slug: c.id })) ??
       []),
   ];
 
-  const handleCategoryChange = (slug: string) => {
-    handleCategorySelect(slug === ALL_SLUG ? "" : slug);
+  const handleCategorySelect = (slug: string) => {
+    // handleCategorySelect(slug === ALL_SLUG ? "" : slug);
     if (slug !== ALL_SLUG) {
-      router.push(`/dashboard/marketplace/${slug}`);
+      router.push(`/marketplace/${slug}`);
     }
   };
 
-  // Map active categoryId back to the tab slug
-  const activeTabSlug = committedFilters.categoryId
-    ? committedFilters.categoryId
-    : ALL_SLUG;
+  // // Map active categoryId back to the tab slug
+  // const activeTabSlug = committedFilters.categoryId
+  //   ? committedFilters.categoryId
+  //   : ALL_SLUG;
 
   return (
     <div className="flex flex-col">
@@ -81,7 +97,7 @@ export default function MarketplacePageComponent() {
           <SearchBar
             className="max-w-[600px] w-full"
             placeholder="Search product names"
-            onSearch={handleSearch}
+            onSearch={setQuery}
             navigateOnSearch={false}
           />
         </div>
@@ -89,16 +105,38 @@ export default function MarketplacePageComponent() {
         {/* Category tabs */}
         {categoriesLoading ? (
           <div className="flex items-center gap-2 h-[63px]">
-            {Array.from({ length: 7 }).map((_, i) => (
-              <Skeleton key={i} className="h-[27px] w-24 rounded-md" />
+            {Array.from({ length: 12 }).map((_, i) => (
+              <Skeleton
+                key={i}
+                className="h-[27px] max-w-24 2-full rounded-md"
+              />
             ))}
           </div>
         ) : (
-          <CategoryTabs
-            categories={categories}
-            activeSlug={activeTabSlug}
-            onSelect={handleCategoryChange}
-          />
+          <div className="flex items-center gap-5">
+            <button
+              className={cn(
+                // Base — matches admin TabsTrigger
+                "inline-flex items-center justify-center whitespace-nowrap",
+                "rounded-md border border-transparent h-[42px] p-md",
+                "text-[15px] font-semibold leading-[1.2] tracking-[0.04em] cursor-pointer",
+                "transition-[color,box-shadow]",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                "disabled:pointer-events-none disabled:opacity-50",
+                // Inactive state — matches admin text-body
+                "text-body font-medium",
+                "bg-storey-foreground! text-heading font-semibold tracking-[0.02em]",
+                "shadow-sm border-border-main table-tag",
+              )}
+            >
+              Find by categories
+            </button>
+            <CategoryTabs
+              categories={categories}
+              // activeSlug={activeTabSlug}
+              onSelect={handleCategorySelect}
+            />
+          </div>
         )}
       </div>
 

@@ -228,45 +228,45 @@ axiosInstance.interceptors.response.use(
     /* ============================
        SPECIFIC STATUS HANDLERS
     ============================ */
-    switch (status) {
-      case 403:
-        // Forbidden - user doesn't have permission
-        if (!originalRequest.noToast) {
-          toast.error("You don't have permission to perform this action");
-        }
-        break;
+    // switch (status) {
+    //   case 403:
+    //     // Forbidden - user doesn't have permission
+    //     if (!originalRequest.noToast) {
+    //       toast.error("You don't have permission to perform this action");
+    //     }
+    //     break;
 
-      case 404:
-        // Not found
-        if (!originalRequest.noToast && isMutation) {
-          toast.error("The requested resource was not found");
-        }
-        break;
+    //   case 404:
+    //     // Not found
+    //     if (!originalRequest.noToast && isMutation) {
+    //       toast.error("The requested resource was not found");
+    //     }
+    //     break;
 
-      case 422:
-        // Validation error
-        if (!originalRequest.noToast) {
-          toast.error("Please check your input and try again");
-        }
-        break;
+    //   case 422:
+    //     // Validation error
+    //     if (!originalRequest.noToast) {
+    //       toast.error("Please check your input and try again");
+    //     }
+    //     break;
 
-      case 429:
-        // Rate limit
-        if (!originalRequest.noToast) {
-          toast.error("Too many requests. Please try again later");
-        }
-        break;
+    //   case 429:
+    //     // Rate limit
+    //     if (!originalRequest.noToast) {
+    //       toast.error("Too many requests. Please try again later");
+    //     }
+    //     break;
 
-      case 500:
-      case 502:
-      case 503:
-      case 504:
-        // Server errors
-        if (!originalRequest.noToast) {
-          toast.error("Server error. Please try again later");
-        }
-        break;
-    }
+    //   case 500:
+    //   case 502:
+    //   case 503:
+    //   case 504:
+    //     // Server errors
+    //     if (!originalRequest.noToast) {
+    //       toast.error("Server error. Please try again later");
+    //     }
+    //     break;
+    // }
 
     return Promise.reject(error);
   }

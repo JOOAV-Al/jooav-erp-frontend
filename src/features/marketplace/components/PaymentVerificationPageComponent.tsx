@@ -2,9 +2,8 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-// import Spinner from "@/components/general/Spinner";
 import { useConfirmOrderPayment } from '@/features/marketplace/services/marketplace.api';
-import { Spinner } from '@/components/ui/spinner';
+import { PageSpinner } from '@/components/ui/spinner';
 import { useDispatch } from 'react-redux';
 import { updateCartNumber } from '@/redux/slices/authSlice';
 
@@ -15,37 +14,39 @@ export default function PaymentVerificationPageComponent() {
   const [paymentMessage, setPaymentMessage] = useState('Verifying payment');
   const dispatch = useDispatch();
 
-  const { mutateAsync: confirmPayment } = useConfirmOrderPayment();
+  const { mutateAsync: confirmPayment, isPending } = useConfirmOrderPayment();
 
   useEffect(() => {
     const verify = async () => {
       if (!paymentReference) return;
-
-      try {
-        const res = await confirmPayment({
-          orderNumber: paymentReference,
-        });
-        if (res?.data?.data?.success) {
-          setPaymentMessage(res.data?.data?.message ?? 'Payment Successful');
-          dispatch(updateCartNumber({ orderNumber: null })); // CLEAR REDUX DRAFT CART
-        } else {
-          setPaymentMessage(res.data?.data?.message ?? 'Payment Failed');
+      if (isPending) return
+        try {
+          const res = await confirmPayment({
+            orderNumber: paymentReference,
+          });
+          if (res?.data?.data?.success) {
+            setPaymentMessage(res.data?.data?.message ?? "Payment Successful");
+            dispatch(updateCartNumber({ orderNumber: null })); // CLEAR REDUX DRAFT CART
+            router.push(`/dashboard/orders`);
+          } else {
+            setPaymentMessage(res.data?.data?.message ?? "Payment Failed");
+            router.push(`/dashboard/orders?tab=incomplete`);
+          }
+        } catch (err) {
+          console.error(err);
+          setPaymentMessage("Payment Failed. An error occurred");
+          router.push(`/dashboard/orders?tab=incomplete`);
         }
-        router.push(`/dashboard`);
-      } catch (err) {
-        console.error(err);
-        setPaymentMessage('Payment Failed. An error occurred');
-        router.push(`/dashboard`);
-      }
     };
 
     verify();
   }, [paymentReference]);
 
   return (
-    <div className="flex flex-col bg-white! items-center gap-sm justify-center min-h-200">
-      <Spinner className="size-6" />
+    <div className="flex flex-col bg-white! items-center gap-sm justify-center py-25">
+      <PageSpinner />
       <h4>{paymentMessage}</h4>
+      {paymentMessage && <p className='font-medium leading-[1.5] tracking-[0.04em] text-body'>Redirecting to orders...</p>}
     </div>
   );
 }

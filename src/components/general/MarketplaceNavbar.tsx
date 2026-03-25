@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ShoppingCart, LogOut, User } from "lucide-react";
 import Cookies from "js-cookie";
-import { cn } from "@/lib/utils";
+import { cn, truncateText } from "@/lib/utils";
 import DashboardDrawer from "@/components/general/DashboardDrawer";
 import {
   useGetOrderDetails,
@@ -27,9 +27,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import LoginForm from "@/features/auth/components/LoginForm";
+import CategoriesDropdown from "@/features/marketplace/components/CategoriesDropdown";
 
 const links = [
-  { label: "Shop by categories", href: "/dashboard/marketplace" },
+  // { label: "Shop by categories", href: "/marketplace" },
   { label: "Contact us", href: "/contact" },
 ];
 
@@ -89,10 +90,11 @@ export default function MarketplaceNavbar() {
   const options = [
     {
       label: "Inventory",
+      action: () => router.push("/dashboard/inventory"),
     },
     {
       label: "Orders",
-      action: () => router.push("/dashboard/marketplace/order-processing"),
+      action: () => router.push("/dashboard/orders"),
     },
     {
       action: handleLogout,
@@ -106,11 +108,10 @@ export default function MarketplaceNavbar() {
     (userDraftOrder?.items && userDraftOrder?.items?.length <= 0);
   return (
     <>
-      <header className="w-full border-b bg-white sticky top-0 z-40">
-        <div className="max-w-app mx-auto px-4 sm:px-6 flex items-center justify-between h-18">
+      <header className="w-full sticky top-0 z-40 bg-white ">
+        <div className="flex items-center justify-between h-18">
           <div className="flex items-center gap-lg">
             {/* Logo */}
-
             <Link href="/dashboard" className="shrink-0">
               <Image
                 src="/auth/jooav-logo.svg"
@@ -123,6 +124,7 @@ export default function MarketplaceNavbar() {
 
             {/* nav */}
             <nav className="hidden smd:flex items-center gap-2 text-sm font-medium text-foreground">
+              <CategoriesDropdown />
               {links.map((link, i) => (
                 <Link
                   key={i}
@@ -163,7 +165,7 @@ export default function MarketplaceNavbar() {
               /* Authenticated avatar + dropdown */
               <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
                 <DropdownMenuTrigger asChild>
-                  <div className="flex items-center rounded-full hover:bg-gray-100 px-2 py-1 transition-colors">
+                  <div className="cursor-pointer flex items-center rounded-full hover:bg-gray-100 px-2 py-1 transition-colors">
                     <Avatar className="size-6">
                       {user.avatar && (
                         <AvatarImage
@@ -176,8 +178,8 @@ export default function MarketplaceNavbar() {
                           (user.lastName?.[0] ?? "")}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="hidden sm:block text-sm font-medium max-w-[100px] truncate p-sm">
-                      {user.firstName}
+                    <span className="hidden sm:block text-sm font-medium max-w-[100px] p-sm">
+                      {truncateText(user.firstName, 10)}
                     </span>
                     {/* <ChevronDown className="h-4 w-4 text-muted-foreground" /> */}
                   </div>
@@ -186,7 +188,7 @@ export default function MarketplaceNavbar() {
                   align="end"
                   className="flex flex-col gap-5 p-sm! rounded-lg! max-h-90 w-[208px] overflow-y-auto user-dropdown"
                 >
-                  <p className="py-5 px-3 tracking-[0.08em] text-body-passive font-family-mono leading-[1.2] text-xs font-normal">
+                  <p className="py-5 px-3 tracking-[0.08em] text-body-passive font-mono leading-[1.2] text-xs font-normal">
                     OTHERS
                   </p>
                   {options?.map((o, i) => (
@@ -220,7 +222,7 @@ export default function MarketplaceNavbar() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
                     align="end"
-                    className="flex flex-col gap-5 p-sm! shadow-none"
+                    className="flex flex-col gap-5 shadow-none bg-transparent border-none!"
                   >
                     <LoginForm
                       isCustom={true}
@@ -245,13 +247,13 @@ export default function MarketplaceNavbar() {
         openDrawer={setOpen}
         isOpen={open}
         temporaryFooter={
-          <div className="flex flex-col gap-main">
+          <div className="flex flex-col gap-main w-full">
             {!hideCheckout && (
               <Button
                 className="w-full gap-4 tracking-[0.02em]"
                 onClick={() => {
                   setOpen(false);
-                  router.push("/dashboard/marketplace/checkout");
+                  router.push("/dashboard/checkout");
                 }}
               >
                 Checkout
@@ -262,7 +264,7 @@ export default function MarketplaceNavbar() {
               className="w-full gap-4 text-body tracking-[0.02em]"
               onClick={() => {
                 setOpen(false);
-                router.push("/dashboard/marketplace");
+                router.push("/marketplace");
               }}
             >
               Continue shopping

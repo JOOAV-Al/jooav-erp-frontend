@@ -28,7 +28,7 @@ export default function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
 
   const handleCheckout = () => {
     onOpenChange(false);
-    router.push("/dashboard/marketplace/checkout");
+    router.push("/dashboard/checkout");
   };
 
   const handleRemove = (id: string) => {

@@ -1,7 +1,7 @@
 "use client";
 
 import { Search } from "lucide-react";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -16,23 +16,29 @@ export default function SearchBar({
   placeholder = "Search product names",
   onSearch,
   className = "",
-  navigateOnSearch = false,
+  // navigateOnSearch = false,
 }: SearchBarProps) {
   const [query, setQuery] = useState("");
-  const router = useRouter();
+  // const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (onSearch) onSearch(query);
-    if (navigateOnSearch && query.trim()) {
-      router.push(
-        `/dashboard/marketplace?q=${encodeURIComponent(query.trim())}`
-      );
-    }
+  // const handleSubmit = (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   if (onSearch) onSearch(query);
+  //   if (navigateOnSearch && query.trim()) {
+  //     router.push(
+  //       `/marketplace?q=${encodeURIComponent(query.trim())}`,
+  //     );
+  //   }
+  // };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setQuery(newValue);
+    onSearch?.(newValue);
   };
 
   return (
-    <form onSubmit={handleSubmit} className={cn("relative w-full", className)}>
+    <div className={cn("relative w-full", className)}>
       {/* Left icon — same position as auth Input leftIcon */}
       <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
         <div className="p-2 h-6 w-6 flex items-center justify-center">
@@ -44,7 +50,7 @@ export default function SearchBar({
       <input
         type="search"
         value={query}
-        onChange={(e) => setQuery(e.target.value)}
+        onChange={handleChange}
         placeholder={placeholder}
         className={cn(
           // Matches auth Input base
@@ -60,6 +66,6 @@ export default function SearchBar({
           "rounded-3xl",
         )}
       />
-    </form>
+    </div>
   );
 }

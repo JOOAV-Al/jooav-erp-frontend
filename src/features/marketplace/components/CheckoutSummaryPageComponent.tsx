@@ -3,11 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Edit3 } from "lucide-react";
+import { Edit3, X } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import {
   useGetOrderDetails,
   useInitiateOrderPayment,
@@ -24,17 +21,7 @@ import { format } from "date-fns";
 import { updateCartNumber } from "@/redux/slices/authSlice";
 import EmptyState from "@/components/general/EmptyState";
 import { Spinner } from "@/components/ui/spinner";
-import { toast } from "sonner";
-
-// ── Schema ─────────────────────────────────────────────────────────────────────
-const checkoutSchema = z.object({
-  deliveryAddress: z
-    .string()
-    .min(1, "Delivery address is required.")
-    .min(5, "Please enter a valid delivery address."),
-});
-
-type CheckoutFormValues = z.infer<typeof checkoutSchema>;
+import CheckoutPageSkeleton from "@/features/marketplace/components/CheckoutPageSkeleton";
 
 // ── Helpers ─────────────────────────────────────────────────────────────────────
 function formatPrice(amount: number, currency = "NGN") {
@@ -45,7 +32,7 @@ function formatPrice(amount: number, currency = "NGN") {
   }).format(amount);
 }
 
-export default function CheckoutSummaryPage() {
+export default function CheckoutSummaryPageComponent() {
   const auth = useSelector((state: RootState) => state.auth);
   const user = auth.user;
   const draftCart = auth.cartDraftNumber;
@@ -61,22 +48,12 @@ export default function CheckoutSummaryPage() {
     orderNumber: selectedOrderNumber ?? "",
   });
   const userDraftCart = data?.data;
+  const deliveryAddress = userDraftCart?.deliveryAddress?.address ?? "";
+  const [address, setAddress] = useState(deliveryAddress);
 
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm<CheckoutFormValues>({
-    resolver: zodResolver(checkoutSchema),
-    values: {
-      deliveryAddress: userDraftCart?.deliveryAddress?.address ?? "",
-    },
-  });
-
-  const deliveryAddress = watch("deliveryAddress");
-
-  const { mutateAsync: updateDraftOrder, isPending: updating } =
+  const { mutateAsync: updateDraftOrder, isPending: removing } =
+    useUpdateDraftOrder();
+  const { mutateAsync: updateAddress, isPending: updatingAddress } =
     useUpdateDraftOrder();
   const { mutateAsync: initiatePayment, isPending: initiatingPayment } =
     useInitiateOrderPayment();
@@ -85,6 +62,7 @@ export default function CheckoutSummaryPage() {
 
   const dummyFiveDaysEstimated = new Date();
   dummyFiveDaysEstimated.setDate(dummyFiveDaysEstimated.getDate() + 5);
+  const allowedPreviousCheckoutStatus = ["DRAFT", "PENDING_PAYMENT"]
 
   const handleRemoveItem = async (item: OrderItem) => {
     if (!item) return;
@@ -103,72 +81,69 @@ export default function CheckoutSummaryPage() {
     refetch();
   };
 
+  const handleUpdateAddress = async () => {
+    if (!selectedOrderNumber) return;
+    const payload: CreateOrderPayload = {
+      deliveryAddress: {
+        address,
+      },
+    };
+    await updateAddress({
+      payload,
+      id: user?.wholesalerProfile?.draftCart ?? "",
+    });
+    setShowEditAddress(false);
+    refetch();
+  };
+
   // ── Proceed to payment (validated) ────────────────────────────────────────
-  const onSubmit = async (values: CheckoutFormValues) => {
+  const handleProceedToPayment = async () => {
     if (!selectedOrderNumber) return;
     if (!userDraftCart) return;
 
-    const deliveryAddressPayload = { address: values.deliveryAddress };
+    // Check if a previous checkout URL exists and is still valid
+    const now = new Date();
+    const expiresAt = userDraftCart?.paymentExpiresAt
+      ? new Date(userDraftCart?.paymentExpiresAt)
+      : null;
+    const isExpired = !expiresAt || expiresAt <= now;
+    const hasValidCheckout = !!userDraftCart?.checkoutUrl && !isExpired;
 
-    try {
-      let res;
+    if (hasValidCheckout && allowedPreviousCheckoutStatus.includes(userDraftCart?.status)) {
+      // Still valid — skip re-initiation, route to payment page
+      router.push(
+        `/dashboard/checkout/complete-payment?orderNumber=${selectedOrderNumber}`,
+      );
+      return;
+    }
 
-      if (userDraftCart.status === "DRAFT") {
-        const now = new Date();
-        const expiresAt = userDraftCart.paymentExpiresAt
-          ? new Date(userDraftCart.paymentExpiresAt)
-          : null;
-        const isExpired = !expiresAt || expiresAt <= now;
-        const hasValidCheckout = !!userDraftCart.checkoutUrl && !isExpired;
+    // Expired or never initiated — call initiate-payment endpoint
+    const res =
+      userDraftCart?.status === "DRAFT"
+        ? await initiatePayment({
+            orderNumber: selectedOrderNumber ?? "",
+          })
+        : await reInitiatePayment({
+            orderNumber: selectedOrderNumber ?? "",
+          });
 
-        if (hasValidCheckout) {
-          router.push(
-            `/dashboard/marketplace/checkout/complete-payment?orderNumber=${selectedOrderNumber}`,
-          );
-          return;
-        }
-
-        res = await initiatePayment({
-          orderNumber: selectedOrderNumber,
-          deliveryAddress: deliveryAddressPayload,
-        });
-      } else {
-        res = await reInitiatePayment({
-          orderNumber: selectedOrderNumber,
-          deliveryAddress: deliveryAddressPayload,
-        });
-      }
-
-      if (res.data.status === "success") {
-        if (!queryOrderNumber) {
-          dispatch(
-            updateCartNumber({
-              orderNumber:
-                res.data.data?.order?.orderNumber ?? userDraftCart?.orderNumber,
-            }),
-          );
-        }
-        router.push(
-          `/dashboard/marketplace/checkout/complete-payment?orderNumber=${res.data.data?.order?.orderNumber}`,
-        );
-        refetch();
-      }
-    } catch (error) {
-      const status = (error as { response?: { status?: number } })?.response
-        ?.status;
-
-      if (status === 404) {
-        toast.error("Payment initialization failed. Please try again.");
-        return;
-      }
-
-      toast.error("Unable to proceed to payment. Please try again.");
+    if (res.data.status === "success") {
+      dispatch(
+        updateCartNumber({
+          orderNumber:
+            res.data.data?.order?.orderNumber ?? userDraftCart?.orderNumber,
+        }),
+      );
+      router.push(
+        `/dashboard/checkout/complete-payment?orderNumber=${res.data.data?.order?.orderNumber}`,
+      );
+      refetch();
     }
   };
 
   const paymentLoading = initiatingPayment || reInitiatingPayment;
 
-  if (isPending) return <ProductDetailSkeleton />;
+  if (isPending) return <CheckoutPageSkeleton />;
 
   if (
     (!isPending && !userDraftCart) ||
@@ -177,7 +152,7 @@ export default function CheckoutSummaryPage() {
     return (
       <div className="py-24 flex flex-col gap-main">
         <Link
-          href="/dashboard/marketplace"
+          href="/dashboard/orders?tab=incomplete"
           className="inline-flex items-center w-fit h-8.5 font-medium text-[15px] leading-[1.2] tracking-[0.04em] text-body hover:text-primary mb-2 transition-colors border border-border-main table-tag bg-storey-foreground p-md rounded-md outline-none"
         >
           Back
@@ -191,9 +166,9 @@ export default function CheckoutSummaryPage() {
   }
 
   return (
-    <div className="max-w-full mx-auto py-8 px-4">
+    <div className="max-w-full mx-auto">
       <Link
-        href="/dashboard/marketplace"
+        href="/dashboard/orders"
         className="inline-flex items-center w-fit h-8.5 font-medium text-[15px] leading-[1.2] tracking-[0.04em] text-body hover:text-primary mb-2 transition-colors border border-border-main table-tag bg-storey-foreground p-md rounded-md outline-none"
       >
         Back
@@ -208,20 +183,17 @@ export default function CheckoutSummaryPage() {
         <div className="mdxl:col-span-3 flex flex-col gap-main py-md">
           <OrderCard
             order={userDraftCart!}
-            actionLoading={updating}
+            isRemoving={removing}
             onRemoveItem={handleRemoveItem}
             showStatus={false}
             withCheckbox={false}
-            refetch={refetch}
+            showFooter={false}
           />
         </div>
 
         {/* ── RIGHT: Summary ───────────────────────────── */}
         <div className="mdxl:col-span-2 flex flex-col gap-sm py-main">
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="flex flex-col gap-[16px] pt-lg pb-main px-main bg-storey-foreground rounded-2xl w-full"
-          >
+          <div className="flex flex-col gap-[16px] pt-lg pb-main px-main bg-storey-foreground rounded-2xl w-full">
             {/* Header */}
             <div className="hidden mdx:block py-sm px-5">
               <h3>Order checkout</h3>
@@ -231,7 +203,7 @@ export default function CheckoutSummaryPage() {
             <div className="flex flex-col gap-md px-5">
               <div className="flex justify-between">
                 <div className="flex flex-col gap-5">
-                  <p className="font-family-mono text-[12px] py-2 leading-[1.2] tracking-[0.08em] uppercase text-body-passive">
+                  <p className="font-mono text-[12px] py-2 leading-[1.2] tracking-[0.08em] uppercase text-body-passive">
                     order for:
                   </p>
                   <p className="text-body font-medium text-[14px] leading-[1.5] tracking-[0.04em]">
@@ -239,7 +211,7 @@ export default function CheckoutSummaryPage() {
                   </p>
                 </div>
                 <div className="flex flex-col gap-5">
-                  <p className="font-family-mono text-[12px] py-2 leading-[1.2] tracking-[0.08em] uppercase text-body-passive">
+                  <p className="font-mono text-[12px] py-2 leading-[1.2] tracking-[0.08em] uppercase text-body-passive">
                     ordered no:
                   </p>
                   <p className="text-body font-medium text-[14px] leading-[1.5] tracking-[0.04em]">
@@ -250,10 +222,10 @@ export default function CheckoutSummaryPage() {
 
               {/* Delivery Address */}
               <div>
-                {!(showEditAddress || !deliveryAddress) ? (
+                {!showEditAddress ? (
                   <div className="flex flex-col gap-5">
                     <div className="flex justify-between items-center">
-                      <p className="font-family-mono text-[12px] py-2 leading-[1.2] tracking-[0.08em] uppercase text-body-passive">
+                      <p className="font-mono text-[12px] py-2 leading-[1.2] tracking-[0.08em] uppercase text-body-passive">
                         Delivery address:
                       </p>
                       <Edit3
@@ -268,31 +240,30 @@ export default function CheckoutSummaryPage() {
                   </div>
                 ) : (
                   <div className="flex flex-col gap-2">
-                    <p className="py-2 leading-[1.2] tracking-[0.04em] text-body-passive text-[0.875rem]">
-                      Delivery address:{" "}
-                      <span className="text-destructive">*</span>
-                    </p>
-                    <Textarea
-                      cols={3}
-                      {...register("deliveryAddress")}
-                      placeholder="Street no., Street name, City, State"
-                      className={
-                        errors.deliveryAddress ? "border-destructive" : ""
-                      }
-                    />
-                    {errors.deliveryAddress && (
-                      <p className="text-destructive text-[12px] leading-[1.4]">
-                        {errors.deliveryAddress.message}
+                    <div className="flex justify-between items-center">
+                      <p className="py-2 leading-[1.2] tracking-[0.04em] text-body-passive text-[0.875rem]">
+                        Delivery address:{" "}
                       </p>
-                    )}
+                      <X
+                        onClick={() => setShowEditAddress(false)}
+                        size={16}
+                        className="text-outline-passive cursor-pointer"
+                      />
+                    </div>
+                    <Textarea
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                      cols={3}
+                      placeholder="Street no., Street name, City, State"
+                    />
                   </div>
                 )}
               </div>
 
               {/* Dates */}
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
                 <div className="flex flex-col gap-5">
-                  <p className="font-family-mono text-[12px] py-2 leading-[1.2] tracking-[0.08em] uppercase text-body-passive">
+                  <p className="font-mono text-[12px] py-2 leading-[1.2] tracking-[0.08em] uppercase text-body-passive">
                     order date:
                   </p>
                   <p className="text-body font-medium text-[14px] leading-[1.5] tracking-[0.04em]">
@@ -304,7 +275,7 @@ export default function CheckoutSummaryPage() {
                 </div>
                 <div className="w-[1.38px] h-7 bg-[#D9D9D9]"></div>
                 <div className="flex flex-col gap-5">
-                  <p className="font-family-mono text-[12px] py-2 leading-[1.2] tracking-[0.08em] uppercase text-body-passive">
+                  <p className="font-mono text-[12px] py-2 leading-[1.2] tracking-[0.08em] uppercase text-body-passive">
                     Est. delivery date:
                   </p>
                   <p className="text-body font-medium text-[14px] leading-[1.5] tracking-[0.04em]">
@@ -316,7 +287,7 @@ export default function CheckoutSummaryPage() {
 
             {/* Total */}
             <div className="flex flex-col gap-[8px] px-5 py-main border-y border-border-main">
-              <p className="font-family-mono text-[12px] py-2 leading-[1.2] tracking-[0.08em] uppercase text-body-passive">
+              <p className="font-mono text-[12px] py-2 leading-[1.2] tracking-[0.08em] uppercase text-body-passive">
                 Total
               </p>
               <h2 className="font-semibold text-body">
@@ -324,20 +295,38 @@ export default function CheckoutSummaryPage() {
               </h2>
             </div>
 
-            <Button
-              type="submit"
-              className="w-full gap-4 tracking-[0.02em]"
-              disabled={paymentLoading}
-            >
-              {paymentLoading ? (
-                <div className="flex items-center">
-                  <Spinner /> <div>Processing...</div>
-                </div>
-              ) : (
-                <div className="flex items-center">Proceed to payment</div>
-              )}
-            </Button>
-          </form>
+            {showEditAddress ? (
+              <Button
+                type="button"
+                className="w-full tracking-[0.02em]"
+                disabled={updatingAddress}
+                onClick={handleUpdateAddress}
+              >
+                {updatingAddress ? (
+                  <>
+                    <Spinner color="white" /> Updating...
+                  </>
+                ) : (
+                  "Update address"
+                )}
+              </Button>
+            ) : (
+              <Button
+                type="submit"
+                className="w-full gap-4 tracking-[0.02em]"
+                disabled={paymentLoading}
+                onClick={handleProceedToPayment}
+              >
+                {paymentLoading ? (
+                  <>
+                    <Spinner color="white" /> Processing...
+                  </>
+                ) : (
+                  "Proceed to payment"
+                )}
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </div>

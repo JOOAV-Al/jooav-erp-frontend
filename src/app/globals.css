@@ -343,6 +343,7 @@
 
   /* Special pill height */
   --spacing-pill: var(--3-3125rem);
+  --spacing-layout: var(--4rem);
 
   /* Margins (from designer) */
   --m-null: var(--0rem);
@@ -561,6 +562,9 @@
   --color-destructive: var(--states-danger);
   --color-destructive-foreground: var(--gray-100);
   --color-border: var(--border-stroke);
+  --color-border-main: var(--border-main);
+  --color-border-brand-stroke: var(--border-brand-stroke);
+  --color-border-accent: var(--border-accent);
   --color-input: var(--border-stroke);
   --color-nominal-input: var(--color-nominal-input);
   --color-nominal-input-hover: var(--color-nominal-input-hover);
@@ -714,6 +718,7 @@
 
   /* ===== SPECIAL HEIGHTS ===== */
   --spacing-pill: var(--spacing-pill);
+  --spacing-layout: var(--spacing-layout);
 }
 
 /* ============================================

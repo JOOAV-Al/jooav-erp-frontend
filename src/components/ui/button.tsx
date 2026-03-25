@@ -46,6 +46,8 @@ const buttonVariants = cva(
           "bg-primary text-primary-foreground hover:bg-primary/90 shadow-button text-shadow-xs text-shadow-[#10284C66] font-medium tracking-[0.02em]",
         neutral:
           "bg-white hover:bg-white/90 shadow-button-neutral hover:bg-storey-foreground font-semibold",
+        tag:
+          "bg-tag-draft table-tag border border-border-main hover:bg-storey-foreground font-semibold text-body",
         input: "bg-white hover:bg-white/90 shadow-input",
         filter:
           "bg-white hover:bg-storey-foreground table-selected text-body-passive font-semibold tracking-[0.05em]",
@@ -60,11 +62,13 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
-        default: "h-11 p-main has-[>svg]:px-3 rounded-lg",
+        default: "h-11 p-main has-[>svg]:px-3 rounded-lg gap-4",
         neutral:
-          "h-[36px] px-md! py-sm! has-[>svg]:px-3 gap-1 rounded-lg text-[13px]",
+          "h-[36px] px-md! py-sm! has-[>svg]:px-3 gap-4 rounded-lg text-[13px]",
+        tag:
+          "h-[34px] px-main! py-md! has-[>svg]:px-3 gap-4 rounded-md text-[15px] tracking-[0.02em]",
         filter: "h-7.25 px-sm! py-5! gap-5 rounded-md",
-        ghost: "has-[>svg]:px-3 rounded-lg",
+        ghost: "has-[>svg]:px-3 rounded-lg gap-4",
         sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
         lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
         icon: "size-9",

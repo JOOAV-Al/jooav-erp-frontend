@@ -60,7 +60,7 @@ export default function Sidebar({
   const links = [
     {
       label: "Marketplace",
-      href: "/dashboard/marketplace",
+      href: "/marketplace",
       icon: ShoppingBag,
     },
     {

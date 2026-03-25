@@ -74,7 +74,7 @@ export const formatCurrency = (value: string | number) => {
 
 export const formatOrderDate = (dateStr: string) => {
   try {
-    return format(new Date(dateStr), "dd/MM/yyyy. h:mmaaa");
+    return format(new Date(dateStr), "dd/MM/yyyy.");
   } catch {
     return dateStr;
   }
