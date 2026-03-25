@@ -21,6 +21,7 @@ import { format } from "date-fns";
 import { updateCartNumber } from "@/redux/slices/authSlice";
 import EmptyState from "@/components/general/EmptyState";
 import { Spinner } from "@/components/ui/spinner";
+import CheckoutPageSkeleton from "@/features/marketplace/components/CheckoutPageSkeleton";
 
 // ── Helpers ─────────────────────────────────────────────────────────────────────
 function formatPrice(amount: number, currency = "NGN") {
@@ -142,7 +143,7 @@ export default function CheckoutSummaryPageComponent() {
 
   const paymentLoading = initiatingPayment || reInitiatingPayment;
 
-  if (isPending) return <ProductDetailSkeleton />;
+  if (isPending) return <CheckoutPageSkeleton />;
 
   if (
     (!isPending && !userDraftCart) ||

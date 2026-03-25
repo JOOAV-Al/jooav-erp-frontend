@@ -226,7 +226,7 @@ export function OrderCard({
                     )}
 
                     {/* Remove */}
-                    {onRemoveItem && (
+                    {onRemoveItem && order.status === "DRAFT" && (
                       <>
                         {isRemoving ? (
                           <Spinner />

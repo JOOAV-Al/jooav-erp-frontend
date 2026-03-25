@@ -13,6 +13,7 @@ import { format } from "date-fns";
 import {
   useCreateOutOfStockReport,
   useGetOrders,
+  useReInitiateOrderPayment,
 } from "@/features/marketplace/services/marketplace.api";
 import { Order, OrderItem } from "@/features/marketplace/types";
 // import {
@@ -59,14 +60,17 @@ import { useDebounce } from "@/hooks/useDebounce";
 export default function InventoryPageComponent() {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
-  const debouncedSearchTerm = useDebounce(searchTerm)
+  const debouncedSearchTerm = useDebounce(searchTerm);
   // const [reorderingOrderNumber, setReorderingOrderNumber] = useState<
   //   string | null
   // >(null);
   // const [reportingItemKeys, setReportingItemKeys] = useState<Set<string>>(
   //   () => new Set(),
   // );
-  const { mutateAsync: createOutOfStockReport, isPending: isReporting } = useCreateOutOfStockReport();
+  const { mutateAsync: createOutOfStockReport, isPending: isReporting } =
+    useCreateOutOfStockReport();
+  const { mutateAsync: reInitiatePayment, isPending: reInitiatingPayment } =
+    useReInitiateOrderPayment();
 
   const { data, isPending, refetch } = useGetOrders({
     status: "COMPLETED",
@@ -134,15 +138,25 @@ export default function InventoryPageComponent() {
     });
   };
 
-  const handleReorder = (order: Order) => {
+  const handleReorder = async (order: Order) => {
     if (!order.orderNumber) return;
 
-    // setReorderingOrderNumber(order.orderNumber);
-    router.push(
-      `/dashboard/checkout?orderNumber=${encodeURIComponent(
-        order.orderNumber,
-      )}`,
-    );
+    const res = await reInitiatePayment({
+      orderNumber: order?.orderNumber ?? "",
+    });
+
+    if (res.data.status === "success") {
+      router.push(
+        `/dashboard/checkout?orderNumber=${res.data.data?.order?.orderNumber}`,
+      );
+      refetch();
+    }
+
+    // router.push(
+    //   `/dashboard/checkout?orderNumber=${encodeURIComponent(
+    //     order.orderNumber,
+    //   )}`,
+    // );
   };
 
   return (
@@ -164,6 +178,7 @@ export default function InventoryPageComponent() {
 
         <OrdersGroupedTable
           onReorder={handleReorder}
+          isReordering={reInitiatingPayment}
           onReportOutOfStock={handleReportOutOfStock}
           isReportPending={isReporting}
           orders={orders}

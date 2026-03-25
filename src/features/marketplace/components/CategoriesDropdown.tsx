@@ -24,19 +24,32 @@ const CategoriesDropdown = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="start"
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 p-sm! rounded-lg! max-h-90 max-w-[1015px] w-full overflow-y-auto user-dropdown"
+        className="gap-5 p-lg! rounded-lg! max-w-[1015px] w-full overflow-y-auto user-dropdown"
       >
-        {categories?.map((c, i) => (
-          <DropdownMenuItem
-            key={i}
-            className={cn(
-              "rounded-md py-5 px-sm h-[22px] cursor-pointer transition-colors text-body-passive hover:bg-storey-foreground select-option",
-            )}
-            onClick={() => router.push(`/marketplace/${c.id}`)}
-          >
-            {c.name}
-          </DropdownMenuItem>
-        ))}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-sm p-sm">
+          {categories?.map((c, i) => {
+            const isLast = i === categories?.length - 1
+            return (
+              <DropdownMenuItem
+                key={i}
+                className={cn(
+                  "border-b border-border-main max-w-[293px] w-full rounded-md mt-2 py-sm h-auto cursor-pointer transition-colors text-body-passive hover:bg-storey-foreground select-option",
+                )}
+                onClick={() => router.push(`/marketplace/${c.id}`)}
+              >
+                <div className="flex items-center gap-main">
+                  <div className="h-8 w-8 border-[1.5px] border-[#EDEDED] bg-storey-foreground rounded-lg"></div>
+                  <p className="text-body-passive leading-[1.2] tracking-[0.04em] font-medium text-[15px] ">
+                    {c.name}
+                  </p>
+                </div>
+                
+              </DropdownMenuItem>
+            );
+          } 
+          
+          )}
+        </div>
       </DropdownMenuContent>
     </DropdownMenu>
   );
