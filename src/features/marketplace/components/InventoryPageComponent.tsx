@@ -61,9 +61,6 @@ export default function InventoryPageComponent() {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm);
-  // const [reorderingOrderNumber, setReorderingOrderNumber] = useState<
-  //   string | null
-  // >(null);
   // const [reportingItemKeys, setReportingItemKeys] = useState<Set<string>>(
   //   () => new Set(),
   // );
@@ -151,12 +148,6 @@ export default function InventoryPageComponent() {
       );
       refetch();
     }
-
-    // router.push(
-    //   `/dashboard/checkout?orderNumber=${encodeURIComponent(
-    //     order.orderNumber,
-    //   )}`,
-    // );
   };
 
   return (
